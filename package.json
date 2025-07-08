@@ -1,6 +1,6 @@
 {
   "name": "capacitor-native-update",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Native Update Plugin for Capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -9,6 +9,7 @@
   "files": [
     "android/src/main/",
     "android/build.gradle",
+    "android/variables.gradle",
     "android/gradle.properties",
     "android/settings.gradle",
     "android/proguard-rules.pro",
