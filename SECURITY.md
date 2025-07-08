@@ -273,7 +273,7 @@ const secureConfig: UpdateSecurityConfig = {
   
   // Validation
   maxBundleSize: 50 * 1024 * 1024, // 50MB
-  allowedHosts: ['updates.example.com'],
+  allowedHosts: ['updates.yourdomain.com'],
   
   // Error Handling
   exposeDetailedErrors: false,
@@ -308,7 +308,7 @@ const secureConfig: UpdateSecurityConfig = {
 
 ## Reporting Security Issues
 
-If you discover a security vulnerability, please email security@example.com with:
+If you discover a security vulnerability, please email aoneahsan@gmail.com with:
 - Description of the vulnerability
 - Steps to reproduce
 - Potential impact

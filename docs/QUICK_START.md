@@ -591,8 +591,8 @@ console.log('Update URL:', config.updateUrl);
 
 ## Support
 
-- 📖 [Documentation](https://github.com/yourusername/capacitor-native-update)
-- 🐛 [Issue Tracker](https://github.com/yourusername/capacitor-native-update/issues)
-- 💬 [Discussions](https://github.com/yourusername/capacitor-native-update/discussions)
+- 📖 [Documentation](https://github.com/aoneahsan/capacitor-native-update)
+- 🐛 [Issue Tracker](https://github.com/aoneahsan/capacitor-native-update/issues)
+- 💬 [Discussions](https://github.com/aoneahsan/capacitor-native-update/discussions)
 
 Happy updating! 🚀

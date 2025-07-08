@@ -79,7 +79,7 @@ npx cap sync
   "appName": "My App",
   "plugins": {
     "CapacitorNativeUpdate": {
-      "updateUrl": "https://updates.example.com/api/v1",
+      "updateUrl": "https://updates.yourdomain.com/api/v1",
       "enabled": true,
       "autoCheck": true,
       "checkInterval": 3600,
@@ -100,7 +100,7 @@ Add to `Info.plist`:
 <key>CapacitorNativeUpdateEnabled</key>
 <true/>
 <key>CapacitorNativeUpdateURL</key>
-<string>https://updates.example.com/api/v1</string>
+<string>https://updates.yourdomain.com/api/v1</string>
 ```
 
 ### 4. Android Additional Setup
@@ -533,7 +533,7 @@ class RobustUpdateManager {
 if (environment.development) {
   // Force check against staging server
   await CapacitorNativeUpdate.configure({
-    updateUrl: 'https://staging-updates.example.com',
+    updateUrl: 'https://staging-updates.yourdomain.com',
     channel: 'development'
   });
 }

@@ -123,7 +123,7 @@ Fixes #123
 ## Reporting Bugs
 
 ### Security Vulnerabilities
-Please email security@example.com instead of using the issue tracker.
+Please email aoneahsan@gmail.com instead of using the issue tracker.
 
 ### Bug Reports
 **Great Bug Reports** tend to have:
@@ -166,7 +166,7 @@ Examples of behavior that contributes to creating a positive environment include
 
 ### Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at aoneahsan@gmail.com.
 
 ## Recognition
 

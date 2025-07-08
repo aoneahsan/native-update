@@ -44,7 +44,7 @@ import { CapacitorNativeUpdate } from 'capacitor-native-update';
 async function initializeApp() {
   // Configure the plugin
   await CapacitorNativeUpdate.configure({
-    updateUrl: 'https://updates.example.com/api/v1',
+    updateUrl: 'https://updates.yourdomain.com/api/v1',
     autoCheck: true,
     publicKey: 'your-public-key-for-security'
   });
@@ -187,7 +187,7 @@ export class AppComponent implements OnInit {
 {
   "plugins": {
     "CapacitorNativeUpdate": {
-      "updateUrl": "https://updates.example.com/api/v1",
+      "updateUrl": "https://updates.yourdomain.com/api/v1",
       "autoCheck": true,
       "checkInterval": 3600,
       "channel": "production",
@@ -273,6 +273,15 @@ MIT License - see [LICENSE](./LICENSE) for details.
 
 ## Support
 
-- 📧 Email: support@example.com
-- 💬 Discord: [Join our community](https://discord.gg/example)
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/capacitor-native-update/issues)
+- 📧 Email: aoneahsan@gmail.com
+- 🌐 Website: [Zaions](https://zaions.com)
+- 💼 LinkedIn: [Ahsan Mahmood](https://linkedin.com/in/aoneahsan)
+- 🐛 Issues: [GitHub Issues](https://github.com/aoneahsan/capacitor-native-update/issues)
+
+## Author
+
+**Ahsan Mahmood**
+- Portfolio: [aoneahsan.com](https://aoneahsan.com)
+- Company: [Zaions](https://zaions.com)
+- Email: aoneahsan@gmail.com
+- Phone: +923046619706

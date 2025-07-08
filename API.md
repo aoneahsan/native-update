@@ -541,4 +541,9 @@ try {
     // Log detailed error internally, show generic message to user
   }
 }
-```
+```## Support
+
+For questions, issues, or contributions:
+- Email: aoneahsan@gmail.com
+- GitHub Issues: [https://github.com/aoneahsan/capacitor-native-update/issues](https://github.com/aoneahsan/capacitor-native-update/issues)
+- Author: Ahsan Mahmood ([Zaions](https://zaions.com))

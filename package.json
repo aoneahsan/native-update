@@ -17,18 +17,19 @@
     "CapacitorNativeUpdate.podspec"
   ],
   "author": {
+    "name": "Ahsan Mahmood",
     "email": "aoneahsan@gmail.com",
-    "name": "Ahsan Mahmood (Aoneahsan)",
     "url": "https://aoneahsan.com"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/capacitor-community/native-update.git"
+    "url": "git+https://github.com/aoneahsan/capacitor-native-update.git"
   },
   "bugs": {
-    "url": "https://github.com/capacitor-community/native-update/issues"
+    "url": "https://github.com/aoneahsan/capacitor-native-update/issues"
   },
+  "homepage": "https://github.com/aoneahsan/capacitor-native-update#readme",
   "keywords": [
     "capacitor",
     "plugin",
