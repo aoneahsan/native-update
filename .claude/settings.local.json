@@ -35,7 +35,12 @@
       "Bash(yarn build)",
       "Bash(yarn add:*)",
       "Bash(yarn lint)",
-      "Bash(yarn prettier:*)"
+      "Bash(yarn prettier:*)",
+      "WebFetch(domain:capawesome.io)",
+      "WebFetch(domain:ionic.io)",
+      "WebFetch(domain:capgo.app)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)"
     ],
     "deny": []
   }
