@@ -1,0 +1,2 @@
+include ':capacitor-native-update'
+project(':capacitor-native-update').projectDir = new File('../.')
