@@ -35,46 +35,168 @@ npx cap sync
 
 ## Quick Start
 
+### 1. Basic Setup
+
 ```typescript
 import { CapacitorNativeUpdate } from 'capacitor-native-update';
 
-// Check for live updates
-const result = await CapacitorNativeUpdate.sync({
-  channel: 'production'
-});
-
-// Check for app store updates
-const updateInfo = await CapacitorNativeUpdate.getAppUpdateInfo();
-if (updateInfo.updateAvailable) {
-  await CapacitorNativeUpdate.performImmediateUpdate();
+// Initialize on app start
+async function initializeApp() {
+  // Configure the plugin
+  await CapacitorNativeUpdate.configure({
+    updateUrl: 'https://updates.example.com/api/v1',
+    autoCheck: true,
+    publicKey: 'your-public-key-for-security'
+  });
 }
+```
 
-// Request app review
-await CapacitorNativeUpdate.requestReview();
+### 2. Live Updates (OTA)
+
+```typescript
+// Check and apply live updates
+async function checkLiveUpdates() {
+  try {
+    const { available, version } = await CapacitorNativeUpdate.checkForUpdate();
+    
+    if (available) {
+      // Download update with progress
+      await CapacitorNativeUpdate.downloadUpdate({
+        onProgress: (progress) => {
+          console.log(`Downloading: ${progress.percent}%`);
+        }
+      });
+      
+      // Apply update (app will restart)
+      await CapacitorNativeUpdate.applyUpdate();
+    }
+  } catch (error) {
+    console.error('Update failed:', error);
+  }
+}
+```
+
+### 3. Native App Updates
+
+```typescript
+// Check for app store updates
+async function checkNativeUpdates() {
+  const result = await CapacitorNativeUpdate.checkAppUpdate();
+  
+  if (result.updateAvailable) {
+    if (result.immediateUpdateAllowed) {
+      // Critical update - must install
+      await CapacitorNativeUpdate.startImmediateUpdate();
+    } else if (result.flexibleUpdateAllowed) {
+      // Optional update - download in background
+      await CapacitorNativeUpdate.startFlexibleUpdate();
+    }
+  }
+}
+```
+
+### 4. App Reviews
+
+```typescript
+// Request app review at the right moment
+async function requestAppReview() {
+  // Only ask after positive interactions
+  const shouldAsk = await checkIfGoodMoment();
+  
+  if (shouldAsk) {
+    const result = await CapacitorNativeUpdate.requestReview();
+    if (result.displayed) {
+      console.log('Review prompt was shown');
+    }
+  }
+}
+```
+
+## Real-World Example
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { AlertController } from '@ionic/angular';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: 'app.component.html'
+})
+export class AppComponent implements OnInit {
+  constructor(private alertCtrl: AlertController) {}
+
+  async ngOnInit() {
+    // Check for updates on app start
+    await this.checkAllUpdates();
+    
+    // Set up periodic checks
+    setInterval(() => this.checkAllUpdates(), 3600000); // Every hour
+  }
+
+  async checkAllUpdates() {
+    // 1. Check live updates first (fastest)
+    const liveUpdate = await CapacitorNativeUpdate.checkForUpdate();
+    if (liveUpdate.available) {
+      await this.promptLiveUpdate(liveUpdate);
+      return; // Don't check native if live update is available
+    }
+    
+    // 2. Check native updates
+    const nativeUpdate = await CapacitorNativeUpdate.checkAppUpdate();
+    if (nativeUpdate.updateAvailable) {
+      await this.promptNativeUpdate(nativeUpdate);
+    }
+  }
+
+  async promptLiveUpdate(update: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Update Available',
+      message: `Version ${update.version} is ready to install`,
+      buttons: [
+        { text: 'Later', role: 'cancel' },
+        { 
+          text: 'Update',
+          handler: () => this.installLiveUpdate()
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async installLiveUpdate() {
+    // Download and apply
+    await CapacitorNativeUpdate.downloadUpdate();
+    await CapacitorNativeUpdate.applyUpdate(); // App restarts
+  }
+
+  // Request review after positive events
+  async onPositiveEvent() {
+    setTimeout(() => {
+      CapacitorNativeUpdate.requestReview();
+    }, 2000);
+  }
+}
 ```
 
 ## Configuration
 
-```typescript
-const config = {
-  liveUpdate: {
-    appId: 'your-app-id',
-    serverUrl: 'https://your-update-server.com',
-    channel: 'production',
-    autoUpdate: true,
-    publicKey: 'your-public-key'
-  },
-  appUpdate: {
-    minimumVersion: '1.0.0',
-    updatePriority: 3
-  },
-  appReview: {
-    minimumDaysSinceInstall: 7,
-    minimumLaunchCount: 3
-  }
-};
+### capacitor.config.json
 
-await CapacitorNativeUpdate.configure(config);
+```json
+{
+  "plugins": {
+    "CapacitorNativeUpdate": {
+      "updateUrl": "https://updates.example.com/api/v1",
+      "autoCheck": true,
+      "checkInterval": 3600,
+      "channel": "production",
+      "publicKey": "YOUR_BASE64_PUBLIC_KEY",
+      "appStoreId": "123456789",
+      "enforceMinVersion": true
+    }
+  }
+}
 ```
 
 ## Platform Support
@@ -103,14 +225,43 @@ This plugin implements multiple security layers:
 
 ## Documentation
 
-- [Features Overview](./FEATURES.md)
-- [API Reference](./API.md)
-- [Migration Guide](./docs/MIGRATION.md)
-- [Security Best Practices](./docs/SECURITY.md)
+### Getting Started
+- 🚀 [Quick Start Guide](./docs/QUICK_START.md) - Get up and running in 5 minutes
+- 📖 [Features Overview](./FEATURES.md) - Detailed feature descriptions
+- 🔧 [API Reference](./API.md) - Complete API documentation
 
-## Example App
+### Implementation Guides
+- 📱 [Live Updates Guide](./docs/LIVE_UPDATES_GUIDE.md) - Complete OTA implementation
+- 🏪 [Native Updates Guide](./docs/NATIVE_UPDATES_GUIDE.md) - App store updates
+- ⭐ [App Review Guide](./docs/APP_REVIEW_GUIDE.md) - Maximize review rates
 
-Check out the [example app](./example) for a complete implementation demonstrating all features.
+### Advanced Topics
+- 🔐 [Security Best Practices](./docs/SECURITY.md) - Security implementation
+- 🔏 [Bundle Signing](./docs/BUNDLE_SIGNING.md) - Cryptographic signing
+- 📊 [Migration Guide](./docs/MIGRATION.md) - Migrate from other solutions
+
+## Example Implementation
+
+### Complete Example App
+Check out the [example app](./example) for a full implementation with:
+- React + TypeScript setup
+- All three features integrated
+- Production-ready UI components
+- Error handling and analytics
+
+### Update Server Example
+The [server example](./server-example) includes:
+- Express.js update server
+- Bundle upload and management
+- Signature generation tools
+- Channel-based deployments
+
+```bash
+# Run the example server
+cd server-example
+npm install
+npm start
+```
 
 ## Contributing
 
