@@ -1,6 +1,6 @@
 {
   "name": "capacitor-native-update",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Native Update Plugin for Capacitor",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
