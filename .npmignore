@@ -1,0 +1,21 @@
+# Development files
+example/
+server-example/
+docs/
+assets/
+*.log
+.env*
+.git*
+.DS_Store
+.vscode/
+.idea/
+tsconfig.json
+rollup.config.js
+eslint.config.js
+yarn.lock
+CONTRIBUTING.md
+SECURITY.md
+CHANGELOG.md
+*.tgz
+coverage/
+.nyc_output/

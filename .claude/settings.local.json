@@ -42,7 +42,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:www.npmjs.com)",
       "WebFetch(domain:capacitorjs.com)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(npm pack:*)"
     ],
     "deny": []
   }
