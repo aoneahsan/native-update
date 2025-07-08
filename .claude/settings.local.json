@@ -40,7 +40,8 @@
       "WebFetch(domain:ionic.io)",
       "WebFetch(domain:capgo.app)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:capacitorjs.com)"
     ],
     "deny": []
   }

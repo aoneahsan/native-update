@@ -87,9 +87,47 @@ The plugin follows the standard Capacitor plugin structure with separate impleme
 5. Build and test using the provided npm scripts
 6. Ensure code quality with lint and prettier before commits
 
-### Security Implementation Notes
-- Always use HTTPS for update URLs
-- Implement public key verification for bundle signatures
-- Store sensitive configuration in secure storage
-- Validate bundle checksums before applying updates
-- Implement certificate pinning for enhanced security
+### Security Implementation Notes (Following Capacitor Security Guidelines)
+
+#### Core Security Principles
+- **Never embed secrets** in plugin code (API keys, encryption keys, certificates)
+- Always use HTTPS for update URLs - never allow http:// endpoints
+- Implement SHA-256 (or higher) checksum verification for all downloads
+- Use public key verification for bundle signatures (RSA/ECDSA)
+- Implement certificate pinning for critical update server connections
+- Validate and sanitize all input from JavaScript layer
+- Only pass JSON-serializable data between native and web layers
+
+#### Platform-Specific Security
+- **iOS**: Use Keychain Services for sensitive data, not UserDefaults
+- **iOS**: Validate all file operations stay within app sandbox
+- **Android**: Use Android Keystore for sensitive data storage
+- **Android**: Request only necessary permissions with runtime checks
+- **Both**: Use platform-specific secure networking APIs
+
+#### Update Security Requirements
+- Prevent downgrade attacks by default (validate version numbers)
+- Store downloads in system temporary directories with proper permissions
+- Clean up temporary files immediately after installation or failure
+- Implement proper file locking mechanisms during updates
+- Set reasonable file size limits to prevent resource exhaustion
+- Validate MIME types and file extensions before processing
+
+#### Error Handling Best Practices
+- Never expose system paths or internal implementation details in errors
+- Provide detailed error codes for debugging without revealing sensitive info
+- Log security events without including sensitive data
+- Implement comprehensive input validation with clear error messages
+
+#### Permission Management
+- Request permissions only when needed (lazy loading)
+- Implement proper permission callbacks and error handling
+- Document all required permissions and their purposes
+- Use Capacitor's @Permission decorator for Android
+
+#### Testing Security Features
+- Test with malformed update packages
+- Verify checksum validation with corrupted files
+- Test network interruption and retry scenarios
+- Validate permission denial flows
+- Test storage limit scenarios

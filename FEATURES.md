@@ -75,21 +75,43 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Channel-specific configurations
   - User segmentation
 
-### Security Features
+### Security Features (Following Capacitor Security Guidelines)
 - **Encryption**
   - End-to-end encryption for bundles
-  - AES-256 encryption support
-  - Secure key management
+  - AES-256-GCM encryption with authenticated encryption
+  - Secure key management using platform keystores
+  - Never embed encryption keys in code
 
 - **Signature Verification**
-  - Public key bundle signing
+  - Public key bundle signing (RSA-2048 minimum)
   - RSA/ECDSA signature support
-  - Certificate pinning
+  - Certificate pinning for update servers
+  - Signature timestamp validation
 
 - **Integrity Checks**
-  - SHA-256 checksum validation
+  - SHA-256 checksum validation (minimum)
+  - SHA-512 support for enhanced security
   - Bundle tampering detection
-  - Secure manifest files
+  - Secure manifest files with nested signatures
+  - File size validation to prevent resource exhaustion
+
+- **Network Security**
+  - HTTPS enforcement (no HTTP fallback)
+  - Certificate validation and pinning
+  - Secure TLS configuration (TLS 1.2+)
+  - Update server whitelist support
+
+- **Storage Security**
+  - Temporary files in secure directories
+  - Immediate cleanup of failed downloads
+  - File permissions set to app-only access
+  - Secure storage for sensitive configuration
+
+- **Input Validation**
+  - Sanitize all JavaScript inputs
+  - Path traversal prevention
+  - URL validation and whitelist checking
+  - Version string format validation
 
 ### Analytics & Monitoring
 - **Update Metrics**
@@ -227,21 +249,41 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
     minimumLaunchCount?: number;
     customTriggers?: string[];
     debugMode?: boolean;
+  },
+  
+  // Security Configuration
+  security: {
+    enforceHttps?: boolean; // Default: true
+    certificatePinning?: {
+      enabled: boolean;
+      certificates: string[]; // SHA256 fingerprints
+      maxAge?: number;
+    };
+    requireSignature?: boolean; // Default: true
+    validateChecksums?: boolean; // Default: true
+    maxBundleSize?: number; // Default: 50MB
+    allowedUpdateServers?: string[]; // Whitelist
+    secureStorage?: boolean; // Default: true
   }
 }
 ```
 
 ### Error Handling
-- Comprehensive error codes
-- Detailed error messages
-- Recovery strategies
-- Fallback mechanisms
+- Comprehensive error codes without exposing system details
+- User-friendly error messages
+- Detailed internal logging (without sensitive data)
+- Recovery strategies for common failures
+- Fallback mechanisms for degraded functionality
+- Security event logging and monitoring
 
 ### Testing Support
-- Debug mode for development
-- Update simulation
-- Force update triggers
+- Debug mode for development (disabled in production)
+- Update simulation with mock servers
+- Force update triggers (development only)
 - Review prompt testing
+- Security testing tools
+- Malformed bundle testing
+- Certificate validation testing
 
 ## 5. Web Platform Support
 
@@ -257,21 +299,83 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 - Browser compatibility
 - Update simulations
 
-## 6. Performance Optimizations
+## 6. Security Implementation Details
+
+### Platform-Specific Security
+
+#### iOS Security
+- **Keychain Services** for storing encryption keys and sensitive data
+- **App Transport Security** enforcement (no HTTP allowed)
+- **Code signing** validation for update bundles
+- **Sandbox validation** for all file operations
+- **Entitlements** properly configured for network access
+
+#### Android Security
+- **Android Keystore** for cryptographic key storage
+- **Network Security Config** for certificate pinning
+- **Runtime permissions** for storage and network access
+- **ProGuard/R8** obfuscation for release builds
+- **SafetyNet** integration for device attestation
+
+### Security Protocols
+- **Update Protocol**
+  1. HTTPS request with certificate validation
+  2. Server authentication via API keys
+  3. Bundle download with progress tracking
+  4. Checksum verification (SHA-256/512)
+  5. Signature verification (RSA/ECDSA)
+  6. Secure extraction to temporary directory
+  7. Validation of bundle contents
+  8. Atomic installation with rollback capability
+
+- **Key Management**
+  - Public keys distributed with app
+  - Private keys secured on update server
+  - Key rotation support with versioning
+  - Hardware-backed key storage when available
+
+### Threat Mitigation
+- **Man-in-the-Middle**: Certificate pinning, HTTPS enforcement
+- **Bundle Tampering**: Cryptographic signatures, checksums
+- **Downgrade Attacks**: Version validation, no downgrades by default
+- **Path Traversal**: Input sanitization, sandboxed operations
+- **Resource Exhaustion**: File size limits, timeout controls
+- **Replay Attacks**: Timestamp validation, nonce usage
+
+## 7. Performance Optimizations
 
 ### Resource Management
-- Memory efficient downloads
-- Disk space checks
-- CPU usage optimization
-- Battery awareness
+- Memory efficient downloads with streaming
+- Disk space pre-check before download
+- CPU usage optimization with background threads
+- Battery awareness (defer updates on low battery)
+- Network state monitoring
 
 ### Network Optimization
-- Intelligent retry logic
-- Connection type detection
-- Bandwidth management
-- CDN support
+- Intelligent retry with exponential backoff
+- Connection type detection (WiFi preferred)
+- Bandwidth throttling options
+- CDN support with geographic distribution
+- Resume capability for interrupted downloads
+- Delta update support to minimize download size
 
-## 7. Future Enhancements
+## 8. Compliance and Privacy
+
+### Data Protection
+- GDPR compliance with data minimization
+- No personal data collection in update process
+- Anonymous usage statistics (opt-in)
+- Secure data transmission and storage
+- Right to erasure support
+
+### App Store Compliance
+- iOS App Store guidelines compliance
+- Google Play Store policy adherence
+- Transparent update notifications
+- User consent for major updates
+- No code injection or dynamic frameworks
+
+## 9. Future Enhancements
 
 ### Planned Features
 - Machine learning for optimal update timing

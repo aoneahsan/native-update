@@ -7,8 +7,10 @@ This document provides a complete API reference for the Capacitor Native Update 
 - [Live Update API](#live-update-api)
 - [App Update API](#app-update-api)
 - [App Review API](#app-review-api)
+- [Security API](#security-api)
 - [Types and Interfaces](#types-and-interfaces)
 - [Error Codes](#error-codes)
+- [Security Best Practices](#security-best-practices)
 
 ## Configuration
 
@@ -20,18 +22,29 @@ Configure the plugin with your settings.
 await CapacitorNativeUpdate.configure({
   liveUpdate: {
     appId: 'your-app-id',
-    serverUrl: 'https://your-update-server.com',
+    serverUrl: 'https://your-update-server.com', // HTTPS required
     channel: 'production',
     autoUpdate: true,
-    publicKey: 'your-public-key'
+    publicKey: 'your-public-key', // For signature verification
+    requireSignature: true, // Enforce signature verification
+    maxBundleSize: 50 * 1024 * 1024, // 50MB limit
+    checksumAlgorithm: 'SHA-256' // Required checksum validation
   },
   appUpdate: {
     minimumVersion: '1.0.0',
-    updatePriority: 3
+    updatePriority: 3,
+    allowDowngrade: false // Prevent version downgrade attacks
   },
   appReview: {
     minimumDaysSinceInstall: 7,
     minimumLaunchCount: 3
+  },
+  security: {
+    enforceHttps: true,
+    certificatePinning: {
+      enabled: true,
+      certificates: ['sha256/...'] // Pin update server certificates
+    }
   }
 });
 ```
@@ -57,9 +70,12 @@ Download a specific bundle version.
 
 ```typescript
 const bundle = await CapacitorNativeUpdate.download({
-  url: 'https://updates.example.com/bundle-v2.0.0.zip',
+  url: 'https://updates.example.com/bundle-v2.0.0.zip', // HTTPS enforced
   version: '2.0.0',
-  checksum: 'sha256:...'
+  checksum: 'sha256:...', // Required for integrity verification
+  signature: 'base64...', // Required if signature verification enabled
+  maxRetries: 3,
+  timeout: 30000 // 30 second timeout
 });
 ```
 
@@ -253,19 +269,24 @@ interface UpdateConfig {
   liveUpdate?: LiveUpdateConfig;
   appUpdate?: AppUpdateConfig;
   appReview?: AppReviewConfig;
+  security?: SecurityConfig;
 }
 
 interface LiveUpdateConfig {
   appId: string;
-  serverUrl: string;
+  serverUrl: string; // Must be HTTPS
   channel?: string;
   autoUpdate?: boolean;
   updateStrategy?: 'immediate' | 'background' | 'manual';
-  publicKey?: string;
+  publicKey?: string; // Base64 encoded public key for signature verification
+  requireSignature?: boolean; // Default: true
+  checksumAlgorithm?: 'SHA-256' | 'SHA-512'; // Default: 'SHA-256'
   checkInterval?: number;
-  allowEmulator?: boolean;
+  allowEmulator?: boolean; // Default: false for production
   mandatoryInstallMode?: InstallMode;
   optionalInstallMode?: InstallMode;
+  maxBundleSize?: number; // Maximum allowed bundle size in bytes
+  allowedHosts?: string[]; // Whitelist of allowed update servers
 }
 
 interface AppUpdateConfig {
@@ -276,6 +297,7 @@ interface AppUpdateConfig {
     ios?: string;
   };
   checkOnAppStart?: boolean;
+  allowDowngrade?: boolean; // Default: false
 }
 
 interface AppReviewConfig {
@@ -283,6 +305,19 @@ interface AppReviewConfig {
   minimumDaysSinceLastPrompt?: number;
   minimumLaunchCount?: number;
   customTriggers?: string[];
+
+interface SecurityConfig {
+  enforceHttps?: boolean; // Default: true
+  certificatePinning?: {
+    enabled: boolean;
+    certificates: string[]; // SHA256 fingerprints
+    includeSubdomains?: boolean;
+    maxAge?: number; // Pin duration in seconds
+  };
+  validateInputs?: boolean; // Default: true
+  secureStorage?: boolean; // Default: true
+  logSecurityEvents?: boolean; // Default: true in debug
+}
   debugMode?: boolean;
 }
 ```
@@ -305,10 +340,13 @@ interface SyncResult {
 interface BundleInfo {
   bundleId: string;
   version: string;
-  path: string;
+  path: string; // Sanitized path within app sandbox
   downloadTime: number;
   size: number;
   status: 'PENDING' | 'DOWNLOADING' | 'READY' | 'ACTIVE' | 'FAILED';
+  checksum: string; // SHA-256 checksum of the bundle
+  signature?: string; // Digital signature if available
+  verified: boolean; // Indicates if bundle passed all security checks
   metadata?: Record<string, any>;
 }
 ```
@@ -348,9 +386,15 @@ The plugin uses standard error codes for different failure scenarios:
 - `SERVER_ERROR` - Update server returned an error
 - `DOWNLOAD_ERROR` - Bundle download failed
 - `VERIFICATION_ERROR` - Bundle signature verification failed
+- `CHECKSUM_ERROR` - Bundle checksum validation failed
 - `STORAGE_ERROR` - Insufficient storage or write error
 - `INSTALL_ERROR` - Bundle installation failed
 - `ROLLBACK_ERROR` - Rollback operation failed
+- `INSECURE_URL` - Attempted to use non-HTTPS URL
+- `INVALID_CERTIFICATE` - Certificate pinning validation failed
+- `SIZE_LIMIT_EXCEEDED` - Bundle exceeds maximum allowed size
+- `PERMISSION_DENIED` - Required permission not granted
+- `PATH_TRAVERSAL` - Attempted directory traversal detected
 
 ### App Update Errors
 - `UPDATE_NOT_AVAILABLE` - No update available in app store
@@ -382,19 +426,119 @@ CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
 CapacitorNativeUpdate.removeAllListeners();
 ```
 
+## Security API
+
+### validateUpdate(options: ValidateOptions): Promise<ValidationResult>
+
+Validate an update bundle before installation.
+
+```typescript
+const validation = await CapacitorNativeUpdate.validateUpdate({
+  bundlePath: '/path/to/bundle',
+  checksum: 'sha256:...',
+  signature: 'base64...',
+  maxSize: 50 * 1024 * 1024
+});
+
+if (!validation.isValid) {
+  console.error(`Validation failed: ${validation.error}`);
+}
+```
+
+### getSecurityInfo(): Promise<SecurityInfo>
+
+Get current security configuration and status.
+
+```typescript
+const security = await CapacitorNativeUpdate.getSecurityInfo();
+console.log(`HTTPS enforced: ${security.enforceHttps}`);
+console.log(`Certificate pinning: ${security.certificatePinning.enabled}`);
+```
+
 ## Platform-Specific Notes
 
 ### iOS
 - App updates require manual version checking against iTunes API
 - In-app reviews use StoreKit framework
 - Maximum 3 review requests per year per user
+- Uses Keychain Services for secure storage
+- File operations validated within app sandbox
 
 ### Android
 - App updates use Google Play Core Library
 - Requires Play Store app to be installed
 - In-app reviews use Play Core Review API
+- Uses Android Keystore for secure storage
+- Runtime permissions required for storage access
 
 ### Web
 - Live updates work through service worker updates
 - App updates and reviews show fallback UI
 - Limited functionality compared to native platforms
+- Uses Web Crypto API for security features
+
+## Security Best Practices
+
+### Secure Configuration Example
+
+```typescript
+// Recommended security configuration
+await CapacitorNativeUpdate.configure({
+  liveUpdate: {
+    appId: 'your-app-id',
+    serverUrl: 'https://updates.example.com', // Always use HTTPS
+    publicKey: process.env.UPDATE_PUBLIC_KEY, // Never hardcode keys
+    requireSignature: true,
+    checksumAlgorithm: 'SHA-256',
+    maxBundleSize: 50 * 1024 * 1024,
+    allowedHosts: ['updates.example.com'], // Whitelist update servers
+    allowEmulator: false // Disable in production
+  },
+  security: {
+    enforceHttps: true,
+    certificatePinning: {
+      enabled: true,
+      certificates: [process.env.UPDATE_CERT_PIN]
+    },
+    validateInputs: true,
+    secureStorage: true
+  }
+});
+```
+
+### Input Validation
+
+Always validate user inputs and options:
+
+```typescript
+// Good: Validate before use
+try {
+  if (!isValidUrl(updateUrl) || !updateUrl.startsWith('https://')) {
+    throw new Error('Invalid update URL');
+  }
+  
+  await CapacitorNativeUpdate.download({
+    url: updateUrl,
+    checksum: checksum,
+    signature: signature
+  });
+} catch (error) {
+  // Handle validation error
+}
+```
+
+### Error Handling
+
+Handle errors without exposing sensitive information:
+
+```typescript
+try {
+  await CapacitorNativeUpdate.sync();
+} catch (error) {
+  // Don't expose internal paths or server details
+  if (error.code === 'VERIFICATION_ERROR') {
+    console.error('Update verification failed');
+    // Log detailed error internally, show generic message to user
+  }
+}
+```
