@@ -126,13 +126,59 @@ export interface AppReviewPlugin {
 }
 
 /**
+ * Background Update Plugin Interface
+ */
+export interface BackgroundUpdatePlugin {
+  /**
+   * Enable background update checking
+   */
+  enableBackgroundUpdates(config: BackgroundUpdateConfig): Promise<void>;
+
+  /**
+   * Disable background update checking
+   */
+  disableBackgroundUpdates(): Promise<void>;
+
+  /**
+   * Get current background update status
+   */
+  getBackgroundUpdateStatus(): Promise<BackgroundUpdateStatus>;
+
+  /**
+   * Schedule background update check with specific interval
+   */
+  scheduleBackgroundCheck(interval: number): Promise<void>;
+
+  /**
+   * Manually trigger background update check
+   */
+  triggerBackgroundCheck(): Promise<BackgroundCheckResult>;
+
+  /**
+   * Configure notification preferences
+   */
+  setNotificationPreferences(preferences: NotificationPreferences): Promise<void>;
+
+  /**
+   * Get notification permissions status
+   */
+  getNotificationPermissions(): Promise<NotificationPermissionStatus>;
+
+  /**
+   * Request notification permissions
+   */
+  requestNotificationPermissions(): Promise<boolean>;
+}
+
+/**
  * Combined plugin interface
  */
 export interface CapacitorNativeUpdateCombinedPlugin
   extends CapacitorNativeUpdatePlugin,
     LiveUpdatePlugin,
     AppUpdatePlugin,
-    AppReviewPlugin {}
+    AppReviewPlugin,
+    BackgroundUpdatePlugin {}
 
 /**
  * Configuration Types
@@ -141,6 +187,7 @@ export interface UpdateConfig {
   liveUpdate?: LiveUpdateConfig;
   appUpdate?: AppUpdateConfig;
   appReview?: AppReviewConfig;
+  backgroundUpdate?: BackgroundUpdateConfig;
   security?: SecurityConfig;
 }
 
@@ -178,6 +225,21 @@ export interface AppReviewConfig {
   minimumLaunchCount?: number;
   customTriggers?: string[];
   debugMode?: boolean;
+}
+
+export interface BackgroundUpdateConfig {
+  enabled: boolean;
+  checkInterval: number;
+  updateTypes: BackgroundUpdateType[];
+  autoInstall?: boolean;
+  notificationPreferences?: NotificationPreferences;
+  respectBatteryOptimization?: boolean;
+  allowMeteredConnection?: boolean;
+  minimumBatteryLevel?: number;
+  requireWifi?: boolean;
+  maxRetries?: number;
+  retryDelay?: number;
+  taskIdentifier?: string;
 }
 
 export interface SecurityConfig {
@@ -300,6 +362,53 @@ export interface CanRequestReviewResult {
 }
 
 /**
+ * Background Update Types
+ */
+export interface BackgroundUpdateStatus {
+  enabled: boolean;
+  lastCheckTime?: number;
+  nextCheckTime?: number;
+  lastUpdateTime?: number;
+  currentTaskId?: string;
+  isRunning: boolean;
+  checkCount: number;
+  failureCount: number;
+  lastError?: UpdateError;
+}
+
+export interface BackgroundCheckResult {
+  success: boolean;
+  updatesFound: boolean;
+  appUpdate?: AppUpdateInfo;
+  liveUpdate?: LatestVersion;
+  notificationSent: boolean;
+  error?: UpdateError;
+}
+
+export interface NotificationPreferences {
+  title?: string;
+  description?: string;
+  iconName?: string;
+  soundEnabled?: boolean;
+  vibrationEnabled?: boolean;
+  showActions?: boolean;
+  actionLabels?: {
+    updateNow?: string;
+    updateLater?: string;
+    dismiss?: string;
+  };
+  channelId?: string;
+  channelName?: string;
+  priority?: NotificationPriority;
+}
+
+export interface NotificationPermissionStatus {
+  granted: boolean;
+  canRequest: boolean;
+  shouldShowRationale?: boolean;
+}
+
+/**
  * Security Types
  */
 export interface SecurityInfo {
@@ -324,6 +433,20 @@ export interface UpdateError {
 /**
  * Enums
  */
+export enum BackgroundUpdateType {
+  APP_UPDATE = 'app_update',
+  LIVE_UPDATE = 'live_update',
+  BOTH = 'both',
+}
+
+export enum NotificationPriority {
+  MIN = 'min',
+  LOW = 'low',
+  DEFAULT = 'default',
+  HIGH = 'high',
+  MAX = 'max',
+}
+
 export enum UpdateStrategy {
   IMMEDIATE = 'immediate',
   BACKGROUND = 'background',
@@ -432,6 +555,20 @@ export interface UpdateStateChangedEvent {
   version: string;
 }
 
+export interface BackgroundUpdateProgressEvent {
+  type: BackgroundUpdateType;
+  status: 'checking' | 'downloading' | 'installing' | 'completed' | 'failed';
+  percent?: number;
+  error?: UpdateError;
+}
+
+export interface BackgroundUpdateNotificationEvent {
+  type: BackgroundUpdateType;
+  updateAvailable: boolean;
+  version?: string;
+  action?: 'shown' | 'tapped' | 'dismissed';
+}
+
 /**
  * Plugin Events
  */
@@ -454,6 +591,22 @@ export interface CapacitorNativeUpdateListeners {
   addListener(
     eventName: 'updateStateChanged',
     listenerFunc: (event: UpdateStateChangedEvent) => void,
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for background update progress
+   */
+  addListener(
+    eventName: 'backgroundUpdateProgress',
+    listenerFunc: (event: BackgroundUpdateProgressEvent) => void,
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for background update notifications
+   */
+  addListener(
+    eventName: 'backgroundUpdateNotification',
+    listenerFunc: (event: BackgroundUpdateNotificationEvent) => void,
   ): Promise<PluginListenerHandle>;
 
   /**

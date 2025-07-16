@@ -9,4 +9,26 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
                      android:maxSdkVersion="28" />
     
+    <!-- Background update permissions -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- WorkManager service -->
+    <service
+        android:name="androidx.work.impl.foreground.SystemForegroundService"
+        android:foregroundServiceType="dataSync" />
+    
+    <!-- Broadcast receiver for notification actions -->
+    <receiver
+        android:name="com.capacitor.nativeupdate.NotificationActionReceiver"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="com.capacitor.nativeupdate.UPDATE_NOW" />
+            <action android:name="com.capacitor.nativeupdate.UPDATE_LATER" />
+            <action android:name="com.capacitor.nativeupdate.DISMISS" />
+        </intent-filter>
+    </receiver>
+    
 </manifest>

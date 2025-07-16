@@ -12,4 +12,5 @@ const CapacitorNativeUpdate = registerPlugin<
 });
 
 export * from './definitions';
+export * from './background-update';
 export { CapacitorNativeUpdate };

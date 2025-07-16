@@ -21,6 +21,7 @@ class CapacitorNativeUpdatePlugin : Plugin() {
     private lateinit var liveUpdatePlugin: LiveUpdatePlugin
     private lateinit var appUpdatePlugin: AppUpdatePlugin
     private lateinit var appReviewPlugin: AppReviewPlugin
+    private lateinit var backgroundUpdatePlugin: BackgroundUpdatePlugin
     private lateinit var securityManager: SecurityManager
     
     override fun load() {
@@ -30,6 +31,7 @@ class CapacitorNativeUpdatePlugin : Plugin() {
         liveUpdatePlugin = LiveUpdatePlugin(activity, context)
         appUpdatePlugin = AppUpdatePlugin(activity, context)
         appReviewPlugin = AppReviewPlugin(activity, context)
+        backgroundUpdatePlugin = BackgroundUpdatePlugin()
         securityManager = SecurityManager(context)
         
         // Set up listeners
@@ -69,6 +71,10 @@ class CapacitorNativeUpdatePlugin : Plugin() {
             
             config.getJSObject("appReview")?.let {
                 appReviewPlugin.configure(it)
+            }
+            
+            config.getJSObject("backgroundUpdate")?.let {
+                backgroundUpdatePlugin.configure(it)
             }
             
             call.resolve()
@@ -190,6 +196,48 @@ class CapacitorNativeUpdatePlugin : Plugin() {
     @PluginMethod
     fun canRequestReview(call: PluginCall) {
         appReviewPlugin.canRequestReview(call)
+    }
+    
+    // Background Update Methods
+    
+    @PluginMethod
+    fun enableBackgroundUpdates(call: PluginCall) {
+        backgroundUpdatePlugin.enableBackgroundUpdates(call)
+    }
+    
+    @PluginMethod
+    fun disableBackgroundUpdates(call: PluginCall) {
+        backgroundUpdatePlugin.disableBackgroundUpdates(call)
+    }
+    
+    @PluginMethod
+    fun getBackgroundUpdateStatus(call: PluginCall) {
+        backgroundUpdatePlugin.getBackgroundUpdateStatus(call)
+    }
+    
+    @PluginMethod
+    fun scheduleBackgroundCheck(call: PluginCall) {
+        backgroundUpdatePlugin.scheduleBackgroundCheck(call)
+    }
+    
+    @PluginMethod
+    fun triggerBackgroundCheck(call: PluginCall) {
+        backgroundUpdatePlugin.triggerBackgroundCheck(call)
+    }
+    
+    @PluginMethod
+    fun setNotificationPreferences(call: PluginCall) {
+        backgroundUpdatePlugin.setNotificationPreferences(call)
+    }
+    
+    @PluginMethod
+    fun getNotificationPermissions(call: PluginCall) {
+        backgroundUpdatePlugin.getNotificationPermissions(call)
+    }
+    
+    @PluginMethod
+    fun requestNotificationPermissions(call: PluginCall) {
+        backgroundUpdatePlugin.requestNotificationPermissions(call)
     }
     
     // Permission Callbacks

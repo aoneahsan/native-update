@@ -17,12 +17,18 @@ import type {
   ReviewResult,
   CanRequestReviewResult,
   UpdateError,
+  BackgroundUpdateConfig,
+  BackgroundUpdateStatus,
+  BackgroundCheckResult,
+  NotificationPreferences,
+  NotificationPermissionStatus,
 } from './definitions';
 
 import {
   SyncStatus,
   BundleStatus,
   UpdateErrorCode,
+  BackgroundUpdateType,
 } from './definitions';
 
 export class CapacitorNativeUpdateWeb
@@ -34,6 +40,13 @@ export class CapacitorNativeUpdateWeb
   private bundles: Map<string, BundleInfo> = new Map();
   private lastReviewRequest: number = 0;
   private launchCount: number = 0;
+  private backgroundUpdateStatus: BackgroundUpdateStatus = {
+    enabled: false,
+    isRunning: false,
+    checkCount: 0,
+    failureCount: 0,
+  };
+  private backgroundCheckInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     super();
@@ -402,6 +415,223 @@ export class CapacitorNativeUpdateWeb
     return {
       allowed: true,
     };
+  }
+
+  /**
+   * Background Update Methods
+   */
+  async enableBackgroundUpdates(config: BackgroundUpdateConfig): Promise<void> {
+    console.log('Web: Enabling background updates', config);
+    
+    if (!this.config.backgroundUpdate) {
+      this.config.backgroundUpdate = config;
+    } else {
+      this.config.backgroundUpdate = { ...this.config.backgroundUpdate, ...config };
+    }
+    
+    this.backgroundUpdateStatus.enabled = config.enabled;
+    
+    if (config.enabled) {
+      await this.scheduleBackgroundCheck(config.checkInterval);
+    } else {
+      await this.disableBackgroundUpdates();
+    }
+    
+    this.saveConfiguration();
+  }
+
+  async disableBackgroundUpdates(): Promise<void> {
+    console.log('Web: Disabling background updates');
+    
+    if (this.backgroundCheckInterval) {
+      clearInterval(this.backgroundCheckInterval);
+      this.backgroundCheckInterval = null;
+    }
+    
+    this.backgroundUpdateStatus.enabled = false;
+    this.backgroundUpdateStatus.isRunning = false;
+    this.backgroundUpdateStatus.currentTaskId = undefined;
+    
+    if (this.config.backgroundUpdate) {
+      this.config.backgroundUpdate.enabled = false;
+    }
+    
+    this.saveConfiguration();
+  }
+
+  async getBackgroundUpdateStatus(): Promise<BackgroundUpdateStatus> {
+    return { ...this.backgroundUpdateStatus };
+  }
+
+  async scheduleBackgroundCheck(interval: number): Promise<void> {
+    console.log('Web: Scheduling background check with interval', interval);
+    
+    if (this.backgroundCheckInterval) {
+      clearInterval(this.backgroundCheckInterval);
+    }
+    
+    this.backgroundCheckInterval = setInterval(async () => {
+      if (this.backgroundUpdateStatus.enabled && !this.backgroundUpdateStatus.isRunning) {
+        await this.triggerBackgroundCheck();
+      }
+    }, interval);
+    
+    this.backgroundUpdateStatus.nextCheckTime = Date.now() + interval;
+  }
+
+  async triggerBackgroundCheck(): Promise<BackgroundCheckResult> {
+    console.log('Web: Triggering background check');
+    
+    if (!this.backgroundUpdateStatus.enabled) {
+      return {
+        success: false,
+        updatesFound: false,
+        notificationSent: false,
+        error: {
+          code: UpdateErrorCode.INVALID_CONFIG,
+          message: 'Background updates not enabled',
+        },
+      };
+    }
+    
+    this.backgroundUpdateStatus.isRunning = true;
+    this.backgroundUpdateStatus.checkCount++;
+    this.backgroundUpdateStatus.lastCheckTime = Date.now();
+    
+    try {
+      const updateInfo = await this.getAppUpdateInfo();
+      const liveUpdate = await this.getLatest();
+      
+      const updatesFound = updateInfo.updateAvailable || liveUpdate.available;
+      let notificationSent = false;
+      
+      if (updatesFound) {
+        notificationSent = await this.sendWebNotification(updateInfo, liveUpdate);
+      }
+      
+      this.backgroundUpdateStatus.isRunning = false;
+      this.backgroundUpdateStatus.lastUpdateTime = updatesFound ? Date.now() : undefined;
+      this.backgroundUpdateStatus.lastError = undefined;
+      
+      return {
+        success: true,
+        updatesFound,
+        appUpdate: updateInfo.updateAvailable ? updateInfo : undefined,
+        liveUpdate: liveUpdate.available ? liveUpdate : undefined,
+        notificationSent,
+      };
+    } catch (error) {
+      this.backgroundUpdateStatus.isRunning = false;
+      this.backgroundUpdateStatus.failureCount++;
+      this.backgroundUpdateStatus.lastError = {
+        code: UpdateErrorCode.UNKNOWN_ERROR,
+        message: error instanceof Error ? error.message : 'Unknown error',
+      };
+      
+      return {
+        success: false,
+        updatesFound: false,
+        notificationSent: false,
+        error: this.backgroundUpdateStatus.lastError,
+      };
+    }
+  }
+
+  async setNotificationPreferences(preferences: NotificationPreferences): Promise<void> {
+    console.log('Web: Setting notification preferences', preferences);
+    
+    if (!this.config.backgroundUpdate) {
+      this.config.backgroundUpdate = {} as BackgroundUpdateConfig;
+    }
+    
+    this.config.backgroundUpdate.notificationPreferences = preferences;
+    this.saveConfiguration();
+  }
+
+  async getNotificationPermissions(): Promise<NotificationPermissionStatus> {
+    if (!('Notification' in window)) {
+      return {
+        granted: false,
+        canRequest: false,
+      };
+    }
+    
+    const permission = Notification.permission;
+    
+    return {
+      granted: permission === 'granted',
+      canRequest: permission === 'default',
+    };
+  }
+
+  async requestNotificationPermissions(): Promise<boolean> {
+    if (!('Notification' in window)) {
+      return false;
+    }
+    
+    if (Notification.permission === 'granted') {
+      return true;
+    }
+    
+    if (Notification.permission === 'denied') {
+      return false;
+    }
+    
+    const permission = await Notification.requestPermission();
+    return permission === 'granted';
+  }
+
+  private async sendWebNotification(appUpdate: AppUpdateInfo, liveUpdate: LatestVersion): Promise<boolean> {
+    const permissions = await this.getNotificationPermissions();
+    if (!permissions.granted) {
+      return false;
+    }
+    
+    const prefs = this.config.backgroundUpdate?.notificationPreferences;
+    let title = prefs?.title || 'App Update Available';
+    let body = prefs?.description || 'A new version of the app is available';
+    
+    if (appUpdate.updateAvailable && liveUpdate.available) {
+      title = 'App Updates Available';
+      body = `App version ${appUpdate.availableVersion} and content updates are available`;
+    } else if (appUpdate.updateAvailable) {
+      title = 'App Update Available';
+      body = `Version ${appUpdate.availableVersion} is available`;
+    } else if (liveUpdate.available) {
+      title = 'Content Update Available';
+      body = `New content version ${liveUpdate.version} is available`;
+    }
+    
+    try {
+      const notification = new Notification(title, {
+        body,
+        icon: prefs?.iconName || '/favicon.ico',
+        badge: '/favicon.ico',
+        silent: !prefs?.soundEnabled,
+        data: {
+          type: 'update_available',
+          appUpdate,
+          liveUpdate,
+        },
+      });
+      
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+        
+        this.notifyListeners('backgroundUpdateNotification', {
+          type: appUpdate.updateAvailable ? 'app_update' : 'live_update',
+          updateAvailable: true,
+          version: appUpdate.availableVersion || liveUpdate.version,
+          action: 'tapped',
+        });
+      };
+      
+      return true;
+    } catch (error) {
+      console.error('Web: Failed to send notification', error);
+      return false;
+    }
   }
 
   /**

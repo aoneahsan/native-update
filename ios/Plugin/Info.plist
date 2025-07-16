@@ -29,5 +29,15 @@
 		<key>NSAllowsLocalNetworking</key>
 		<false/>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>background-app-refresh</string>
+		<string>background-processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.capacitor.native.update.background</string>
+		<string>com.capacitor.native.update.processing</string>
+	</array>
 </dict>
 </plist>

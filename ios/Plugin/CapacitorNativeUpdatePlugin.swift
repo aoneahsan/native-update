@@ -6,6 +6,7 @@ public class CapacitorNativeUpdatePlugin: CAPPlugin {
     private var liveUpdatePlugin: LiveUpdatePlugin!
     private var appUpdatePlugin: AppUpdatePlugin!
     private var appReviewPlugin: AppReviewPlugin!
+    private var backgroundUpdatePlugin: BackgroundUpdatePlugin!
     private var securityManager: SecurityManager!
     
     override public func load() {
@@ -15,6 +16,7 @@ public class CapacitorNativeUpdatePlugin: CAPPlugin {
         liveUpdatePlugin = LiveUpdatePlugin(plugin: self)
         appUpdatePlugin = AppUpdatePlugin(plugin: self)
         appReviewPlugin = AppReviewPlugin(plugin: self)
+        backgroundUpdatePlugin = BackgroundUpdatePlugin()
         securityManager = SecurityManager()
         
         // Set up listeners
@@ -50,6 +52,10 @@ public class CapacitorNativeUpdatePlugin: CAPPlugin {
             
             if let appReviewConfig = config["appReview"] as? [String: Any] {
                 try appReviewPlugin.configure(appReviewConfig)
+            }
+            
+            if let backgroundUpdateConfig = config["backgroundUpdate"] as? [String: Any] {
+                try backgroundUpdatePlugin.configure(backgroundUpdateConfig)
             }
             
             call.resolve()
@@ -146,5 +152,39 @@ public class CapacitorNativeUpdatePlugin: CAPPlugin {
     
     @objc func canRequestReview(_ call: CAPPluginCall) {
         appReviewPlugin.canRequestReview(call)
+    }
+    
+    // MARK: - Background Update Methods
+    
+    @objc func enableBackgroundUpdates(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.enableBackgroundUpdates(call)
+    }
+    
+    @objc func disableBackgroundUpdates(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.disableBackgroundUpdates(call)
+    }
+    
+    @objc func getBackgroundUpdateStatus(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.getBackgroundUpdateStatus(call)
+    }
+    
+    @objc func scheduleBackgroundCheck(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.scheduleBackgroundCheck(call)
+    }
+    
+    @objc func triggerBackgroundCheck(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.triggerBackgroundCheck(call)
+    }
+    
+    @objc func setNotificationPreferences(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.setNotificationPreferences(call)
+    }
+    
+    @objc func getNotificationPermissions(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.getNotificationPermissions(call)
+    }
+    
+    @objc func requestNotificationPermissions(_ call: CAPPluginCall) {
+        backgroundUpdatePlugin.requestNotificationPermissions(call)
     }
 }
