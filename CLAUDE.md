@@ -72,7 +72,7 @@ The plugin follows the standard Capacitor plugin structure with separate impleme
 3. **Build Output (`/dist/`)**: Generated JavaScript bundles for different module systems
 
 ### Key Configuration Files
-- `capacitor.config.ts` - Capacitor configuration with app ID `com.zaions.cap_native_update`
+- `capacitor.config.ts` - Capacitor configuration with app ID `com.ahsanmahmood.cap_native_update`
 - `CapacitorNativeUpdate.podspec` - iOS CocoaPods specification for the plugin
 - `rollup.config.js` - Bundler configuration for multiple output formats
 

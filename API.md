@@ -546,4 +546,4 @@ try {
 For questions, issues, or contributions:
 - Email: aoneahsan@gmail.com
 - GitHub Issues: [https://github.com/aoneahsan/capacitor-native-update/issues](https://github.com/aoneahsan/capacitor-native-update/issues)
-- Author: Ahsan Mahmood ([Zaions](https://zaions.com))
+- Author: Ahsan Mahmood ([Portfolio](https://aoneahsan.com))
