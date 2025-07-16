@@ -2,11 +2,13 @@ import type {
   BackgroundUpdateConfig,
   BackgroundUpdateStatus,
   BackgroundCheckResult,
-  BackgroundUpdateType,
-  UpdateError,
-  UpdateErrorCode,
   AppUpdateInfo,
   LatestVersion,
+} from '../definitions';
+
+import {
+  BackgroundUpdateType,
+  UpdateErrorCode,
 } from '../definitions';
 
 export class BackgroundScheduler {
@@ -117,8 +119,8 @@ export class BackgroundScheduler {
   }
 
   private async sendNotification(
-    appUpdate?: AppUpdateInfo,
-    liveUpdate?: LatestVersion,
+    _appUpdate?: AppUpdateInfo,
+    _liveUpdate?: LatestVersion,
   ): Promise<boolean> {
     throw new Error('Notification sending not implemented in base class');
   }

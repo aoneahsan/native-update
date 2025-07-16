@@ -28,7 +28,6 @@ import {
   SyncStatus,
   BundleStatus,
   UpdateErrorCode,
-  BackgroundUpdateType,
 } from './definitions';
 
 export class NativeUpdateWeb

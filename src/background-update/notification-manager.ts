@@ -1,10 +1,12 @@
 import type {
   NotificationPreferences,
   NotificationPermissionStatus,
-  NotificationPriority,
   AppUpdateInfo,
   LatestVersion,
-  BackgroundUpdateType,
+} from '../definitions';
+
+import {
+  NotificationPriority,
 } from '../definitions';
 
 export interface NotificationData {
