@@ -1,4 +1,4 @@
-export interface CapacitorNativeUpdatePlugin {
+export interface NativeUpdatePlugin {
   /**
    * Configure the plugin with initial settings
    */
@@ -173,8 +173,8 @@ export interface BackgroundUpdatePlugin {
 /**
  * Combined plugin interface
  */
-export interface CapacitorNativeUpdateCombinedPlugin
-  extends CapacitorNativeUpdatePlugin,
+export interface NativeUpdateCombinedPlugin
+  extends NativeUpdatePlugin,
     LiveUpdatePlugin,
     AppUpdatePlugin,
     AppReviewPlugin,
@@ -576,7 +576,7 @@ export interface PluginListenerHandle {
   remove: () => Promise<void>;
 }
 
-export interface CapacitorNativeUpdateListeners {
+export interface NativeUpdateListeners {
   /**
    * Listen for download progress
    */

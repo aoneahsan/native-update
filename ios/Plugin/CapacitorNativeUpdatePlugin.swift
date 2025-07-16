@@ -1,8 +1,8 @@
 import Foundation
 import Capacitor
 
-@objc(CapacitorNativeUpdatePlugin)
-public class CapacitorNativeUpdatePlugin: CAPPlugin {
+@objc(NativeUpdatePlugin)
+public class NativeUpdatePlugin: CAPPlugin {
     private var liveUpdatePlugin: LiveUpdatePlugin!
     private var appUpdatePlugin: AppUpdatePlugin!
     private var appReviewPlugin: AppReviewPlugin!

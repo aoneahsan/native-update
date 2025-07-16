@@ -1,14 +1,14 @@
 import { registerPlugin } from '@capacitor/core';
 
 import type {
-  CapacitorNativeUpdateCombinedPlugin,
-  CapacitorNativeUpdateListeners,
+  NativeUpdateCombinedPlugin,
+  NativeUpdateListeners,
 } from './definitions';
 
 const CapacitorNativeUpdate = registerPlugin<
-  CapacitorNativeUpdateCombinedPlugin & CapacitorNativeUpdateListeners
+  NativeUpdateCombinedPlugin & NativeUpdateListeners
 >('CapacitorNativeUpdate', {
-  web: () => import('./web').then((m) => new m.CapacitorNativeUpdateWeb()),
+  web: () => import('./web').then((m) => new m.NativeUpdateWeb()),
 });
 
 export * from './definitions';

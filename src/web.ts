@@ -1,7 +1,7 @@
 import { WebPlugin } from '@capacitor/core';
 
 import type {
-  CapacitorNativeUpdateCombinedPlugin,
+  NativeUpdateCombinedPlugin,
   UpdateConfig,
   SecurityInfo,
   SyncOptions,
@@ -31,9 +31,9 @@ import {
   BackgroundUpdateType,
 } from './definitions';
 
-export class CapacitorNativeUpdateWeb
+export class NativeUpdateWeb
   extends WebPlugin
-  implements CapacitorNativeUpdateCombinedPlugin
+  implements NativeUpdateCombinedPlugin
 {
   private config: UpdateConfig = {};
   private currentBundle: BundleInfo | null = null;

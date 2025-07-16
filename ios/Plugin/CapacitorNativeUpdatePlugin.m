@@ -3,7 +3,7 @@
 
 // Define the plugin using the CAP_PLUGIN Macro, and
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
-CAP_PLUGIN(CapacitorNativeUpdatePlugin, "CapacitorNativeUpdate",
+CAP_PLUGIN(NativeUpdatePlugin, "CapacitorNativeUpdate",
     CAP_PLUGIN_METHOD(configure, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(getSecurityInfo, CAPPluginReturnPromise);
     
@@ -32,4 +32,14 @@ CAP_PLUGIN(CapacitorNativeUpdatePlugin, "CapacitorNativeUpdate",
     // App Review Methods
     CAP_PLUGIN_METHOD(requestReview, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(canRequestReview, CAPPluginReturnPromise);
+    
+    // Background Update Methods
+    CAP_PLUGIN_METHOD(enableBackgroundUpdates, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(disableBackgroundUpdates, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(getBackgroundUpdateStatus, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(scheduleBackgroundCheck, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(triggerBackgroundCheck, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(setNotificationPreferences, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(getNotificationPermissions, CAPPluginReturnPromise);
+    CAP_PLUGIN_METHOD(requestNotificationPermissions, CAPPluginReturnPromise);
 )
