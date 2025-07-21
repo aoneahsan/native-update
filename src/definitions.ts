@@ -294,7 +294,7 @@ export interface BundleInfo {
   checksum: string;
   signature?: string;
   verified: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DeleteOptions {
@@ -429,7 +429,7 @@ export interface SecurityInfo {
 export interface UpdateError {
   code: UpdateErrorCode;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 /**

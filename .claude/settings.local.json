@@ -380,7 +380,8 @@
       "WebFetch(domain:aoneahsan.com)",
       "WebFetch(domain:zaions.com)",
       "Bash(npm outdated)",
-      "Bash(yarn pack:*)"
+      "Bash(yarn pack:*)",
+      "Bash(npm pack:*)"
     ],
     "deny": []
   }

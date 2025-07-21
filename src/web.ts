@@ -22,6 +22,7 @@ import type {
   BackgroundCheckResult,
   NotificationPreferences,
   NotificationPermissionStatus,
+  LiveUpdateConfig,
 } from './definitions';
 
 import { SyncStatus, BundleStatus, UpdateErrorCode } from './definitions';
@@ -275,7 +276,7 @@ export class NativeUpdateWeb
 
   async setChannel(channel: string): Promise<void> {
     if (!this.config.liveUpdate) {
-      this.config.liveUpdate = {} as any;
+      this.config.liveUpdate = {} as LiveUpdateConfig;
     }
     this.config.liveUpdate!.channel = channel;
     this.saveConfiguration();
@@ -293,7 +294,7 @@ export class NativeUpdateWeb
     }
 
     if (!this.config.liveUpdate) {
-      this.config.liveUpdate = {} as any;
+      this.config.liveUpdate = {} as LiveUpdateConfig;
     }
     this.config.liveUpdate!.serverUrl = url;
     this.saveConfiguration();

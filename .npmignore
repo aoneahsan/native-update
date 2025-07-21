@@ -1,7 +1,6 @@
 # Development files
 example/
 server-example/
-docs/
 assets/
 *.log
 .env*

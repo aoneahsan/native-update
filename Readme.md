@@ -1,5 +1,37 @@
 # Capacitor Native Update Plugin
 
+## 📚 Documentation
+
+### Getting Started
+- **[Installation Guide](./docs/getting-started/installation.md)** - Step-by-step installation instructions
+- **[Quick Start Guide](./docs/getting-started/quick-start.md)** - Get up and running in minutes
+- **[Configuration Guide](./docs/getting-started/configuration.md)** - Detailed configuration options
+
+### Features Documentation
+- **[Live Updates (OTA)](./docs/features/live-updates.md)** - Deploy web updates instantly
+- **[App Updates](./docs/features/app-updates.md)** - Native app store update management
+- **[App Reviews](./docs/features/app-reviews.md)** - In-app review integration
+- **[Background Updates](./docs/background-updates.md)** - Background update management
+
+### Guides & Best Practices
+- **[Security Best Practices](./docs/guides/security-best-practices.md)** - Implement secure updates
+- **[Migration Guide](./docs/guides/migration-guide.md)** - Migrate from other solutions
+- **[Production Readiness](./docs/production-readiness.md)** - Production deployment checklist
+- **[Bundle Signing](./docs/BUNDLE_SIGNING.md)** - Cryptographic signing guide
+
+### API Reference
+- **[Live Update API](./docs/api/live-update-api.md)** - Complete API for OTA updates
+- **[App Update API](./docs/api/app-update-api.md)** - Native app update methods
+- **[App Review API](./docs/api/app-review-api.md)** - Review request methods
+- **[Events API](./docs/api/events-api.md)** - Event listeners and handlers
+
+### Examples
+- **[Basic Usage](./docs/examples/basic-usage.md)** - Simple implementation examples
+- **[Advanced Scenarios](./docs/examples/advanced-scenarios.md)** - Complex use cases
+- **[Integration Examples](./docs/examples/integration-examples.md)** - Framework integrations
+
+---
+
 A comprehensive update management plugin for Capacitor that combines Live/OTA updates, native app store updates, and in-app review capabilities in a single, unified solution.
 
 ## Features
@@ -230,25 +262,6 @@ This plugin implements multiple security layers:
 - **Checksum validation** before applying updates
 - **Certificate pinning** support for enhanced security
 
-## Documentation
-
-### Getting Started
-
-- 🚀 [Quick Start Guide](./docs/QUICK_START.md) - Get up and running in 5 minutes
-- 📖 [Features Overview](./FEATURES.md) - Detailed feature descriptions
-- 🔧 [API Reference](./API.md) - Complete API documentation
-
-### Implementation Guides
-
-- 📱 [Live Updates Guide](./docs/LIVE_UPDATES_GUIDE.md) - Complete OTA implementation
-- 🏪 [Native Updates Guide](./docs/NATIVE_UPDATES_GUIDE.md) - App store updates
-- ⭐ [App Review Guide](./docs/APP_REVIEW_GUIDE.md) - Maximize review rates
-
-### Advanced Topics
-
-- 🔐 [Security Best Practices](./docs/SECURITY.md) - Security implementation
-- 🔏 [Bundle Signing](./docs/BUNDLE_SIGNING.md) - Cryptographic signing
-- 📊 [Migration Guide](./docs/MIGRATION.md) - Migrate from other solutions
 
 ## Example Implementation
 
@@ -281,42 +294,6 @@ npm start
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
-## 📚 Comprehensive Documentation
-
-### Getting Started
-
-- **[Installation Guide](./docs/getting-started/installation.md)** - Step-by-step installation instructions
-- **[Quick Start Guide](./docs/getting-started/quick-start.md)** - Get up and running in minutes
-- **[Configuration Guide](./docs/getting-started/configuration.md)** - Detailed configuration options
-
-### Features
-
-- **[Live Updates (OTA)](./docs/features/live-updates.md)** - Deploy web updates instantly
-- **[App Updates](./docs/features/app-updates.md)** - Native app store update management
-- **[App Reviews](./docs/features/app-reviews.md)** - In-app review integration
-
-### Guides
-
-- **[Security Best Practices](./docs/guides/security-best-practices.md)** - Implement secure updates
-- **[Migration Guide](./docs/guides/migration-guide.md)** - Migrate from other solutions
-- **[Troubleshooting](./docs/guides/troubleshooting.md)** - Common issues and solutions
-
-### API Reference
-
-- **[Live Update API](./docs/api/live-update-api.md)** - Complete API for OTA updates
-- **[App Update API](./docs/api/app-update-api.md)** - Native app update methods
-- **[App Review API](./docs/api/app-review-api.md)** - Review request methods
-- **[Events API](./docs/api/events-api.md)** - Event listeners and handlers
-
-### Examples
-
-- **[Basic Usage](./docs/examples/basic-usage.md)** - Simple implementation examples
-- **[Advanced Scenarios](./docs/examples/advanced-scenarios.md)** - Complex use cases
-- **[Integration Examples](./docs/examples/integration-examples.md)** - Framework integrations
-
-### Production
-
-- **[Production Readiness](./docs/production-readiness.md)** - Comprehensive production checklist
 
 ## 🏆 Production Ready
 

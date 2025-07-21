@@ -67,7 +67,7 @@ export class BackgroundScheduler {
   }
 
   private async checkForUpdates(): Promise<BackgroundCheckResult> {
-    const promises: Promise<any>[] = [];
+    const promises: Promise<unknown>[] = [];
     let appUpdate: AppUpdateInfo | undefined;
     let liveUpdate: LatestVersion | undefined;
 
@@ -88,11 +88,11 @@ export class BackgroundScheduler {
     const results = await Promise.allSettled(promises);
 
     if (results[0]?.status === 'fulfilled') {
-      appUpdate = results[0].value;
+      appUpdate = results[0].value as AppUpdateInfo;
     }
 
     if (results[1]?.status === 'fulfilled') {
-      liveUpdate = results[1].value;
+      liveUpdate = results[1].value as LatestVersion;
     }
 
     const updatesFound =

@@ -10,7 +10,7 @@ import { NotificationPriority } from '../definitions';
 export interface NotificationData {
   title: string;
   body: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   actions?: NotificationAction[];
 }
 
