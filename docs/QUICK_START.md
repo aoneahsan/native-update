@@ -21,6 +21,7 @@ npx cap sync
 ### 1. Configure the Plugin
 
 **capacitor.config.json**:
+
 ```json
 {
   "appId": "com.example.app",
@@ -50,7 +51,7 @@ export class App {
     // Check for all types of updates
     await this.checkLiveUpdates();
     await this.checkNativeUpdates();
-    
+
     // Set up review prompt for later
     this.scheduleReviewPrompt();
   }
@@ -70,8 +71,9 @@ export class LiveUpdateService {
   async checkAndApplyUpdates() {
     try {
       // 1. Check for updates
-      const { available, version } = await CapacitorNativeUpdate.checkForUpdate();
-      
+      const { available, version } =
+        await CapacitorNativeUpdate.checkForUpdate();
+
       if (!available) {
         console.log('No updates available');
         return;
@@ -83,12 +85,11 @@ export class LiveUpdateService {
       await CapacitorNativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           console.log(`Download: ${progress.percent}%`);
-        }
+        },
       });
 
       // 3. Apply the update (app will restart)
       await CapacitorNativeUpdate.applyUpdate();
-      
     } catch (error) {
       console.error('Update failed:', error);
     }
@@ -106,8 +107,9 @@ export class UpdateUIService {
   ) {}
 
   async checkForUpdatesWithUI() {
-    const { available, version, notes } = await CapacitorNativeUpdate.checkForUpdate();
-    
+    const { available, version, notes } =
+      await CapacitorNativeUpdate.checkForUpdate();
+
     if (!available) return;
 
     // Show update dialog
@@ -116,11 +118,11 @@ export class UpdateUIService {
       message: `Version ${version} is ready!\n\n${notes || 'Bug fixes and improvements'}`,
       buttons: [
         { text: 'Later', role: 'cancel' },
-        { 
+        {
           text: 'Update Now',
-          handler: () => this.downloadAndInstall()
-        }
-      ]
+          handler: () => this.downloadAndInstall(),
+        },
+      ],
     });
 
     await alert.present();
@@ -128,7 +130,7 @@ export class UpdateUIService {
 
   private async downloadAndInstall() {
     const loading = await this.loadingController.create({
-      message: 'Downloading update...'
+      message: 'Downloading update...',
     });
     await loading.present();
 
@@ -136,12 +138,11 @@ export class UpdateUIService {
       await CapacitorNativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           loading.message = `Downloading: ${Math.round(progress.percent)}%`;
-        }
+        },
       });
 
       loading.message = 'Installing...';
       await CapacitorNativeUpdate.applyUpdate();
-      
     } catch (error) {
       await loading.dismiss();
       // Show error
@@ -179,7 +180,7 @@ export class NativeUpdateService {
   async checkForAppStoreUpdates() {
     try {
       const result = await CapacitorNativeUpdate.checkAppUpdate();
-      
+
       if (!result.updateAvailable) {
         console.log('App is up to date');
         return;
@@ -191,7 +192,6 @@ export class NativeUpdateService {
       } else if (Capacitor.getPlatform() === 'ios') {
         await this.handleiOSUpdate(result);
       }
-      
     } catch (error) {
       console.error('Native update check failed:', error);
     }
@@ -214,11 +214,11 @@ export class NativeUpdateService {
       message: `Version ${result.availableVersion} is available on the App Store`,
       buttons: [
         { text: 'Later', role: 'cancel' },
-        { 
+        {
           text: 'Update',
-          handler: () => CapacitorNativeUpdate.openAppStore()
-        }
-      ]
+          handler: () => CapacitorNativeUpdate.openAppStore(),
+        },
+      ],
     });
     await alert.present();
   }
@@ -236,7 +236,8 @@ export class AndroidUpdateProgress {
     await CapacitorNativeUpdate.startFlexibleUpdate();
 
     // Track progress
-    CapacitorNativeUpdate.addListener('onAppUpdateDownloadProgress', 
+    CapacitorNativeUpdate.addListener(
+      'onAppUpdateDownloadProgress',
       (progress) => {
         this.downloadProgress = Math.round(
           (progress.bytesDownloaded / progress.totalBytesToDownload) * 100
@@ -245,22 +246,20 @@ export class AndroidUpdateProgress {
     );
 
     // Handle completion
-    CapacitorNativeUpdate.addListener('onAppUpdateDownloaded', 
-      async () => {
-        const alert = await this.alertController.create({
-          header: 'Update Ready',
-          message: 'Update has been downloaded. Install now?',
-          buttons: [
-            { text: 'Later' },
-            { 
-              text: 'Install',
-              handler: () => CapacitorNativeUpdate.completeFlexibleUpdate()
-            }
-          ]
-        });
-        await alert.present();
-      }
-    );
+    CapacitorNativeUpdate.addListener('onAppUpdateDownloaded', async () => {
+      const alert = await this.alertController.create({
+        header: 'Update Ready',
+        message: 'Update has been downloaded. Install now?',
+        buttons: [
+          { text: 'Later' },
+          {
+            text: 'Install',
+            handler: () => CapacitorNativeUpdate.completeFlexibleUpdate(),
+          },
+        ],
+      });
+      await alert.present();
+    });
   }
 }
 ```
@@ -276,7 +275,7 @@ export class AppReviewService {
   async requestReview() {
     try {
       const result = await CapacitorNativeUpdate.requestReview();
-      
+
       if (result.displayed) {
         console.log('Review prompt shown');
         // Track analytics
@@ -300,13 +299,13 @@ export class SmartReviewService {
 
   async checkAndRequestReview() {
     // Don't ask too early
-    if (!await this.isGoodTimeToAsk()) {
+    if (!(await this.isGoodTimeToAsk())) {
       return;
     }
 
     // Two-step approach
     const enjoying = await this.askIfEnjoying();
-    
+
     if (enjoying) {
       await CapacitorNativeUpdate.requestReview();
     } else {
@@ -317,9 +316,11 @@ export class SmartReviewService {
   private async isGoodTimeToAsk(): Promise<boolean> {
     const sessions = await this.getSessionCount();
     const daysSinceInstall = await this.getDaysSinceInstall();
-    
-    return sessions >= this.MIN_SESSIONS && 
-           daysSinceInstall >= this.MIN_DAYS_INSTALLED;
+
+    return (
+      sessions >= this.MIN_SESSIONS &&
+      daysSinceInstall >= this.MIN_DAYS_INSTALLED
+    );
   }
 
   private async askIfEnjoying(): Promise<boolean> {
@@ -327,15 +328,15 @@ export class SmartReviewService {
       const alert = this.alertController.create({
         header: 'Enjoying MyApp?',
         buttons: [
-          { 
+          {
             text: 'Not really',
-            handler: () => resolve(false)
+            handler: () => resolve(false),
           },
-          { 
+          {
             text: 'Yes!',
-            handler: () => resolve(true)
-          }
-        ]
+            handler: () => resolve(true),
+          },
+        ],
       });
       alert.present();
     });
@@ -354,7 +355,7 @@ export class ReviewTriggers {
   // After completing important task
   async onTaskCompleted() {
     const taskCount = await this.getCompletedTasks();
-    
+
     // Every 5 tasks
     if (taskCount % 5 === 0) {
       setTimeout(() => {
@@ -372,7 +373,7 @@ export class ReviewTriggers {
   async onAppLaunch() {
     const lastPrompt = await this.getLastPromptDate();
     const daysSince = this.daysSince(lastPrompt);
-    
+
     // Max once per month
     if (daysSince >= 30) {
       await this.reviewService.checkAndRequestReview();
@@ -392,7 +393,7 @@ import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html'
+  templateUrl: 'app.component.html',
 })
 export class AppComponent implements OnInit {
   constructor(
@@ -402,7 +403,7 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     await this.platform.ready();
-    
+
     // Initialize all update features
     await this.initializeUpdates();
   }
@@ -410,10 +411,10 @@ export class AppComponent implements OnInit {
   async initializeUpdates() {
     // 1. Check for live updates on startup
     this.checkLiveUpdates();
-    
+
     // 2. Check for native updates periodically
     this.scheduleNativeUpdateCheck();
-    
+
     // 3. Set up smart review prompts
     this.initializeReviewPrompts();
   }
@@ -422,19 +423,21 @@ export class AppComponent implements OnInit {
   private async checkLiveUpdates() {
     try {
       const { available } = await CapacitorNativeUpdate.checkForUpdate();
-      
+
       if (available) {
         // Auto-download in background
         await CapacitorNativeUpdate.downloadUpdate();
-        
+
         // Notify user
         const toast = await this.toastCtrl.create({
           message: 'Update ready! Restart to apply.',
           duration: 5000,
-          buttons: [{
-            text: 'Restart',
-            handler: () => CapacitorNativeUpdate.applyUpdate()
-          }]
+          buttons: [
+            {
+              text: 'Restart',
+              handler: () => CapacitorNativeUpdate.applyUpdate(),
+            },
+          ],
         });
         await toast.present();
       }
@@ -447,17 +450,20 @@ export class AppComponent implements OnInit {
   private scheduleNativeUpdateCheck() {
     // Check immediately
     this.checkNativeUpdates();
-    
+
     // Then check daily
-    setInterval(() => {
-      this.checkNativeUpdates();
-    }, 24 * 60 * 60 * 1000);
+    setInterval(
+      () => {
+        this.checkNativeUpdates();
+      },
+      24 * 60 * 60 * 1000
+    );
   }
 
   private async checkNativeUpdates() {
     try {
       const result = await CapacitorNativeUpdate.checkAppUpdate();
-      
+
       if (result.updateAvailable && result.flexibleUpdateAllowed) {
         // Start background download for Android
         if (Capacitor.getPlatform() === 'android') {
@@ -475,7 +481,7 @@ export class AppComponent implements OnInit {
     document.addEventListener('task-completed', () => {
       this.maybeRequestReview();
     });
-    
+
     // Check on app foreground
     document.addEventListener('resume', () => {
       this.maybeRequestReview();
@@ -484,7 +490,7 @@ export class AppComponent implements OnInit {
 
   private async maybeRequestReview() {
     const canAsk = await this.canAskForReview();
-    
+
     if (canAsk) {
       await CapacitorNativeUpdate.requestReview();
       await this.markReviewRequested();
@@ -495,7 +501,7 @@ export class AppComponent implements OnInit {
     // Your conditions here
     const lastAsked = await this.getLastReviewDate();
     const daysSince = this.daysSince(lastAsked);
-    
+
     return daysSince > 30; // Once per month max
   }
 }
@@ -524,13 +530,15 @@ curl -X POST http://localhost:3000/api/v1/bundles \
 ### 2. Test Native Updates
 
 **Android:**
+
 - Upload APK to Internal Test Track
 - Install older version
 - Open app to trigger update
 
 **iOS:**
+
 - Use TestFlight
-- Install older version  
+- Install older version
 - Check for updates in app
 
 ### 3. Test App Reviews

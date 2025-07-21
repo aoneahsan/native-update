@@ -6,10 +6,7 @@ import type {
   LatestVersion,
 } from '../definitions';
 
-import {
-  BackgroundUpdateType,
-  UpdateErrorCode,
-} from '../definitions';
+import { BackgroundUpdateType, UpdateErrorCode } from '../definitions';
 
 export class BackgroundScheduler {
   private config: BackgroundUpdateConfig | null = null;
@@ -74,27 +71,32 @@ export class BackgroundScheduler {
     let appUpdate: AppUpdateInfo | undefined;
     let liveUpdate: LatestVersion | undefined;
 
-    if (this.config?.updateTypes.includes(BackgroundUpdateType.APP_UPDATE) ||
-        this.config?.updateTypes.includes(BackgroundUpdateType.BOTH)) {
+    if (
+      this.config?.updateTypes.includes(BackgroundUpdateType.APP_UPDATE) ||
+      this.config?.updateTypes.includes(BackgroundUpdateType.BOTH)
+    ) {
       promises.push(this.checkAppUpdate());
     }
 
-    if (this.config?.updateTypes.includes(BackgroundUpdateType.LIVE_UPDATE) ||
-        this.config?.updateTypes.includes(BackgroundUpdateType.BOTH)) {
+    if (
+      this.config?.updateTypes.includes(BackgroundUpdateType.LIVE_UPDATE) ||
+      this.config?.updateTypes.includes(BackgroundUpdateType.BOTH)
+    ) {
       promises.push(this.checkLiveUpdate());
     }
 
     const results = await Promise.allSettled(promises);
-    
+
     if (results[0]?.status === 'fulfilled') {
       appUpdate = results[0].value;
     }
-    
+
     if (results[1]?.status === 'fulfilled') {
       liveUpdate = results[1].value;
     }
 
-    const updatesFound = (appUpdate?.updateAvailable || liveUpdate?.available) || false;
+    const updatesFound =
+      appUpdate?.updateAvailable || liveUpdate?.available || false;
     let notificationSent = false;
 
     if (updatesFound) {
@@ -120,7 +122,7 @@ export class BackgroundScheduler {
 
   private async sendNotification(
     _appUpdate?: AppUpdateInfo,
-    _liveUpdate?: LatestVersion,
+    _liveUpdate?: LatestVersion
   ): Promise<boolean> {
     throw new Error('Notification sending not implemented in base class');
   }

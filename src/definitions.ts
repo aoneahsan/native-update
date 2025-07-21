@@ -157,7 +157,9 @@ export interface BackgroundUpdatePlugin {
   /**
    * Configure notification preferences
    */
-  setNotificationPreferences(preferences: NotificationPreferences): Promise<void>;
+  setNotificationPreferences(
+    preferences: NotificationPreferences
+  ): Promise<void>;
 
   /**
    * Get notification permissions status
@@ -582,7 +584,7 @@ export interface NativeUpdateListeners {
    */
   addListener(
     eventName: 'downloadProgress',
-    listenerFunc: (event: DownloadProgressEvent) => void,
+    listenerFunc: (event: DownloadProgressEvent) => void
   ): Promise<PluginListenerHandle>;
 
   /**
@@ -590,7 +592,7 @@ export interface NativeUpdateListeners {
    */
   addListener(
     eventName: 'updateStateChanged',
-    listenerFunc: (event: UpdateStateChangedEvent) => void,
+    listenerFunc: (event: UpdateStateChangedEvent) => void
   ): Promise<PluginListenerHandle>;
 
   /**
@@ -598,7 +600,7 @@ export interface NativeUpdateListeners {
    */
   addListener(
     eventName: 'backgroundUpdateProgress',
-    listenerFunc: (event: BackgroundUpdateProgressEvent) => void,
+    listenerFunc: (event: BackgroundUpdateProgressEvent) => void
   ): Promise<PluginListenerHandle>;
 
   /**
@@ -606,7 +608,7 @@ export interface NativeUpdateListeners {
    */
   addListener(
     eventName: 'backgroundUpdateNotification',
-    listenerFunc: (event: BackgroundUpdateNotificationEvent) => void,
+    listenerFunc: (event: BackgroundUpdateNotificationEvent) => void
   ): Promise<PluginListenerHandle>;
 
   /**

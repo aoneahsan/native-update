@@ -3,6 +3,7 @@
 This document provides a complete API reference for the Capacitor Native Update plugin.
 
 ## Table of Contents
+
 - [Configuration](#configuration)
 - [Live Update API](#live-update-api)
 - [App Update API](#app-update-api)
@@ -28,24 +29,24 @@ await CapacitorNativeUpdate.configure({
     publicKey: 'your-public-key', // For signature verification
     requireSignature: true, // Enforce signature verification
     maxBundleSize: 50 * 1024 * 1024, // 50MB limit
-    checksumAlgorithm: 'SHA-256' // Required checksum validation
+    checksumAlgorithm: 'SHA-256', // Required checksum validation
   },
   appUpdate: {
     minimumVersion: '1.0.0',
     updatePriority: 3,
-    allowDowngrade: false // Prevent version downgrade attacks
+    allowDowngrade: false, // Prevent version downgrade attacks
   },
   appReview: {
     minimumDaysSinceInstall: 7,
-    minimumLaunchCount: 3
+    minimumLaunchCount: 3,
   },
   security: {
     enforceHttps: true,
     certificatePinning: {
       enabled: true,
-      certificates: ['sha256/...'] // Pin update server certificates
-    }
-  }
+      certificates: ['sha256/...'], // Pin update server certificates
+    },
+  },
 });
 ```
 
@@ -58,7 +59,7 @@ Synchronize with the update server and apply updates if available.
 ```typescript
 const result = await CapacitorNativeUpdate.sync({
   channel: 'production',
-  updateMode: 'background'
+  updateMode: 'background',
 });
 
 console.log(result.status); // 'UP_TO_DATE' | 'UPDATE_AVAILABLE' | 'UPDATE_INSTALLED' | 'ERROR'
@@ -75,7 +76,7 @@ const bundle = await CapacitorNativeUpdate.download({
   checksum: 'sha256:...', // Required for integrity verification
   signature: 'base64...', // Required if signature verification enabled
   maxRetries: 3,
-  timeout: 30000 // 30 second timeout
+  timeout: 30000, // 30 second timeout
 });
 ```
 
@@ -87,7 +88,7 @@ Set the active bundle to a specific downloaded version.
 await CapacitorNativeUpdate.set({
   bundleId: 'bundle-123',
   version: '2.0.0',
-  path: '/path/to/bundle'
+  path: '/path/to/bundle',
 });
 ```
 
@@ -122,7 +123,7 @@ List all downloaded bundles.
 
 ```typescript
 const bundles = await CapacitorNativeUpdate.list();
-bundles.forEach(bundle => {
+bundles.forEach((bundle) => {
   console.log(`${bundle.version} - ${bundle.downloadTime}`);
 });
 ```
@@ -136,9 +137,9 @@ Delete a specific bundle or clean up old bundles.
 await CapacitorNativeUpdate.delete({ bundleId: 'bundle-123' });
 
 // Clean up old bundles
-await CapacitorNativeUpdate.delete({ 
+await CapacitorNativeUpdate.delete({
   keepVersions: 2,
-  olderThan: Date.now() - 7 * 24 * 60 * 60 * 1000 // 7 days
+  olderThan: Date.now() - 7 * 24 * 60 * 60 * 1000, // 7 days
 });
 ```
 
@@ -230,7 +231,7 @@ Open the app store page for the app.
 
 ```typescript
 await CapacitorNativeUpdate.openAppStore({
-  appId: 'com.example.app' // Optional, uses current app ID if not provided
+  appId: 'com.example.app', // Optional, uses current app ID if not provided
 });
 ```
 
@@ -382,6 +383,7 @@ interface ReviewResult {
 The plugin uses standard error codes for different failure scenarios:
 
 ### Live Update Errors
+
 - `NETWORK_ERROR` - Network connection failed
 - `SERVER_ERROR` - Update server returned an error
 - `DOWNLOAD_ERROR` - Bundle download failed
@@ -397,12 +399,14 @@ The plugin uses standard error codes for different failure scenarios:
 - `PATH_TRAVERSAL` - Attempted directory traversal detected
 
 ### App Update Errors
+
 - `UPDATE_NOT_AVAILABLE` - No update available in app store
 - `UPDATE_IN_PROGRESS` - Another update is already in progress
 - `UPDATE_CANCELLED` - User cancelled the update
 - `PLATFORM_NOT_SUPPORTED` - Feature not supported on this platform
 
 ### App Review Errors
+
 - `REVIEW_NOT_SUPPORTED` - In-app reviews not supported
 - `QUOTA_EXCEEDED` - Review request quota exceeded
 - `CONDITIONS_NOT_MET` - Review conditions not satisfied
@@ -437,7 +441,7 @@ const validation = await CapacitorNativeUpdate.validateUpdate({
   bundlePath: '/path/to/bundle',
   checksum: 'sha256:...',
   signature: 'base64...',
-  maxSize: 50 * 1024 * 1024
+  maxSize: 50 * 1024 * 1024,
 });
 
 if (!validation.isValid) {
@@ -458,6 +462,7 @@ console.log(`Certificate pinning: ${security.certificatePinning.enabled}`);
 ## Platform-Specific Notes
 
 ### iOS
+
 - App updates require manual version checking against iTunes API
 - In-app reviews use StoreKit framework
 - Maximum 3 review requests per year per user
@@ -465,6 +470,7 @@ console.log(`Certificate pinning: ${security.certificatePinning.enabled}`);
 - File operations validated within app sandbox
 
 ### Android
+
 - App updates use Google Play Core Library
 - Requires Play Store app to be installed
 - In-app reviews use Play Core Review API
@@ -472,6 +478,7 @@ console.log(`Certificate pinning: ${security.certificatePinning.enabled}`);
 - Runtime permissions required for storage access
 
 ### Web
+
 - Live updates work through service worker updates
 - App updates and reviews show fallback UI
 - Limited functionality compared to native platforms
@@ -492,17 +499,17 @@ await CapacitorNativeUpdate.configure({
     checksumAlgorithm: 'SHA-256',
     maxBundleSize: 50 * 1024 * 1024,
     allowedHosts: ['updates.example.com'], // Whitelist update servers
-    allowEmulator: false // Disable in production
+    allowEmulator: false, // Disable in production
   },
   security: {
     enforceHttps: true,
     certificatePinning: {
       enabled: true,
-      certificates: [process.env.UPDATE_CERT_PIN]
+      certificates: [process.env.UPDATE_CERT_PIN],
     },
     validateInputs: true,
-    secureStorage: true
-  }
+    secureStorage: true,
+  },
 });
 ```
 
@@ -516,11 +523,11 @@ try {
   if (!isValidUrl(updateUrl) || !updateUrl.startsWith('https://')) {
     throw new Error('Invalid update URL');
   }
-  
+
   await CapacitorNativeUpdate.download({
     url: updateUrl,
     checksum: checksum,
-    signature: signature
+    signature: signature,
   });
 } catch (error) {
   // Handle validation error
@@ -531,7 +538,7 @@ try {
 
 Handle errors without exposing sensitive information:
 
-```typescript
+````typescript
 try {
   await CapacitorNativeUpdate.sync();
 } catch (error) {
@@ -547,3 +554,4 @@ For questions, issues, or contributions:
 - Email: aoneahsan@gmail.com
 - GitHub Issues: [https://github.com/aoneahsan/capacitor-native-update/issues](https://github.com/aoneahsan/capacitor-native-update/issues)
 - Author: Ahsan Mahmood ([Portfolio](https://aoneahsan.com))
+````

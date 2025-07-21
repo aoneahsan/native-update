@@ -5,6 +5,7 @@ This guide explains how to implement cryptographic signing for update bundles to
 ## Overview
 
 Bundle signing uses RSA-2048 with SHA-256 to create digital signatures that verify:
+
 - **Integrity**: The bundle hasn't been modified
 - **Authenticity**: The bundle comes from a trusted source
 - **Non-repudiation**: The signature proves origin
@@ -19,6 +20,7 @@ node bundle-signer.js generate-keys
 ```
 
 This creates:
+
 - `private.key` - Keep secure on your server
 - `public.key` - Include in your app
 - `public.key.b64` - Base64 version for app config
@@ -61,6 +63,7 @@ This creates `bundle-1.0.0.zip.sig` containing the base64 signature.
 ### 3. Signature Format
 
 Signatures are:
+
 - RSA-SHA256 algorithm
 - Base64 encoded
 - Stored as string in bundle metadata
@@ -70,6 +73,7 @@ Signatures are:
 ### 1. Configure Public Key
 
 #### Android
+
 ```kotlin
 // capacitor.config.json
 {
@@ -83,6 +87,7 @@ Signatures are:
 ```
 
 #### iOS
+
 ```swift
 // Info.plist
 <key>CapacitorNativeUpdatePublicKey</key>
@@ -97,10 +102,13 @@ The plugin automatically verifies signatures:
 
 ```typescript
 // Internal verification flow
-async function verifyBundle(bundle: ArrayBuffer, signature: string): Promise<boolean> {
+async function verifyBundle(
+  bundle: ArrayBuffer,
+  signature: string
+): Promise<boolean> {
   const publicKey = await getPublicKey();
   return crypto.subtle.verify(
-    "RSASSA-PKCS1-v1_5",
+    'RSASSA-PKCS1-v1_5',
     publicKey,
     base64ToArrayBuffer(signature),
     bundle
@@ -118,12 +126,14 @@ async function verifyBundle(bundle: ArrayBuffer, signature: string): Promise<boo
 ### 1. Key Management
 
 **DO:**
+
 - Generate keys on secure, offline machine
 - Use hardware security modules (HSM) for production
 - Rotate keys periodically (yearly recommended)
 - Keep multiple key versions for rollback
 
 **DON'T:**
+
 - Store private keys in version control
 - Share private keys across environments
 - Use weak key sizes (< 2048 bits)
@@ -144,6 +154,7 @@ async function verifyBundle(bundle: ArrayBuffer, signature: string): Promise<boo
 ### 3. CI/CD Integration
 
 #### GitHub Actions Example
+
 ```yaml
 - name: Sign Bundle
   env:
@@ -155,6 +166,7 @@ async function verifyBundle(bundle: ArrayBuffer, signature: string): Promise<boo
 ```
 
 #### Jenkins Example
+
 ```groovy
 withCredentials([file(credentialsId: 'bundle-signing-key', variable: 'KEY_FILE')]) {
     sh 'node bundle-signer.js sign dist/bundle.zip $KEY_FILE'
@@ -232,13 +244,14 @@ Response: {
 const isValid = await CapacitorNativeUpdate.verifySignature({
   bundlePath: '/path/to/bundle.zip',
   signature: 'base64-signature',
-  publicKey: 'base64-public-key' // Optional, uses config if not provided
+  publicKey: 'base64-public-key', // Optional, uses config if not provided
 });
 ```
 
 ## Compliance
 
 Bundle signing helps meet security requirements for:
+
 - **PCI DSS**: Integrity monitoring
 - **HIPAA**: Data authenticity
 - **SOC 2**: Change management

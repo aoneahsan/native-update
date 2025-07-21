@@ -9,7 +9,9 @@ import './App.css';
 const updateService = UpdateService.getInstance();
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'live' | 'app' | 'review' | 'security'>('live');
+  const [activeTab, setActiveTab] = useState<
+    'live' | 'app' | 'review' | 'security'
+  >('live');
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,17 +23,21 @@ function App() {
     try {
       await updateService.initialize();
       setIsInitialized(true);
-      
+
       // Notify app is ready after successful initialization
       await updateService.notifyAppReady();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to initialize update service');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to initialize update service'
+      );
     }
   };
 
   if (error) {
     return (
-      <div className="error-container">
+      <div className='error-container'>
         <h2>Initialization Error</h2>
         <p>{error}</p>
         <button onClick={() => window.location.reload()}>Reload</button>
@@ -41,19 +47,19 @@ function App() {
 
   if (!isInitialized) {
     return (
-      <div className="loading-container">
+      <div className='loading-container'>
         <h2>Initializing Update Service...</h2>
       </div>
     );
   }
 
   return (
-    <div className="app">
-      <header className="app-header">
+    <div className='app'>
+      <header className='app-header'>
         <h1>Capacitor Native Update Demo</h1>
       </header>
 
-      <nav className="tab-nav">
+      <nav className='tab-nav'>
         <button
           className={activeTab === 'live' ? 'active' : ''}
           onClick={() => setActiveTab('live')}
@@ -80,11 +86,19 @@ function App() {
         </button>
       </nav>
 
-      <main className="app-content">
-        {activeTab === 'live' && <LiveUpdatePanel updateService={updateService} />}
-        {activeTab === 'app' && <AppUpdatePanel updateService={updateService} />}
-        {activeTab === 'review' && <AppReviewPanel updateService={updateService} />}
-        {activeTab === 'security' && <SecurityInfoPanel updateService={updateService} />}
+      <main className='app-content'>
+        {activeTab === 'live' && (
+          <LiveUpdatePanel updateService={updateService} />
+        )}
+        {activeTab === 'app' && (
+          <AppUpdatePanel updateService={updateService} />
+        )}
+        {activeTab === 'review' && (
+          <AppReviewPanel updateService={updateService} />
+        )}
+        {activeTab === 'security' && (
+          <SecurityInfoPanel updateService={updateService} />
+        )}
       </main>
     </div>
   );

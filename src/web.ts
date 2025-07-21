@@ -24,11 +24,7 @@ import type {
   NotificationPermissionStatus,
 } from './definitions';
 
-import {
-  SyncStatus,
-  BundleStatus,
-  UpdateErrorCode,
-} from './definitions';
+import { SyncStatus, BundleStatus, UpdateErrorCode } from './definitions';
 
 export class NativeUpdateWeb
   extends WebPlugin
@@ -58,9 +54,15 @@ export class NativeUpdateWeb
    */
   async configure(options: UpdateConfig): Promise<void> {
     // Validate configuration
-    if (options.liveUpdate?.serverUrl && !options.liveUpdate.serverUrl.startsWith('https://')) {
+    if (
+      options.liveUpdate?.serverUrl &&
+      !options.liveUpdate.serverUrl.startsWith('https://')
+    ) {
       if (options.security?.enforceHttps !== false) {
-        throw this.createError(UpdateErrorCode.INSECURE_URL, 'Server URL must use HTTPS');
+        throw this.createError(
+          UpdateErrorCode.INSECURE_URL,
+          'Server URL must use HTTPS'
+        );
       }
     }
 
@@ -74,7 +76,8 @@ export class NativeUpdateWeb
       enforceHttps: this.config.security?.enforceHttps !== false,
       certificatePinning: {
         enabled: this.config.security?.certificatePinning?.enabled || false,
-        certificates: this.config.security?.certificatePinning?.certificates || [],
+        certificates:
+          this.config.security?.certificatePinning?.certificates || [],
       },
       validateInputs: this.config.security?.validateInputs !== false,
       secureStorage: this.config.security?.secureStorage !== false,
@@ -93,11 +96,11 @@ export class NativeUpdateWeb
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration) {
           await registration.update();
-          
+
           if (registration.waiting) {
             // There's an update waiting
             registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-            
+
             return {
               status: SyncStatus.UPDATE_AVAILABLE,
               version: 'web-update',
@@ -114,15 +117,24 @@ export class NativeUpdateWeb
     } catch (error) {
       return {
         status: SyncStatus.ERROR,
-        error: this.createError(UpdateErrorCode.UNKNOWN_ERROR, (error as Error).message),
+        error: this.createError(
+          UpdateErrorCode.UNKNOWN_ERROR,
+          (error as Error).message
+        ),
       };
     }
   }
 
   async download(options: DownloadOptions): Promise<BundleInfo> {
     // Validate URL
-    if (!options.url.startsWith('https://') && this.config.security?.enforceHttps !== false) {
-      throw this.createError(UpdateErrorCode.INSECURE_URL, 'Download URL must use HTTPS');
+    if (
+      !options.url.startsWith('https://') &&
+      this.config.security?.enforceHttps !== false
+    ) {
+      throw this.createError(
+        UpdateErrorCode.INSECURE_URL,
+        'Download URL must use HTTPS'
+      );
     }
 
     const bundleId = `bundle-${Date.now()}`;
@@ -144,19 +156,19 @@ export class NativeUpdateWeb
     for (let i = 0; i <= 100; i += 10) {
       await this.notifyListeners('downloadProgress', {
         percent: i,
-        bytesDownloaded: (i * 1000),
+        bytesDownloaded: i * 1000,
         totalBytes: 10000,
         bundleId,
       });
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     // Update bundle status
     bundle.status = BundleStatus.READY;
     bundle.verified = true; // In real implementation, would verify checksum/signature
-    
+
     this.saveStoredData();
-    
+
     await this.notifyListeners('updateStateChanged', {
       status: bundle.status,
       bundleId: bundle.bundleId,
@@ -185,7 +197,7 @@ export class NativeUpdateWeb
 
   async reload(): Promise<void> {
     console.log('Web: Reloading application...');
-    
+
     // In web, we can reload the page
     if (typeof window !== 'undefined') {
       window.location.reload();
@@ -194,15 +206,15 @@ export class NativeUpdateWeb
 
   async reset(): Promise<void> {
     console.log('Web: Resetting to original bundle...');
-    
+
     this.currentBundle = null;
     this.bundles.clear();
     this.saveStoredData();
-    
+
     // Clear service worker cache if available
     if ('caches' in window) {
       const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      await Promise.all(cacheNames.map((name) => caches.delete(name)));
     }
   }
 
@@ -218,16 +230,17 @@ export class NativeUpdateWeb
     if (options.bundleId) {
       this.bundles.delete(options.bundleId);
     } else if (options.keepVersions !== undefined) {
-      const sortedBundles = Array.from(this.bundles.values())
-        .sort((a, b) => b.downloadTime - a.downloadTime);
-      
+      const sortedBundles = Array.from(this.bundles.values()).sort(
+        (a, b) => b.downloadTime - a.downloadTime
+      );
+
       const bundlesToDelete = sortedBundles.slice(options.keepVersions);
-      bundlesToDelete.forEach(bundle => this.bundles.delete(bundle.bundleId));
+      bundlesToDelete.forEach((bundle) => this.bundles.delete(bundle.bundleId));
     } else if (options.olderThan !== undefined) {
       const cutoffTime = options.olderThan;
       Array.from(this.bundles.values())
-        .filter(bundle => bundle.downloadTime < cutoffTime)
-        .forEach(bundle => this.bundles.delete(bundle.bundleId));
+        .filter((bundle) => bundle.downloadTime < cutoffTime)
+        .forEach((bundle) => this.bundles.delete(bundle.bundleId));
     }
 
     this.saveStoredData();
@@ -235,7 +248,7 @@ export class NativeUpdateWeb
 
   async notifyAppReady(): Promise<void> {
     console.log('Web: App ready notification received');
-    
+
     if (this.currentBundle) {
       this.currentBundle.verified = true;
       this.saveStoredData();
@@ -269,8 +282,14 @@ export class NativeUpdateWeb
   }
 
   async setUpdateUrl(url: string): Promise<void> {
-    if (!url.startsWith('https://') && this.config.security?.enforceHttps !== false) {
-      throw this.createError(UpdateErrorCode.INSECURE_URL, 'Update URL must use HTTPS');
+    if (
+      !url.startsWith('https://') &&
+      this.config.security?.enforceHttps !== false
+    ) {
+      throw this.createError(
+        UpdateErrorCode.INSECURE_URL,
+        'Update URL must use HTTPS'
+      );
     }
 
     if (!this.config.liveUpdate) {
@@ -282,8 +301,13 @@ export class NativeUpdateWeb
 
   async validateUpdate(options: ValidateOptions): Promise<ValidationResult> {
     // Simulate validation
-    const checksumValid = await this.validateChecksum(options.bundlePath, options.checksum);
-    const signatureValid = options.signature ? await this.validateSignature(options.bundlePath, options.signature) : true;
+    const checksumValid = await this.validateChecksum(
+      options.bundlePath,
+      options.checksum
+    );
+    const signatureValid = options.signature
+      ? await this.validateSignature(options.bundlePath, options.signature)
+      : true;
     const sizeValid = options.maxSize ? true : true; // Would check actual size
 
     const isValid = checksumValid && signatureValid && sizeValid;
@@ -305,7 +329,7 @@ export class NativeUpdateWeb
    */
   async getAppUpdateInfo(): Promise<AppUpdateInfo> {
     console.log('Web: App updates not supported on web platform');
-    
+
     return {
       updateAvailable: false,
       currentVersion: '1.0.0',
@@ -337,12 +361,13 @@ export class NativeUpdateWeb
 
   async openAppStore(options?: OpenAppStoreOptions): Promise<void> {
     console.log('Web: Opening app store fallback URL', options);
-    
+
     // Fallback to website or app landing page
-    const fallbackUrl = this.config.appUpdate?.storeUrl?.android || 
-                       this.config.appUpdate?.storeUrl?.ios || 
-                       'https://example.com/download';
-    
+    const fallbackUrl =
+      this.config.appUpdate?.storeUrl?.android ||
+      this.config.appUpdate?.storeUrl?.ios ||
+      'https://example.com/download';
+
     window.open(fallbackUrl, '_blank');
   }
 
@@ -351,7 +376,7 @@ export class NativeUpdateWeb
    */
   async requestReview(): Promise<ReviewResult> {
     const canRequest = await this.canRequestReview();
-    
+
     if (!canRequest.allowed) {
       return {
         shown: false,
@@ -360,15 +385,20 @@ export class NativeUpdateWeb
     }
 
     console.log('Web: Showing review request fallback');
-    
+
     // Update last request time
     this.lastReviewRequest = Date.now();
-    localStorage.setItem('capacitor-native-update-last-review', this.lastReviewRequest.toString());
+    localStorage.setItem(
+      'capacitor-native-update-last-review',
+      this.lastReviewRequest.toString()
+    );
 
     // In web, we could show a custom modal or redirect to a review page
     const reviewUrl = 'https://example.com/review';
-    const shouldRedirect = confirm('Would you like to leave a review for our app?');
-    
+    const shouldRedirect = confirm(
+      'Would you like to leave a review for our app?'
+    );
+
     if (shouldRedirect) {
       window.open(reviewUrl, '_blank');
     }
@@ -385,7 +415,10 @@ export class NativeUpdateWeb
     const daysSinceInstall = (now - installDate) / (1000 * 60 * 60 * 24);
 
     // Check minimum days since install
-    if (config?.minimumDaysSinceInstall && daysSinceInstall < config.minimumDaysSinceInstall) {
+    if (
+      config?.minimumDaysSinceInstall &&
+      daysSinceInstall < config.minimumDaysSinceInstall
+    ) {
       return {
         allowed: false,
         reason: 'Not enough days since install',
@@ -394,7 +427,8 @@ export class NativeUpdateWeb
 
     // Check minimum days since last prompt
     if (config?.minimumDaysSinceLastPrompt && this.lastReviewRequest > 0) {
-      const daysSinceLastPrompt = (now - this.lastReviewRequest) / (1000 * 60 * 60 * 24);
+      const daysSinceLastPrompt =
+        (now - this.lastReviewRequest) / (1000 * 60 * 60 * 24);
       if (daysSinceLastPrompt < config.minimumDaysSinceLastPrompt) {
         return {
           allowed: false,
@@ -404,7 +438,10 @@ export class NativeUpdateWeb
     }
 
     // Check minimum launch count
-    if (config?.minimumLaunchCount && this.launchCount < config.minimumLaunchCount) {
+    if (
+      config?.minimumLaunchCount &&
+      this.launchCount < config.minimumLaunchCount
+    ) {
       return {
         allowed: false,
         reason: 'Not enough app launches',
@@ -421,40 +458,43 @@ export class NativeUpdateWeb
    */
   async enableBackgroundUpdates(config: BackgroundUpdateConfig): Promise<void> {
     console.log('Web: Enabling background updates', config);
-    
+
     if (!this.config.backgroundUpdate) {
       this.config.backgroundUpdate = config;
     } else {
-      this.config.backgroundUpdate = { ...this.config.backgroundUpdate, ...config };
+      this.config.backgroundUpdate = {
+        ...this.config.backgroundUpdate,
+        ...config,
+      };
     }
-    
+
     this.backgroundUpdateStatus.enabled = config.enabled;
-    
+
     if (config.enabled) {
       await this.scheduleBackgroundCheck(config.checkInterval);
     } else {
       await this.disableBackgroundUpdates();
     }
-    
+
     this.saveConfiguration();
   }
 
   async disableBackgroundUpdates(): Promise<void> {
     console.log('Web: Disabling background updates');
-    
+
     if (this.backgroundCheckInterval) {
       clearInterval(this.backgroundCheckInterval);
       this.backgroundCheckInterval = null;
     }
-    
+
     this.backgroundUpdateStatus.enabled = false;
     this.backgroundUpdateStatus.isRunning = false;
     this.backgroundUpdateStatus.currentTaskId = undefined;
-    
+
     if (this.config.backgroundUpdate) {
       this.config.backgroundUpdate.enabled = false;
     }
-    
+
     this.saveConfiguration();
   }
 
@@ -464,23 +504,26 @@ export class NativeUpdateWeb
 
   async scheduleBackgroundCheck(interval: number): Promise<void> {
     console.log('Web: Scheduling background check with interval', interval);
-    
+
     if (this.backgroundCheckInterval) {
       clearInterval(this.backgroundCheckInterval);
     }
-    
+
     this.backgroundCheckInterval = setInterval(async () => {
-      if (this.backgroundUpdateStatus.enabled && !this.backgroundUpdateStatus.isRunning) {
+      if (
+        this.backgroundUpdateStatus.enabled &&
+        !this.backgroundUpdateStatus.isRunning
+      ) {
         await this.triggerBackgroundCheck();
       }
     }, interval);
-    
+
     this.backgroundUpdateStatus.nextCheckTime = Date.now() + interval;
   }
 
   async triggerBackgroundCheck(): Promise<BackgroundCheckResult> {
     console.log('Web: Triggering background check');
-    
+
     if (!this.backgroundUpdateStatus.enabled) {
       return {
         success: false,
@@ -492,26 +535,31 @@ export class NativeUpdateWeb
         },
       };
     }
-    
+
     this.backgroundUpdateStatus.isRunning = true;
     this.backgroundUpdateStatus.checkCount++;
     this.backgroundUpdateStatus.lastCheckTime = Date.now();
-    
+
     try {
       const updateInfo = await this.getAppUpdateInfo();
       const liveUpdate = await this.getLatest();
-      
+
       const updatesFound = updateInfo.updateAvailable || liveUpdate.available;
       let notificationSent = false;
-      
+
       if (updatesFound) {
-        notificationSent = await this.sendWebNotification(updateInfo, liveUpdate);
+        notificationSent = await this.sendWebNotification(
+          updateInfo,
+          liveUpdate
+        );
       }
-      
+
       this.backgroundUpdateStatus.isRunning = false;
-      this.backgroundUpdateStatus.lastUpdateTime = updatesFound ? Date.now() : undefined;
+      this.backgroundUpdateStatus.lastUpdateTime = updatesFound
+        ? Date.now()
+        : undefined;
       this.backgroundUpdateStatus.lastError = undefined;
-      
+
       return {
         success: true,
         updatesFound,
@@ -526,7 +574,7 @@ export class NativeUpdateWeb
         code: UpdateErrorCode.UNKNOWN_ERROR,
         message: error instanceof Error ? error.message : 'Unknown error',
       };
-      
+
       return {
         success: false,
         updatesFound: false,
@@ -536,13 +584,15 @@ export class NativeUpdateWeb
     }
   }
 
-  async setNotificationPreferences(preferences: NotificationPreferences): Promise<void> {
+  async setNotificationPreferences(
+    preferences: NotificationPreferences
+  ): Promise<void> {
     console.log('Web: Setting notification preferences', preferences);
-    
+
     if (!this.config.backgroundUpdate) {
       this.config.backgroundUpdate = {} as BackgroundUpdateConfig;
     }
-    
+
     this.config.backgroundUpdate.notificationPreferences = preferences;
     this.saveConfiguration();
   }
@@ -554,9 +604,9 @@ export class NativeUpdateWeb
         canRequest: false,
       };
     }
-    
+
     const permission = Notification.permission;
-    
+
     return {
       granted: permission === 'granted',
       canRequest: permission === 'default',
@@ -567,29 +617,32 @@ export class NativeUpdateWeb
     if (!('Notification' in window)) {
       return false;
     }
-    
+
     if (Notification.permission === 'granted') {
       return true;
     }
-    
+
     if (Notification.permission === 'denied') {
       return false;
     }
-    
+
     const permission = await Notification.requestPermission();
     return permission === 'granted';
   }
 
-  private async sendWebNotification(appUpdate: AppUpdateInfo, liveUpdate: LatestVersion): Promise<boolean> {
+  private async sendWebNotification(
+    appUpdate: AppUpdateInfo,
+    liveUpdate: LatestVersion
+  ): Promise<boolean> {
     const permissions = await this.getNotificationPermissions();
     if (!permissions.granted) {
       return false;
     }
-    
+
     const prefs = this.config.backgroundUpdate?.notificationPreferences;
     let title = prefs?.title || 'App Update Available';
     let body = prefs?.description || 'A new version of the app is available';
-    
+
     if (appUpdate.updateAvailable && liveUpdate.available) {
       title = 'App Updates Available';
       body = `App version ${appUpdate.availableVersion} and content updates are available`;
@@ -600,7 +653,7 @@ export class NativeUpdateWeb
       title = 'Content Update Available';
       body = `New content version ${liveUpdate.version} is available`;
     }
-    
+
     try {
       const notification = new Notification(title, {
         body,
@@ -613,11 +666,11 @@ export class NativeUpdateWeb
           liveUpdate,
         },
       });
-      
+
       notification.onclick = () => {
         window.focus();
         notification.close();
-        
+
         this.notifyListeners('backgroundUpdateNotification', {
           type: appUpdate.updateAvailable ? 'app_update' : 'live_update',
           updateAvailable: true,
@@ -625,7 +678,7 @@ export class NativeUpdateWeb
           action: 'tapped',
         });
       };
-      
+
       return true;
     } catch (error) {
       console.error('Web: Failed to send notification', error);
@@ -656,13 +709,19 @@ export class NativeUpdateWeb
     };
   }
 
-  private async validateChecksum(_data: string, expectedChecksum: string): Promise<boolean> {
+  private async validateChecksum(
+    _data: string,
+    expectedChecksum: string
+  ): Promise<boolean> {
     // In a real implementation, would calculate actual checksum
     console.log('Web: Validating checksum...', expectedChecksum);
     return true;
   }
 
-  private async validateSignature(_data: string, signature: string): Promise<boolean> {
+  private async validateSignature(
+    _data: string,
+    signature: string
+  ): Promise<boolean> {
     // In a real implementation, would verify signature
     console.log('Web: Validating signature...', signature);
     return true;
@@ -676,42 +735,60 @@ export class NativeUpdateWeb
     }
 
     // Load bundles
-    const storedBundles = localStorage.getItem('capacitor-native-update-bundles');
+    const storedBundles = localStorage.getItem(
+      'capacitor-native-update-bundles'
+    );
     if (storedBundles) {
       const bundlesArray: BundleInfo[] = JSON.parse(storedBundles);
-      bundlesArray.forEach(bundle => this.bundles.set(bundle.bundleId, bundle));
+      bundlesArray.forEach((bundle) =>
+        this.bundles.set(bundle.bundleId, bundle)
+      );
     }
 
     // Load current bundle
-    const storedCurrent = localStorage.getItem('capacitor-native-update-current');
+    const storedCurrent = localStorage.getItem(
+      'capacitor-native-update-current'
+    );
     if (storedCurrent) {
       this.currentBundle = JSON.parse(storedCurrent);
     }
 
     // Load last review request time
-    const storedLastReview = localStorage.getItem('capacitor-native-update-last-review');
+    const storedLastReview = localStorage.getItem(
+      'capacitor-native-update-last-review'
+    );
     if (storedLastReview) {
       this.lastReviewRequest = parseInt(storedLastReview, 10);
     }
 
     // Load launch count
-    const storedLaunchCount = localStorage.getItem('capacitor-native-update-launch-count');
+    const storedLaunchCount = localStorage.getItem(
+      'capacitor-native-update-launch-count'
+    );
     if (storedLaunchCount) {
       this.launchCount = parseInt(storedLaunchCount, 10);
     }
   }
 
   private saveStoredData(): void {
-    localStorage.setItem('capacitor-native-update-bundles', 
-      JSON.stringify(Array.from(this.bundles.values())));
-    
+    localStorage.setItem(
+      'capacitor-native-update-bundles',
+      JSON.stringify(Array.from(this.bundles.values()))
+    );
+
     if (this.currentBundle) {
-      localStorage.setItem('capacitor-native-update-current', JSON.stringify(this.currentBundle));
+      localStorage.setItem(
+        'capacitor-native-update-current',
+        JSON.stringify(this.currentBundle)
+      );
     }
   }
 
   private saveConfiguration(): void {
-    localStorage.setItem('capacitor-native-update-config', JSON.stringify(this.config));
+    localStorage.setItem(
+      'capacitor-native-update-config',
+      JSON.stringify(this.config)
+    );
   }
 
   private getInstallDate(): number {
@@ -719,14 +796,20 @@ export class NativeUpdateWeb
     if (stored) {
       return parseInt(stored, 10);
     }
-    
+
     const now = Date.now();
-    localStorage.setItem('capacitor-native-update-install-date', now.toString());
+    localStorage.setItem(
+      'capacitor-native-update-install-date',
+      now.toString()
+    );
     return now;
   }
 
   private incrementLaunchCount(): void {
     this.launchCount++;
-    localStorage.setItem('capacitor-native-update-launch-count', this.launchCount.toString());
+    localStorage.setItem(
+      'capacitor-native-update-launch-count',
+      this.launchCount.toString()
+    );
   }
 }

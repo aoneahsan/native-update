@@ -3,6 +3,7 @@
 This comprehensive guide explains how to implement Native App Updates (App Store and Google Play updates) in your Capacitor application using the CapacitorNativeUpdate plugin.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Platform Differences](#platform-differences)
 - [Setup Guide](#setup-guide)
@@ -14,6 +15,7 @@ This comprehensive guide explains how to implement Native App Updates (App Store
 ## Overview
 
 Native App Updates allow your app to:
+
 - 🔄 Check for new versions in app stores
 - 📥 Download updates within the app
 - 🚀 Install updates seamlessly
@@ -22,19 +24,21 @@ Native App Updates allow your app to:
 ### Benefits
 
 - **User Experience**: Users update without leaving your app
-- **Adoption Rate**: Higher update rates vs waiting for manual updates  
+- **Adoption Rate**: Higher update rates vs waiting for manual updates
 - **Control**: Guide users through important updates
 - **Flexibility**: Immediate vs flexible update strategies
 
 ## Platform Differences
 
 ### Android (Google Play)
+
 - Uses Google Play Core Library
 - Supports In-App Updates API
 - Two update modes: Immediate and Flexible
 - Requires Google Play Store (not available on other stores)
 
 ### iOS (App Store)
+
 - Uses StoreKit framework
 - Redirects to App Store for download
 - Cannot install directly within app
@@ -64,6 +68,7 @@ npx cap sync
 ### Android Configuration
 
 1. **Add to `android/app/build.gradle`:**
+
 ```gradle
 dependencies {
     implementation 'com.google.android.play:core:2.1.0'
@@ -72,6 +77,7 @@ dependencies {
 ```
 
 2. **Add to `AndroidManifest.xml`:**
+
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -80,6 +86,7 @@ dependencies {
 ### iOS Configuration
 
 1. **Add to `Info.plist`:**
+
 ```xml
 <key>LSApplicationQueriesSchemes</key>
 <array>
@@ -104,14 +111,14 @@ export class NativeUpdateService {
     try {
       // Check current platform
       const platform = Capacitor.getPlatform();
-      
+
       // Check for native app updates
       const result = await CapacitorNativeUpdate.checkAppUpdate();
-      
+
       if (result.updateAvailable) {
         console.log(`Update available: ${result.availableVersion}`);
         console.log(`Current version: ${result.currentVersion}`);
-        
+
         // Handle based on update type
         if (result.immediateUpdateAllowed) {
           await this.performImmediateUpdate();
@@ -131,13 +138,14 @@ export class NativeUpdateService {
 ### Step 2: Android In-App Updates
 
 #### Immediate Update (Blocking)
+
 ```typescript
 export class AndroidImmediateUpdate {
   async performImmediateUpdate() {
     try {
       // Start immediate update
       const { started } = await CapacitorNativeUpdate.startImmediateUpdate();
-      
+
       if (started) {
         // The app will be restarted automatically after update
         console.log('Immediate update started');
@@ -156,12 +164,14 @@ export class AndroidImmediateUpdate {
       header: 'Update Required',
       message: 'This update is required to continue using the app.',
       backdropDismiss: false,
-      buttons: [{
-        text: 'Update',
-        handler: () => {
-          this.performImmediateUpdate();
-        }
-      }]
+      buttons: [
+        {
+          text: 'Update',
+          handler: () => {
+            this.performImmediateUpdate();
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -169,6 +179,7 @@ export class AndroidImmediateUpdate {
 ```
 
 #### Flexible Update (Non-blocking)
+
 ```typescript
 export class AndroidFlexibleUpdate {
   private updateDownloaded = false;
@@ -177,23 +188,24 @@ export class AndroidFlexibleUpdate {
     try {
       // Start flexible update
       await CapacitorNativeUpdate.startFlexibleUpdate();
-      
+
       // Listen for download progress
-      CapacitorNativeUpdate.addListener('onAppUpdateDownloadProgress', 
+      CapacitorNativeUpdate.addListener(
+        'onAppUpdateDownloadProgress',
         (progress) => {
-          console.log(`Download progress: ${progress.bytesDownloaded} / ${progress.totalBytesToDownload}`);
+          console.log(
+            `Download progress: ${progress.bytesDownloaded} / ${progress.totalBytesToDownload}`
+          );
           this.updateProgressUI(progress);
         }
       );
 
       // Listen for download completion
-      CapacitorNativeUpdate.addListener('onAppUpdateDownloaded', 
-        () => {
-          console.log('Update downloaded');
-          this.updateDownloaded = true;
-          this.showInstallPrompt();
-        }
-      );
+      CapacitorNativeUpdate.addListener('onAppUpdateDownloaded', () => {
+        console.log('Update downloaded');
+        this.updateDownloaded = true;
+        this.showInstallPrompt();
+      });
     } catch (error) {
       console.error('Flexible update failed:', error);
     }
@@ -202,22 +214,23 @@ export class AndroidFlexibleUpdate {
   async showInstallPrompt() {
     const alert = await this.alertController.create({
       header: 'Update Ready',
-      message: 'A new version has been downloaded. Would you like to install it now?',
+      message:
+        'A new version has been downloaded. Would you like to install it now?',
       buttons: [
         {
           text: 'Later',
           role: 'cancel',
           handler: () => {
             // Install will happen on next app restart
-          }
+          },
         },
         {
           text: 'Install',
           handler: () => {
             this.completeFlexibleUpdate();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -235,7 +248,7 @@ export class AndroidFlexibleUpdate {
     const percent = Math.round(
       (progress.bytesDownloaded / progress.totalBytesToDownload) * 100
     );
-    
+
     // Update your UI progress bar
     this.downloadProgress = percent;
   }
@@ -249,7 +262,7 @@ export class iOSAppStoreUpdate {
   async checkAndPromptUpdate() {
     try {
       const result = await CapacitorNativeUpdate.checkAppUpdate();
-      
+
       if (result.updateAvailable) {
         await this.showiOSUpdateDialog(result);
       }
@@ -265,15 +278,15 @@ export class iOSAppStoreUpdate {
       buttons: [
         {
           text: 'Later',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'Update',
           handler: () => {
             this.openAppStore();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -302,7 +315,7 @@ export class UnifiedUpdateService {
   async checkAndUpdateApp() {
     try {
       const updateInfo = await CapacitorNativeUpdate.checkAppUpdate();
-      
+
       if (!updateInfo.updateAvailable) {
         console.log('App is up to date');
         return;
@@ -323,14 +336,14 @@ export class UnifiedUpdateService {
   private async handleAndroidUpdate(updateInfo: any) {
     // Determine update priority
     const priority = updateInfo.updatePriority || 0;
-    
+
     if (priority >= 4 || updateInfo.immediateUpdateAllowed) {
       // High priority or immediate update required
       await this.showUpdateDialog({
         title: 'Important Update',
         message: 'A critical update is available and must be installed.',
         mandatory: true,
-        action: () => this.performImmediateUpdate()
+        action: () => this.performImmediateUpdate(),
       });
     } else if (updateInfo.flexibleUpdateAllowed) {
       // Normal priority - flexible update
@@ -338,7 +351,7 @@ export class UnifiedUpdateService {
         title: 'Update Available',
         message: `Version ${updateInfo.availableVersion} is available with new features and improvements.`,
         mandatory: false,
-        action: () => this.performFlexibleUpdate()
+        action: () => this.performFlexibleUpdate(),
       });
     }
   }
@@ -348,7 +361,7 @@ export class UnifiedUpdateService {
       title: 'Update Available',
       message: `Version ${updateInfo.availableVersion} is available on the App Store.`,
       mandatory: false,
-      action: () => CapacitorNativeUpdate.openAppStore()
+      action: () => CapacitorNativeUpdate.openAppStore(),
     });
   }
 
@@ -358,27 +371,29 @@ export class UnifiedUpdateService {
     mandatory: boolean;
     action: () => Promise<void>;
   }) {
-    const buttons = options.mandatory 
-      ? [{
-          text: 'Update Now',
-          handler: () => options.action()
-        }]
+    const buttons = options.mandatory
+      ? [
+          {
+            text: 'Update Now',
+            handler: () => options.action(),
+          },
+        ]
       : [
           {
             text: 'Later',
-            role: 'cancel'
+            role: 'cancel',
           },
           {
             text: 'Update',
-            handler: () => options.action()
-          }
+            handler: () => options.action(),
+          },
         ];
 
     const alert = await this.alertController.create({
       header: options.title,
       message: options.message,
       backdropDismiss: !options.mandatory,
-      buttons
+      buttons,
     });
 
     await alert.present();
@@ -396,35 +411,34 @@ export class UpdateStatusManager {
 
   private setupUpdateListeners() {
     // Installation status
-    CapacitorNativeUpdate.addListener('onAppUpdateInstallStatus', 
-      (status) => {
-        switch (status.status) {
-          case 'PENDING':
-            console.log('Update pending');
-            break;
-          case 'DOWNLOADING':
-            console.log('Downloading update');
-            break;
-          case 'INSTALLING':
-            console.log('Installing update');
-            break;
-          case 'INSTALLED':
-            console.log('Update installed');
-            this.notifyUpdateComplete();
-            break;
-          case 'FAILED':
-            console.error('Update failed:', status.error);
-            this.handleUpdateFailure(status.error);
-            break;
-          case 'CANCELED':
-            console.log('Update canceled by user');
-            break;
-        }
+    CapacitorNativeUpdate.addListener('onAppUpdateInstallStatus', (status) => {
+      switch (status.status) {
+        case 'PENDING':
+          console.log('Update pending');
+          break;
+        case 'DOWNLOADING':
+          console.log('Downloading update');
+          break;
+        case 'INSTALLING':
+          console.log('Installing update');
+          break;
+        case 'INSTALLED':
+          console.log('Update installed');
+          this.notifyUpdateComplete();
+          break;
+        case 'FAILED':
+          console.error('Update failed:', status.error);
+          this.handleUpdateFailure(status.error);
+          break;
+        case 'CANCELED':
+          console.log('Update canceled by user');
+          break;
       }
-    );
+    });
 
     // Download progress (Android flexible updates)
-    CapacitorNativeUpdate.addListener('onAppUpdateDownloadProgress',
+    CapacitorNativeUpdate.addListener(
+      'onAppUpdateDownloadProgress',
       (progress) => {
         const percent = Math.round(
           (progress.bytesDownloaded / progress.totalBytesToDownload) * 100
@@ -453,7 +467,7 @@ export class UpdateUIService {
   async showSmartUpdatePrompt(updateInfo: any) {
     const timeSinceLastPrompt = Date.now() - this.lastPromptTime;
     const oneDayInMs = 24 * 60 * 60 * 1000;
-    
+
     // Don't prompt too frequently
     if (timeSinceLastPrompt < oneDayInMs && !updateInfo.mandatory) {
       return;
@@ -467,7 +481,7 @@ export class UpdateUIService {
     } else {
       await this.showStandardUpdateUI(updateInfo);
     }
-    
+
     this.lastPromptTime = Date.now();
   }
 
@@ -476,7 +490,7 @@ export class UpdateUIService {
     const modal = await this.modalController.create({
       component: CriticalUpdateComponent,
       componentProps: { updateInfo },
-      backdropDismiss: false
+      backdropDismiss: false,
     });
     await modal.present();
   }
@@ -487,10 +501,12 @@ export class UpdateUIService {
       message: 'A new version is available',
       duration: 5000,
       position: 'top',
-      buttons: [{
-        text: 'Update',
-        handler: () => this.startUpdate()
-      }]
+      buttons: [
+        {
+          text: 'Update',
+          handler: () => this.startUpdate(),
+        },
+      ],
     });
     await toast.present();
   }
@@ -519,12 +535,12 @@ export class UpdateUIService {
 export class SmartUpdateScheduler {
   async scheduleUpdate() {
     const updateInfo = await CapacitorNativeUpdate.checkAppUpdate();
-    
+
     if (!updateInfo.updateAvailable) return;
 
     // Check user preferences
     const preferences = await this.getUpdatePreferences();
-    
+
     if (preferences.autoUpdate === 'wifi-only') {
       const connection = await Network.getStatus();
       if (connection.connectionType !== 'wifi') {
@@ -554,26 +570,28 @@ export class SmartUpdateScheduler {
 ### Android Testing
 
 1. **Using Internal Test Track**:
+
 ```typescript
 // Enable internal app sharing for testing
-await CapacitorNativeUpdate.enableDebugMode({ 
+await CapacitorNativeUpdate.enableDebugMode({
   enabled: true,
-  testMode: 'internal-test'
+  testMode: 'internal-test',
 });
 ```
 
 2. **Test Different Scenarios**:
+
 ```typescript
 // Test immediate update
 await CapacitorNativeUpdate.simulateUpdate({
   type: 'immediate',
-  version: '2.0.0'
+  version: '2.0.0',
 });
 
 // Test flexible update
 await CapacitorNativeUpdate.simulateUpdate({
   type: 'flexible',
-  version: '1.1.0'
+  version: '1.1.0',
 });
 ```
 
@@ -605,6 +623,7 @@ await CapacitorNativeUpdate.simulateUpdate({
 ### Common Issues
 
 #### 1. Update Not Detected
+
 ```typescript
 // Debug update detection
 const debug = await CapacitorNativeUpdate.getDebugInfo();
@@ -612,11 +631,12 @@ console.log('Debug info:', {
   currentVersion: debug.currentVersion,
   packageName: debug.packageName,
   lastCheckTime: debug.lastCheckTime,
-  playServicesAvailable: debug.playServicesAvailable // Android
+  playServicesAvailable: debug.playServicesAvailable, // Android
 });
 ```
 
 #### 2. Update Fails to Install
+
 ```typescript
 // Check update state
 const state = await CapacitorNativeUpdate.getUpdateState();
@@ -628,6 +648,7 @@ if (state.status === 'FAILED') {
 ```
 
 #### 3. iOS App Store Not Opening
+
 ```typescript
 // Verify App Store ID configuration
 const config = await CapacitorNativeUpdate.getConfiguration();
@@ -642,12 +663,14 @@ if (!config.appStoreId) {
 ### Platform-Specific Issues
 
 #### Android
+
 - Ensure Google Play Services is updated
 - Check Play Store app is installed
 - Verify app is signed with release key
 - Test on device with Play Store (not emulator)
 
 #### iOS
+
 - Verify App Store ID is correct
 - Check iTunes lookup API response
 - Ensure app is live on App Store

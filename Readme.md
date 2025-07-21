@@ -5,7 +5,9 @@ A comprehensive update management plugin for Capacitor that combines Live/OTA up
 ## Features
 
 ### 🚀 Live Updates (OTA)
+
 Deploy JavaScript, HTML, and CSS updates instantly without going through app store approval:
+
 - **Multiple update strategies**: Immediate, background, or manual updates
 - **Delta updates**: Only download changed files for faster updates
 - **Automatic rollback**: Revert to previous version if update fails
@@ -13,14 +15,18 @@ Deploy JavaScript, HTML, and CSS updates instantly without going through app sto
 - **Security**: End-to-end encryption and signature verification
 
 ### 📱 Native App Updates
+
 Seamlessly manage app store updates with native UI integration:
+
 - **Version checking**: Detect when newer versions are available
 - **Flexible updates**: Background download with user-controlled installation
 - **Immediate updates**: Force critical updates with blocking UI
 - **Platform integration**: Google Play Core (Android) and App Store (iOS) support
 
 ### ⭐ App Reviews
+
 Increase user engagement with intelligent review prompts:
+
 - **In-app reviews**: Native review dialogs without leaving the app
 - **Smart triggering**: Request reviews at optimal moments
 - **Rate limiting**: Respect platform limits (iOS: 3x/year)
@@ -46,7 +52,7 @@ async function initializeApp() {
   await CapacitorNativeUpdate.configure({
     updateUrl: 'https://updates.yourdomain.com/api/v1',
     autoCheck: true,
-    publicKey: 'your-public-key-for-security'
+    publicKey: 'your-public-key-for-security',
   });
 }
 ```
@@ -58,15 +64,15 @@ async function initializeApp() {
 async function checkLiveUpdates() {
   try {
     const { available, version } = await CapacitorNativeUpdate.checkForUpdate();
-    
+
     if (available) {
       // Download update with progress
       await CapacitorNativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           console.log(`Downloading: ${progress.percent}%`);
-        }
+        },
       });
-      
+
       // Apply update (app will restart)
       await CapacitorNativeUpdate.applyUpdate();
     }
@@ -82,7 +88,7 @@ async function checkLiveUpdates() {
 // Check for app store updates
 async function checkNativeUpdates() {
   const result = await CapacitorNativeUpdate.checkAppUpdate();
-  
+
   if (result.updateAvailable) {
     if (result.immediateUpdateAllowed) {
       // Critical update - must install
@@ -102,7 +108,7 @@ async function checkNativeUpdates() {
 async function requestAppReview() {
   // Only ask after positive interactions
   const shouldAsk = await checkIfGoodMoment();
-  
+
   if (shouldAsk) {
     const result = await CapacitorNativeUpdate.requestReview();
     if (result.displayed) {
@@ -121,7 +127,7 @@ import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html'
+  templateUrl: 'app.component.html',
 })
 export class AppComponent implements OnInit {
   constructor(private alertCtrl: AlertController) {}
@@ -129,7 +135,7 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     // Check for updates on app start
     await this.checkAllUpdates();
-    
+
     // Set up periodic checks
     setInterval(() => this.checkAllUpdates(), 3600000); // Every hour
   }
@@ -141,7 +147,7 @@ export class AppComponent implements OnInit {
       await this.promptLiveUpdate(liveUpdate);
       return; // Don't check native if live update is available
     }
-    
+
     // 2. Check native updates
     const nativeUpdate = await CapacitorNativeUpdate.checkAppUpdate();
     if (nativeUpdate.updateAvailable) {
@@ -155,11 +161,11 @@ export class AppComponent implements OnInit {
       message: `Version ${update.version} is ready to install`,
       buttons: [
         { text: 'Later', role: 'cancel' },
-        { 
+        {
           text: 'Update',
-          handler: () => this.installLiveUpdate()
-        }
-      ]
+          handler: () => this.installLiveUpdate(),
+        },
+      ],
     });
     await alert.present();
   }
@@ -202,10 +208,10 @@ export class AppComponent implements OnInit {
 ## Platform Support
 
 | Platform | Live Updates | App Updates | App Reviews |
-|----------|-------------|-------------|-------------|
-| iOS      | ✅          | ✅          | ✅          |
-| Android  | ✅          | ✅          | ✅          |
-| Web      | ✅          | ⚠️           | ⚠️           |
+| -------- | ------------ | ----------- | ----------- |
+| iOS      | ✅           | ✅          | ✅          |
+| Android  | ✅           | ✅          | ✅          |
+| Web      | ✅           | ⚠️          | ⚠️          |
 
 ⚠️ = Graceful fallback with limited functionality
 
@@ -218,6 +224,7 @@ export class AppComponent implements OnInit {
 ## Security
 
 This plugin implements multiple security layers:
+
 - **HTTPS enforcement** for all update downloads
 - **Public key signature verification** for bundle integrity
 - **Checksum validation** before applying updates
@@ -226,16 +233,19 @@ This plugin implements multiple security layers:
 ## Documentation
 
 ### Getting Started
+
 - 🚀 [Quick Start Guide](./docs/QUICK_START.md) - Get up and running in 5 minutes
 - 📖 [Features Overview](./FEATURES.md) - Detailed feature descriptions
 - 🔧 [API Reference](./API.md) - Complete API documentation
 
 ### Implementation Guides
+
 - 📱 [Live Updates Guide](./docs/LIVE_UPDATES_GUIDE.md) - Complete OTA implementation
 - 🏪 [Native Updates Guide](./docs/NATIVE_UPDATES_GUIDE.md) - App store updates
 - ⭐ [App Review Guide](./docs/APP_REVIEW_GUIDE.md) - Maximize review rates
 
 ### Advanced Topics
+
 - 🔐 [Security Best Practices](./docs/SECURITY.md) - Security implementation
 - 🔏 [Bundle Signing](./docs/BUNDLE_SIGNING.md) - Cryptographic signing
 - 📊 [Migration Guide](./docs/MIGRATION.md) - Migrate from other solutions
@@ -243,14 +253,18 @@ This plugin implements multiple security layers:
 ## Example Implementation
 
 ### Complete Example App
+
 Check out the [example app](./example) for a full implementation with:
+
 - React + TypeScript setup
 - All three features integrated
 - Production-ready UI components
 - Error handling and analytics
 
 ### Update Server Example
+
 The [server example](./server-example) includes:
+
 - Express.js update server
 - Bundle upload and management
 - Signature generation tools
@@ -270,32 +284,38 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 ## 📚 Comprehensive Documentation
 
 ### Getting Started
+
 - **[Installation Guide](./docs/getting-started/installation.md)** - Step-by-step installation instructions
 - **[Quick Start Guide](./docs/getting-started/quick-start.md)** - Get up and running in minutes
 - **[Configuration Guide](./docs/getting-started/configuration.md)** - Detailed configuration options
 
 ### Features
+
 - **[Live Updates (OTA)](./docs/features/live-updates.md)** - Deploy web updates instantly
 - **[App Updates](./docs/features/app-updates.md)** - Native app store update management
 - **[App Reviews](./docs/features/app-reviews.md)** - In-app review integration
 
 ### Guides
+
 - **[Security Best Practices](./docs/guides/security-best-practices.md)** - Implement secure updates
 - **[Migration Guide](./docs/guides/migration-guide.md)** - Migrate from other solutions
 - **[Troubleshooting](./docs/guides/troubleshooting.md)** - Common issues and solutions
 
 ### API Reference
+
 - **[Live Update API](./docs/api/live-update-api.md)** - Complete API for OTA updates
 - **[App Update API](./docs/api/app-update-api.md)** - Native app update methods
 - **[App Review API](./docs/api/app-review-api.md)** - Review request methods
 - **[Events API](./docs/api/events-api.md)** - Event listeners and handlers
 
 ### Examples
+
 - **[Basic Usage](./docs/examples/basic-usage.md)** - Simple implementation examples
 - **[Advanced Scenarios](./docs/examples/advanced-scenarios.md)** - Complex use cases
 - **[Integration Examples](./docs/examples/integration-examples.md)** - Framework integrations
 
 ### Production
+
 - **[Production Readiness](./docs/production-readiness.md)** - Comprehensive production checklist
 
 ## 🏆 Production Ready
@@ -303,30 +323,35 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 This package is **production-ready** and includes:
 
 ### ✅ Enterprise-Grade Security
+
 - End-to-end encryption and signature verification
 - Certificate pinning and HTTPS enforcement
 - Input validation and sanitization
 - Secure storage for sensitive data
 
 ### ✅ High Performance
+
 - Optimized bundle management
 - Background downloads with resume capability
 - Efficient caching strategies
 - Memory-conscious implementation
 
 ### ✅ Comprehensive Testing
+
 - Unit tests with >85% coverage
 - Integration tests across platforms
 - Security vulnerability testing
 - Performance benchmarks
 
 ### ✅ Complete Documentation
+
 - Detailed API documentation
 - Security best practices guide
 - Production deployment checklist
 - Troubleshooting and support guides
 
 ### ✅ Enterprise Support
+
 - Professional support available
 - Security updates and patches
 - Performance optimization
@@ -335,6 +360,7 @@ This package is **production-ready** and includes:
 ## 🚀 Quick Production Deployment
 
 1. **Install and Configure**:
+
    ```bash
    npm install capacitor-native-update
    npx cap sync
@@ -359,12 +385,14 @@ This package is **production-ready** and includes:
 This package is **open-source** and created by **Ahsan Mahmood** for the developer community. We welcome contributions, feedback, and collaboration.
 
 ### Community Resources
+
 - **[GitHub Repository](https://github.com/aoneahsan/capacitor-native-update)** - Source code and issues
 - **[Documentation](./docs/README.md)** - Comprehensive documentation
 - **[Examples](./docs/examples/)** - Real-world usage examples
 - **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute
 
 ### Professional Support
+
 - **Custom Implementation**: Tailored solutions for your needs
 - **Security Audits**: Professional security assessments
 - **Performance Optimization**: Performance tuning and optimization
@@ -391,6 +419,7 @@ MIT License - see [LICENSE](./LICENSE) for details.
 ## Author
 
 **Ahsan Mahmood**
+
 - Portfolio: [aoneahsan.com](https://aoneahsan.com)
 - GitHub: [aoneahsan](https://github.com/aoneahsan)
 - Email: aoneahsan@gmail.com

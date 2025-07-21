@@ -13,6 +13,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 1. Live Update Features (OTA)
 
 ### Bundle Management
+
 - **Download Management**
   - Progressive download with resume capability
   - Background download support
@@ -33,6 +34,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Bundle size limits
 
 ### Update Strategies
+
 - **Immediate Update**
   - Force update on app launch
   - Block app usage until update completes
@@ -49,6 +51,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - User-triggered updates
 
 ### Rollback & Recovery
+
 - **Automatic Rollback**
   - Detect failed updates
   - Automatic revert to previous version
@@ -64,6 +67,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Telemetry on update success
 
 ### Update Channels
+
 - **Multiple Channels**
   - Production, staging, development
   - Beta testing channels
@@ -76,6 +80,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - User segmentation
 
 ### Security Features (Following Capacitor Security Guidelines)
+
 - **Encryption**
   - End-to-end encryption for bundles
   - AES-256-GCM encryption with authenticated encryption
@@ -114,6 +119,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Version string format validation
 
 ### Analytics & Monitoring
+
 - **Update Metrics**
   - Download success rates
   - Update application rates
@@ -128,6 +134,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 2. Native App Update Features
 
 ### Update Detection
+
 - **Version Checking**
   - Check current vs available versions
   - Version code and name comparison
@@ -141,6 +148,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Custom priority levels
 
 ### Update Types
+
 - **Immediate Updates**
   - Blocking UI during update
   - Force update for critical fixes
@@ -154,6 +162,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Install at convenient time
 
 ### Platform Integration
+
 - **Android Features**
   - Google Play Core integration
   - In-app update API support
@@ -167,6 +176,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Version comparison logic
 
 ### Update UI
+
 - **Native Dialogs**
   - Platform-specific update prompts
   - Customizable messaging
@@ -182,6 +192,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 3. App Review Features
 
 ### Review Prompts
+
 - **In-App Reviews**
   - Native review dialogs
   - No app switching required
@@ -195,6 +206,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Configurable triggers
 
 ### Rate Limiting
+
 - **Platform Limits**
   - iOS: Maximum 3 times per year
   - Android: Quota management
@@ -208,6 +220,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Conditional triggering
 
 ### Analytics
+
 - **Review Metrics**
   - Request success rates
   - User interaction tracking
@@ -217,6 +230,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 4. Configuration & Management
 
 ### Plugin Configuration
+
 ```typescript
 {
   // Live Update Configuration
@@ -230,7 +244,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
     checkInterval?: number;
     allowEmulator?: boolean;
   },
-  
+
   // App Update Configuration
   appUpdate: {
     minimumVersion?: string;
@@ -241,7 +255,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
     };
     checkOnAppStart?: boolean;
   },
-  
+
   // App Review Configuration
   appReview: {
     minimumDaysSinceInstall?: number;
@@ -250,7 +264,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
     customTriggers?: string[];
     debugMode?: boolean;
   },
-  
+
   // Security Configuration
   security: {
     enforceHttps?: boolean; // Default: true
@@ -269,6 +283,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ```
 
 ### Error Handling
+
 - Comprehensive error codes without exposing system details
 - User-friendly error messages
 - Detailed internal logging (without sensitive data)
@@ -277,6 +292,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 - Security event logging and monitoring
 
 ### Testing Support
+
 - Debug mode for development (disabled in production)
 - Update simulation with mock servers
 - Force update triggers (development only)
@@ -288,12 +304,14 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 5. Web Platform Support
 
 ### Progressive Web Apps
+
 - Service worker integration
 - Cache management
 - Update notifications
 - Background sync
 
 ### Web Fallbacks
+
 - Graceful degradation
 - Feature detection
 - Browser compatibility
@@ -304,6 +322,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ### Platform-Specific Security
 
 #### iOS Security
+
 - **Keychain Services** for storing encryption keys and sensitive data
 - **App Transport Security** enforcement (no HTTP allowed)
 - **Code signing** validation for update bundles
@@ -311,6 +330,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 - **Entitlements** properly configured for network access
 
 #### Android Security
+
 - **Android Keystore** for cryptographic key storage
 - **Network Security Config** for certificate pinning
 - **Runtime permissions** for storage and network access
@@ -318,6 +338,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 - **SafetyNet** integration for device attestation
 
 ### Security Protocols
+
 - **Update Protocol**
   1. HTTPS request with certificate validation
   2. Server authentication via API keys
@@ -335,6 +356,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
   - Hardware-backed key storage when available
 
 ### Threat Mitigation
+
 - **Man-in-the-Middle**: Certificate pinning, HTTPS enforcement
 - **Bundle Tampering**: Cryptographic signatures, checksums
 - **Downgrade Attacks**: Version validation, no downgrades by default
@@ -345,6 +367,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 7. Performance Optimizations
 
 ### Resource Management
+
 - Memory efficient downloads with streaming
 - Disk space pre-check before download
 - CPU usage optimization with background threads
@@ -352,6 +375,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 - Network state monitoring
 
 ### Network Optimization
+
 - Intelligent retry with exponential backoff
 - Connection type detection (WiFi preferred)
 - Bandwidth throttling options
@@ -362,6 +386,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 8. Compliance and Privacy
 
 ### Data Protection
+
 - GDPR compliance with data minimization
 - No personal data collection in update process
 - Anonymous usage statistics (opt-in)
@@ -369,6 +394,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 - Right to erasure support
 
 ### App Store Compliance
+
 - iOS App Store guidelines compliance
 - Google Play Store policy adherence
 - Transparent update notifications
@@ -378,6 +404,7 @@ The Capacitor Native Update plugin provides a comprehensive solution for managin
 ## 9. Future Enhancements
 
 ### Planned Features
+
 - Machine learning for optimal update timing
 - Predictive pre-loading
 - Peer-to-peer update distribution

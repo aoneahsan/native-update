@@ -7,6 +7,7 @@
 If you're migrating from the official Capacitor Live Updates plugin:
 
 1. **Update imports**:
+
 ```typescript
 // Before
 import { LiveUpdates } from '@capacitor/live-updates';
@@ -16,6 +17,7 @@ import { CapacitorNativeUpdate } from 'capacitor-native-update';
 ```
 
 2. **Update configuration**:
+
 ```typescript
 // Before
 await LiveUpdates.configure({
@@ -32,11 +34,12 @@ await CapacitorNativeUpdate.configure({
     channel: 'production',
     updateStrategy: 'background',
     publicKey: 'your-public-key',
-  }
+  },
 });
 ```
 
 3. **Update method calls**:
+
 ```typescript
 // Before
 const result = await LiveUpdates.sync();
@@ -55,6 +58,7 @@ If you're migrating from @capgo/capacitor-updater:
    - Bundle IDs are generated differently
 
 2. **API differences**:
+
 ```typescript
 // Capgo
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
@@ -62,10 +66,10 @@ await CapacitorUpdater.download({ url, version });
 
 // Capacitor Native Update
 import { CapacitorNativeUpdate } from 'capacitor-native-update';
-await CapacitorNativeUpdate.download({ 
-  url, 
-  version, 
-  checksum: 'required-checksum' 
+await CapacitorNativeUpdate.download({
+  url,
+  version,
+  checksum: 'required-checksum',
 });
 ```
 
@@ -83,6 +87,7 @@ If you're migrating from Ionic Appflow:
    - See our server implementation guide for details
 
 2. **Channel management**:
+
 ```typescript
 // Similar channel concept
 await CapacitorNativeUpdate.setChannel('production');
@@ -158,7 +163,7 @@ const config = {
     serverUrl: process.env.UPDATE_SERVER_URL,
     channel: process.env.UPDATE_CHANNEL || 'production',
     publicKey: process.env.UPDATE_PUBLIC_KEY,
-  }
+  },
 };
 
 await CapacitorNativeUpdate.configure(config);

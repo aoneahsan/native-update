@@ -17,16 +17,16 @@ async function initializeUpdates() {
       serverUrl: 'https://updates.yourserver.com',
       channel: 'production',
       autoUpdate: true,
-      updateStrategy: 'IMMEDIATE'
+      updateStrategy: 'IMMEDIATE',
     },
     appUpdate: {
       checkOnAppStart: true,
-      minimumVersion: '1.0.0'
+      minimumVersion: '1.0.0',
     },
     appReview: {
       minimumDaysSinceInstall: 7,
-      minimumLaunchCount: 3
-    }
+      minimumLaunchCount: 3,
+    },
   });
 }
 
@@ -43,7 +43,7 @@ initializeUpdates();
 async function syncUpdates() {
   try {
     const result = await CapacitorNativeUpdate.LiveUpdate.sync();
-    
+
     if (result.status === 'UPDATE_INSTALLED') {
       console.log('Update installed:', result.bundle.version);
       // Update will be applied based on your updateStrategy
@@ -63,7 +63,7 @@ async function syncUpdates() {
 async function checkForUpdates() {
   const latest = await CapacitorNativeUpdate.LiveUpdate.getLatest();
   const current = await CapacitorNativeUpdate.LiveUpdate.current();
-  
+
   if (latest.version !== current.version) {
     console.log(`Update available: ${latest.version}`);
     return true;
@@ -76,12 +76,12 @@ async function downloadAndInstallUpdate() {
   try {
     // Download the latest version
     const bundle = await CapacitorNativeUpdate.LiveUpdate.download({
-      version: 'latest'
+      version: 'latest',
     });
-    
+
     // Set it as active
     await CapacitorNativeUpdate.LiveUpdate.set(bundle);
-    
+
     // Reload the app to apply
     await CapacitorNativeUpdate.LiveUpdate.reload();
   } catch (error) {
@@ -114,10 +114,10 @@ const progressListener = await CapacitorNativeUpdate.LiveUpdate.addListener(
 async function checkAppStoreUpdate() {
   try {
     const updateInfo = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
-    
+
     if (updateInfo.updateAvailable) {
       console.log(`New version available: ${updateInfo.availableVersion}`);
-      
+
       if (updateInfo.updatePriority >= 4) {
         // High priority - immediate update
         await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
@@ -145,7 +145,7 @@ function showUpdateDialog(updateInfo) {
 // Start downloading in background
 async function startFlexibleUpdate() {
   await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
-  
+
   // Listen for download completion
   const listener = await CapacitorNativeUpdate.AppUpdate.addListener(
     'flexibleUpdateStateChanged',
@@ -174,11 +174,11 @@ async function requestReviewIfAppropriate() {
   try {
     // Check if we can request a review
     const canRequest = await CapacitorNativeUpdate.AppReview.canRequestReview();
-    
+
     if (canRequest.allowed) {
       // Request the review
       const result = await CapacitorNativeUpdate.AppReview.requestReview();
-      
+
       if (result.shown) {
         console.log('Review dialog was shown');
       }
@@ -208,7 +208,7 @@ App.addListener('appStateChange', async ({ isActive }) => {
   if (isActive) {
     // Check for updates when app becomes active
     await CapacitorNativeUpdate.LiveUpdate.sync({
-      installMode: 'ON_NEXT_RESUME'
+      installMode: 'ON_NEXT_RESUME',
     });
   }
 });
@@ -224,17 +224,17 @@ class UpdateManager {
       liveUpdate: {
         appId: 'your-app-id',
         serverUrl: 'https://your-server.com',
-        autoUpdate: true
-      }
+        autoUpdate: true,
+      },
     });
-    
+
     // Set up listeners
     this.setupListeners();
-    
+
     // Initial sync
     await this.checkForUpdates();
   }
-  
+
   setupListeners() {
     // Listen for update state changes
     CapacitorNativeUpdate.LiveUpdate.addListener(
@@ -245,11 +245,11 @@ class UpdateManager {
       }
     );
   }
-  
+
   async checkForUpdates() {
     try {
       const result = await CapacitorNativeUpdate.LiveUpdate.sync();
-      
+
       if (result.status === 'UPDATE_INSTALLED') {
         // Notify user about update
         this.notifyUpdateInstalled(result.bundle.version);
@@ -258,7 +258,7 @@ class UpdateManager {
       console.error('Update check failed:', error);
     }
   }
-  
+
   handleUpdateState(event) {
     switch (event.status) {
       case 'DOWNLOADING':
@@ -311,16 +311,18 @@ async function safeUpdateCheck() {
 ### Development Tips
 
 1. **Use staging channel for testing**:
+
    ```typescript
    await CapacitorNativeUpdate.LiveUpdate.setChannel('staging');
    ```
 
 2. **Enable debug mode for app reviews**:
+
    ```typescript
    await CapacitorNativeUpdate.configure({
      appReview: {
-       debugMode: true  // Bypass time restrictions
-     }
+       debugMode: true, // Bypass time restrictions
+     },
    });
    ```
 
@@ -328,7 +330,7 @@ async function safeUpdateCheck() {
    ```typescript
    // Clear cache and check
    await CapacitorNativeUpdate.LiveUpdate.sync({
-     forceCheck: true
+     forceCheck: true,
    });
    ```
 
@@ -345,20 +347,20 @@ Now that you have the basics working:
 
 ### Essential Methods
 
-| Method | Purpose |
-|--------|---------|
-| `configure()` | Initialize plugin with settings |
-| `LiveUpdate.sync()` | Check and apply updates |
-| `LiveUpdate.current()` | Get current bundle info |
-| `AppUpdate.getAppUpdateInfo()` | Check app store updates |
-| `AppReview.requestReview()` | Request user review |
+| Method                         | Purpose                         |
+| ------------------------------ | ------------------------------- |
+| `configure()`                  | Initialize plugin with settings |
+| `LiveUpdate.sync()`            | Check and apply updates         |
+| `LiveUpdate.current()`         | Get current bundle info         |
+| `AppUpdate.getAppUpdateInfo()` | Check app store updates         |
+| `AppReview.requestReview()`    | Request user review             |
 
 ### Key Events
 
-| Event | Description |
-|-------|-------------|
-| `downloadProgress` | Update download progress |
-| `updateStateChanged` | Bundle state changes |
+| Event                | Description              |
+| -------------------- | ------------------------ |
+| `downloadProgress`   | Update download progress |
+| `updateStateChanged` | Bundle state changes     |
 
 ---
 

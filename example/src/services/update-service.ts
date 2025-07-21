@@ -100,7 +100,11 @@ export class UpdateService {
     }
   }
 
-  async downloadUpdate(url: string, version: string, checksum: string): Promise<BundleInfo> {
+  async downloadUpdate(
+    url: string,
+    version: string,
+    checksum: string
+  ): Promise<BundleInfo> {
     try {
       return await CapacitorNativeUpdate.download({
         url,
@@ -210,7 +214,9 @@ export class UpdateService {
 
   // Event Handlers
 
-  onDownloadProgress(callback: (progress: DownloadProgressEvent) => void): void {
+  onDownloadProgress(
+    callback: (progress: DownloadProgressEvent) => void
+  ): void {
     this.downloadProgressCallback = callback;
   }
 

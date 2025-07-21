@@ -5,6 +5,7 @@ The Background Update feature allows your app to check for updates automatically
 ## Features
 
 ### Core Functionality
+
 - **Background Update Checking**: Automatically check for app and live updates while the app is not active
 - **Native Notifications**: Send native device notifications when updates are available
 - **Configurable Intervals**: Set custom check intervals and update types
@@ -12,6 +13,7 @@ The Background Update feature allows your app to check for updates automatically
 - **Cross-Platform**: Works on iOS (BGTaskScheduler) and Android (WorkManager)
 
 ### Platform-Specific Implementation
+
 - **iOS**: Uses BGTaskScheduler for background tasks and UNUserNotificationCenter for notifications
 - **Android**: Uses WorkManager for background processing and NotificationManager for notifications
 - **Web**: Uses Notification API and intervals for fallback functionality
@@ -21,7 +23,10 @@ The Background Update feature allows your app to check for updates automatically
 ### Basic Setup
 
 ```typescript
-import { CapacitorNativeUpdate, BackgroundUpdateType } from 'capacitor-native-update';
+import {
+  CapacitorNativeUpdate,
+  BackgroundUpdateType,
+} from 'capacitor-native-update';
 
 // Configure the plugin with background updates
 await CapacitorNativeUpdate.configure({
@@ -41,10 +46,10 @@ await CapacitorNativeUpdate.configure({
       actionLabels: {
         updateNow: 'Update Now',
         updateLater: 'Later',
-        dismiss: 'Not Now'
-      }
-    }
-  }
+        dismiss: 'Not Now',
+      },
+    },
+  },
 });
 ```
 
@@ -56,7 +61,10 @@ await CapacitorNativeUpdate.configure({
   backgroundUpdate: {
     enabled: true,
     checkInterval: 12 * 60 * 60 * 1000, // 12 hours
-    updateTypes: [BackgroundUpdateType.APP_UPDATE, BackgroundUpdateType.LIVE_UPDATE],
+    updateTypes: [
+      BackgroundUpdateType.APP_UPDATE,
+      BackgroundUpdateType.LIVE_UPDATE,
+    ],
     autoInstall: true, // Only for live updates
     respectBatteryOptimization: true,
     allowMeteredConnection: false,
@@ -77,10 +85,10 @@ await CapacitorNativeUpdate.configure({
       actionLabels: {
         updateNow: 'Install Now',
         updateLater: 'Remind Me Later',
-        dismiss: 'Skip This Version'
-      }
-    }
-  }
+        dismiss: 'Skip This Version',
+      },
+    },
+  },
 });
 ```
 
@@ -92,7 +100,7 @@ await CapacitorNativeUpdate.configure({
 await CapacitorNativeUpdate.enableBackgroundUpdates({
   enabled: true,
   checkInterval: 24 * 60 * 60 * 1000,
-  updateTypes: [BackgroundUpdateType.BOTH]
+  updateTypes: [BackgroundUpdateType.BOTH],
 });
 ```
 
@@ -133,8 +141,8 @@ await CapacitorNativeUpdate.setNotificationPreferences({
   actionLabels: {
     updateNow: 'Install',
     updateLater: 'Later',
-    dismiss: 'Skip'
-  }
+    dismiss: 'Skip',
+  },
 });
 
 // Request notification permissions
@@ -163,7 +171,7 @@ CapacitorNativeUpdate.addListener('backgroundUpdateProgress', (event) => {
 ```typescript
 CapacitorNativeUpdate.addListener('backgroundUpdateNotification', (event) => {
   console.log('Notification action:', event.action);
-  
+
   switch (event.action) {
     case 'tapped':
       // User tapped notification
@@ -213,17 +221,20 @@ Add to your `AndroidManifest.xml`:
 ## Best Practices
 
 ### Battery Optimization
+
 - Set `respectBatteryOptimization: true` to work within system constraints
 - Use reasonable check intervals (not less than 15 minutes)
 - Consider `requireWifi: true` for large updates
 
 ### User Experience
+
 - Always request notification permissions before enabling background updates
 - Provide clear notification messages and actions
 - Handle notification actions appropriately
 - Allow users to disable background updates in settings
 
 ### Performance
+
 - Use `BackgroundUpdateType.APP_UPDATE` for critical updates only
 - Use `BackgroundUpdateType.LIVE_UPDATE` for content updates
 - Use `BackgroundUpdateType.BOTH` sparingly to avoid excessive battery usage
@@ -249,44 +260,47 @@ CapacitorNativeUpdate.addListener('backgroundUpdateProgress', (event) => {
 
 ### BackgroundUpdateConfig
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `enabled` | boolean | `false` | Enable/disable background updates |
-| `checkInterval` | number | `86400000` | Check interval in milliseconds (24 hours) |
-| `updateTypes` | BackgroundUpdateType[] | `['both']` | Types of updates to check for |
-| `autoInstall` | boolean | `false` | Auto-install updates (live updates only) |
-| `respectBatteryOptimization` | boolean | `true` | Respect system battery optimization |
-| `allowMeteredConnection` | boolean | `false` | Allow updates on metered connections |
-| `minimumBatteryLevel` | number | `20` | Minimum battery level (%) |
-| `requireWifi` | boolean | `false` | Require WiFi connection |
-| `maxRetries` | number | `3` | Maximum retry attempts |
-| `retryDelay` | number | `5000` | Retry delay in milliseconds |
+| Option                       | Type                   | Default    | Description                               |
+| ---------------------------- | ---------------------- | ---------- | ----------------------------------------- |
+| `enabled`                    | boolean                | `false`    | Enable/disable background updates         |
+| `checkInterval`              | number                 | `86400000` | Check interval in milliseconds (24 hours) |
+| `updateTypes`                | BackgroundUpdateType[] | `['both']` | Types of updates to check for             |
+| `autoInstall`                | boolean                | `false`    | Auto-install updates (live updates only)  |
+| `respectBatteryOptimization` | boolean                | `true`     | Respect system battery optimization       |
+| `allowMeteredConnection`     | boolean                | `false`    | Allow updates on metered connections      |
+| `minimumBatteryLevel`        | number                 | `20`       | Minimum battery level (%)                 |
+| `requireWifi`                | boolean                | `false`    | Require WiFi connection                   |
+| `maxRetries`                 | number                 | `3`        | Maximum retry attempts                    |
+| `retryDelay`                 | number                 | `5000`     | Retry delay in milliseconds               |
 
 ### NotificationPreferences
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `title` | string | `'App Update Available'` | Notification title |
-| `description` | string | `'A new version is available'` | Notification description |
-| `soundEnabled` | boolean | `true` | Enable notification sound |
-| `vibrationEnabled` | boolean | `true` | Enable notification vibration |
-| `showActions` | boolean | `true` | Show notification action buttons |
-| `priority` | string | `'default'` | Notification priority |
-| `actionLabels` | object | See defaults | Custom action button labels |
+| Option             | Type    | Default                        | Description                      |
+| ------------------ | ------- | ------------------------------ | -------------------------------- |
+| `title`            | string  | `'App Update Available'`       | Notification title               |
+| `description`      | string  | `'A new version is available'` | Notification description         |
+| `soundEnabled`     | boolean | `true`                         | Enable notification sound        |
+| `vibrationEnabled` | boolean | `true`                         | Enable notification vibration    |
+| `showActions`      | boolean | `true`                         | Show notification action buttons |
+| `priority`         | string  | `'default'`                    | Notification priority            |
+| `actionLabels`     | object  | See defaults                   | Custom action button labels      |
 
 ## Troubleshooting
 
 ### iOS Issues
+
 - Ensure background app refresh is enabled in device settings
 - Check that the app has notification permissions
 - Verify BGTaskScheduler identifiers in Info.plist
 
 ### Android Issues
+
 - Check that the app is not in battery optimization whitelist
 - Ensure notification permissions are granted
 - Verify WorkManager dependencies are included
 
 ### Common Issues
+
 - Background tasks may be limited by the OS
 - Notifications may not work without proper permissions
 - Battery optimization can prevent background execution
@@ -301,7 +315,8 @@ class BackgroundUpdateManager {
     if (this.isInitialized) return;
 
     // Request notification permissions first
-    const granted = await CapacitorNativeUpdate.requestNotificationPermissions();
+    const granted =
+      await CapacitorNativeUpdate.requestNotificationPermissions();
     if (!granted) {
       console.warn('Notification permissions not granted');
       return;
@@ -322,16 +337,19 @@ class BackgroundUpdateManager {
           actionLabels: {
             updateNow: 'Install Now',
             updateLater: 'Later',
-            dismiss: 'Skip'
-          }
-        }
-      }
+            dismiss: 'Skip',
+          },
+        },
+      },
     });
 
     // Set up event listeners
-    CapacitorNativeUpdate.addListener('backgroundUpdateNotification', (event) => {
-      this.handleNotificationAction(event.action);
-    });
+    CapacitorNativeUpdate.addListener(
+      'backgroundUpdateNotification',
+      (event) => {
+        this.handleNotificationAction(event.action);
+      }
+    );
 
     this.isInitialized = true;
   }

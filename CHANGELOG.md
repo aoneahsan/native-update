@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.2] - 2024-12-01
 
 ### Added
+
 - Comprehensive documentation for all features
 - Bundle signing and security utilities
 - CI/CD pipeline with GitHub Actions
@@ -16,11 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ESLint v9 flat config support
 
 ### Fixed
+
 - Security vulnerabilities in update process
 - TypeScript compilation errors
 - Path traversal prevention
 
 ### Security
+
 - Enforced HTTPS for all update downloads
 - Added RSA signature verification
 - Implemented checksum validation
@@ -29,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - 2024-01-08
 
 ### Added
+
 - Initial release of Capacitor Native Update plugin
 - Live/OTA update functionality
   - Bundle download and management
@@ -66,12 +70,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Feature overview
 
 ### Security
+
 - Enforced HTTPS for all update operations by default
 - Required checksum validation for all bundle downloads
 - Implemented path traversal prevention
 - Added secure storage for sensitive configuration
 
 ### Known Issues
+
 - ESLint configuration needs update for v9 compatibility
 - Certificate pinning requires manual certificate configuration
 - Delta updates require server-side implementation
@@ -79,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Future Releases
 
 ### [0.1.0] - Planned
+
 - Add delta update server reference implementation
 - Improve offline update handling
 - Add update scheduling APIs
@@ -86,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Batch update support
 
 ### [0.2.0] - Planned
+
 - Machine learning for optimal update timing
 - Peer-to-peer update distribution
 - Advanced A/B testing framework

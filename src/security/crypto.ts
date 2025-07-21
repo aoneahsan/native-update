@@ -9,10 +9,10 @@ export class CryptoUtils {
   static async calculateChecksum(data: ArrayBuffer | string): Promise<string> {
     const encoder = new TextEncoder();
     const dataBuffer = typeof data === 'string' ? encoder.encode(data) : data;
-    
+
     const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   /**
@@ -27,7 +27,7 @@ export class CryptoUtils {
       // Convert base64 strings to ArrayBuffer
       const signatureBuffer = this.base64ToArrayBuffer(signature);
       const publicKeyBuffer = this.base64ToArrayBuffer(publicKey);
-      
+
       // Import public key
       const key = await crypto.subtle.importKey(
         'spki',
@@ -39,11 +39,11 @@ export class CryptoUtils {
         false,
         ['verify']
       );
-      
+
       // Prepare data
       const encoder = new TextEncoder();
       const dataBuffer = typeof data === 'string' ? encoder.encode(data) : data;
-      
+
       // Verify signature
       return await crypto.subtle.verify(
         {
@@ -78,16 +78,21 @@ export class CryptoUtils {
   static generateNonce(length: number = 16): string {
     const array = new Uint8Array(length);
     crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+      ''
+    );
   }
 
   /**
    * Validate checksum format
    */
-  static isValidChecksum(checksum: string, algorithm: 'SHA-256' | 'SHA-512' = 'SHA-256'): boolean {
+  static isValidChecksum(
+    checksum: string,
+    algorithm: 'SHA-256' | 'SHA-512' = 'SHA-256'
+  ): boolean {
     const expectedLength = algorithm === 'SHA-256' ? 64 : 128;
     const hexPattern = /^[a-f0-9]+$/i;
-    
+
     return checksum.length === expectedLength && hexPattern.test(checksum);
   }
 }

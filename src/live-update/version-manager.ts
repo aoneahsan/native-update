@@ -5,7 +5,8 @@ import type { LatestVersion } from '../definitions';
  * Manages version checking and comparison
  */
 export class VersionManager {
-  private static readonly VERSION_CHECK_CACHE_KEY = 'capacitor_native_update_version_cache';
+  private static readonly VERSION_CHECK_CACHE_KEY =
+    'capacitor_native_update_version_cache';
   private static readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   /**
@@ -19,7 +20,11 @@ export class VersionManager {
   ): Promise<LatestVersion | null> {
     // Check cache first
     const cached = this.getCachedVersionInfo();
-    if (cached && cached.channel === channel && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+    if (
+      cached &&
+      cached.channel === channel &&
+      Date.now() - cached.timestamp < this.CACHE_DURATION
+    ) {
       return cached.data;
     }
 
@@ -44,7 +49,7 @@ export class VersionManager {
       }
 
       const data = await response.json();
-      
+
       // Validate response
       if (data.version && !Validator.validateVersion(data.version).valid) {
         throw new Error('Invalid version format in response');
@@ -75,7 +80,7 @@ export class VersionManager {
     minimumVersion?: string
   ): boolean {
     if (!minimumVersion) return false;
-    
+
     return Validator.compareVersions(currentVersion, minimumVersion) < 0;
   }
 
@@ -117,15 +122,15 @@ export class VersionManager {
     build?: string;
   }): string {
     let version = `${components.major}.${components.minor}.${components.patch}`;
-    
+
     if (components.prerelease) {
       version += `-${components.prerelease}`;
     }
-    
+
     if (components.build) {
       version += `+${components.build}`;
     }
-    
+
     return version;
   }
 

@@ -3,6 +3,7 @@
 This comprehensive guide explains how to implement in-app review functionality in your Capacitor application using the CapacitorNativeUpdate plugin.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [Why In-App Reviews Matter](#why-in-app-reviews-matter)
 - [Platform Guidelines](#platform-guidelines)
@@ -33,11 +34,13 @@ The App Review feature allows users to rate and review your app without leaving 
 ## Why In-App Reviews Matter
 
 ### Statistics
+
 - Apps with 4+ star ratings see **2x more downloads**
 - **70% of users** look at ratings before downloading
 - In-app review prompts have **4-5x higher engagement** than external links
 
 ### Impact on ASO (App Store Optimization)
+
 - Higher ratings improve search ranking
 - More reviews increase credibility
 - Recent reviews show active development
@@ -110,7 +113,7 @@ export class AppReviewService {
   async requestReview() {
     try {
       const result = await CapacitorNativeUpdate.requestReview();
-      
+
       if (result.displayed) {
         console.log('Review prompt was displayed');
         // Track that prompt was shown
@@ -137,20 +140,20 @@ export class SmartReviewManager {
     minSessions: 5,
     minDaysInstalled: 3,
     minActionsCompleted: 10,
-    positiveExperienceRequired: true
+    positiveExperienceRequired: true,
   };
 
   async checkAndRequestReview() {
     // Check if we should ask for review
     const shouldAsk = await this.shouldAskForReview();
-    
+
     if (!shouldAsk) {
       return;
     }
 
     // Check if user had positive experience
     const hasPositiveExperience = await this.checkPositiveExperience();
-    
+
     if (!hasPositiveExperience) {
       // Ask for feedback instead
       await this.askForFeedback();
@@ -163,7 +166,7 @@ export class SmartReviewManager {
 
   private async shouldAskForReview(): Promise<boolean> {
     const stats = await this.getUserStats();
-    
+
     // Check all conditions
     const conditions = [
       stats.sessionCount >= this.REVIEW_CONDITIONS.minSessions,
@@ -171,34 +174,34 @@ export class SmartReviewManager {
       stats.completedActions >= this.REVIEW_CONDITIONS.minActionsCompleted,
       !stats.hasReviewedBefore,
       !stats.hasDeclinedRecently,
-      this.isGoodMoment()
+      this.isGoodMoment(),
     ];
 
-    return conditions.every(condition => condition);
+    return conditions.every((condition) => condition);
   }
 
   private isGoodMoment(): boolean {
     // Don't interrupt critical flows
     const currentRoute = this.router.url;
     const badMoments = ['/checkout', '/payment', '/onboarding', '/support'];
-    
-    return !badMoments.some(route => currentRoute.includes(route));
+
+    return !badMoments.some((route) => currentRoute.includes(route));
   }
 
   private async checkPositiveExperience(): Promise<boolean> {
     // Check recent user actions
     const recentActions = await this.getRecentUserActions();
-    
+
     const positiveSignals = [
       recentActions.includes('task_completed'),
       recentActions.includes('content_shared'),
       recentActions.includes('milestone_achieved'),
       !recentActions.includes('error_encountered'),
-      !recentActions.includes('support_contacted')
+      !recentActions.includes('support_contacted'),
     ];
 
     // Need at least 3 positive signals
-    return positiveSignals.filter(signal => signal).length >= 3;
+    return positiveSignals.filter((signal) => signal).length >= 3;
   }
 }
 ```
@@ -215,10 +218,11 @@ export class ReviewTriggerPoints {
   // After completing important action
   async onTaskCompleted() {
     await this.incrementPositiveAction('task_completed');
-    
+
     // Check if this is a milestone
     const taskCount = await this.getCompletedTaskCount();
-    if (taskCount % 5 === 0) { // Every 5 tasks
+    if (taskCount % 5 === 0) {
+      // Every 5 tasks
       await this.reviewService.checkAndRequestReview();
     }
   }
@@ -226,7 +230,7 @@ export class ReviewTriggerPoints {
   // After successful transaction
   async onPurchaseCompleted() {
     await this.incrementPositiveAction('purchase_completed');
-    
+
     // Wait a bit before asking
     setTimeout(() => {
       this.reviewService.checkAndRequestReview();
@@ -236,10 +240,10 @@ export class ReviewTriggerPoints {
   // After achieving milestone
   async onMilestoneAchieved(milestone: string) {
     await this.incrementPositiveAction('milestone_achieved');
-    
+
     // Show achievement first
     await this.showAchievementToast(milestone);
-    
+
     // Then ask for review
     setTimeout(() => {
       this.reviewService.checkAndRequestReview();
@@ -256,7 +260,7 @@ export class ReviewTriggerPoints {
   async onAppForegrounded() {
     const lastPrompt = await this.getLastReviewPromptDate();
     const daysSinceLastPrompt = this.daysSince(lastPrompt);
-    
+
     // Check every 30 days
     if (daysSinceLastPrompt >= 30) {
       await this.reviewService.checkAndRequestReview();
@@ -272,7 +276,7 @@ export class TwoStepReviewFlow {
   async initiateReviewFlow() {
     // Step 1: Ask if they enjoy the app
     const enjoys = await this.askEnjoyment();
-    
+
     if (enjoys) {
       // Step 2: Ask for review
       await this.askForReview();
@@ -293,16 +297,16 @@ export class TwoStepReviewFlow {
             handler: () => {
               this.analytics.track('review_enjoyment_negative');
               resolve(false);
-            }
+            },
           },
           {
             text: 'Yes!',
             handler: () => {
               this.analytics.track('review_enjoyment_positive');
               resolve(true);
-            }
-          }
-        ]
+            },
+          },
+        ],
       });
       alert.present();
     });
@@ -319,16 +323,16 @@ export class TwoStepReviewFlow {
           handler: () => {
             this.analytics.track('review_declined');
             this.markDeclined();
-          }
+          },
         },
         {
           text: 'Sure!',
           handler: async () => {
             this.analytics.track('review_accepted');
             await CapacitorNativeUpdate.requestReview();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -337,24 +341,26 @@ export class TwoStepReviewFlow {
     const alert = await this.alertController.create({
       header: 'We appreciate your feedback',
       message: 'What can we do to improve your experience?',
-      inputs: [{
-        name: 'feedback',
-        type: 'textarea',
-        placeholder: 'Your feedback...'
-      }],
+      inputs: [
+        {
+          name: 'feedback',
+          type: 'textarea',
+          placeholder: 'Your feedback...',
+        },
+      ],
       buttons: [
         {
           text: 'Cancel',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'Send',
           handler: (data) => {
             this.submitFeedback(data.feedback);
             this.showThankYou();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
     await alert.present();
   }
@@ -368,7 +374,7 @@ export class AlternativeReviewMethods {
   // For when in-app review is not available
   async openExternalReview() {
     const platform = Capacitor.getPlatform();
-    
+
     if (platform === 'ios') {
       await this.openAppStore();
     } else if (platform === 'android') {
@@ -381,7 +387,7 @@ export class AlternativeReviewMethods {
   private async openAppStore() {
     const appStoreId = 'YOUR_APP_STORE_ID';
     const reviewUrl = `https://apps.apple.com/app/id${appStoreId}?action=write-review`;
-    
+
     try {
       await Browser.open({ url: reviewUrl });
       this.analytics.track('external_review_opened', { platform: 'ios' });
@@ -393,7 +399,7 @@ export class AlternativeReviewMethods {
   private async openPlayStore() {
     const packageName = 'com.example.app';
     const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
-    
+
     try {
       await Browser.open({ url: playStoreUrl });
       this.analytics.track('external_review_opened', { platform: 'android' });
@@ -405,7 +411,7 @@ export class AlternativeReviewMethods {
   private async openWebReview() {
     // Custom web review form or third-party service
     const modal = await this.modalController.create({
-      component: WebReviewComponent
+      component: WebReviewComponent,
     });
     await modal.present();
   }
@@ -424,7 +430,7 @@ export class ReviewTimingStrategy {
     'after_successful_transaction',
     'after_positive_interaction',
     'after_content_shared',
-    'after_returning_user_session'
+    'after_returning_user_session',
   ];
 
   // Bad moments to avoid
@@ -434,12 +440,12 @@ export class ReviewTimingStrategy {
     'during_payment_flow',
     'immediately_after_install',
     'after_support_contact',
-    'during_critical_task'
+    'during_critical_task',
   ];
 
   async isGoodMomentForReview(): Promise<boolean> {
     const currentContext = await this.getCurrentUserContext();
-    
+
     // Check if it's a bad moment
     if (this.BAD_MOMENTS.includes(currentContext.state)) {
       return false;
@@ -457,13 +463,13 @@ export class ReviewTimingStrategy {
   private async additionalTimingChecks(context: any): Promise<boolean> {
     // Don't ask too soon after install
     if (context.daysSinceInstall < 3) return false;
-    
+
     // Don't ask if user is in a hurry
     if (context.sessionDuration < 60) return false;
-    
+
     // Don't ask if user had recent issues
     if (context.recentErrors > 0) return false;
-    
+
     return true;
   }
 }
@@ -479,25 +485,25 @@ export class ReviewPreferenceManager {
     const prefs = await this.getPreferences();
     prefs.declineCount++;
     prefs.lastDeclineDate = new Date().toISOString();
-    
+
     // After 3 declines, stop asking
     if (prefs.declineCount >= 3) {
       prefs.permanentlyDeclined = true;
     }
-    
+
     await this.savePreferences(prefs);
   }
 
   async canAskForReview(): Promise<boolean> {
     const prefs = await this.getPreferences();
-    
+
     // Never ask if permanently declined
     if (prefs.permanentlyDeclined) return false;
-    
+
     // Wait longer after each decline
     const daysSinceDecline = this.daysSince(prefs.lastDeclineDate);
     const requiredDays = prefs.declineCount * 30; // 30, 60, 90 days
-    
+
     return daysSinceDecline >= requiredDays;
   }
 
@@ -518,7 +524,7 @@ export class ReviewABTesting {
   async getReviewStrategy(): Promise<string> {
     const userId = await this.getUserId();
     const variant = this.hashUserId(userId) % 3;
-    
+
     switch (variant) {
       case 0:
         return 'immediate'; // Direct review request
@@ -531,7 +537,7 @@ export class ReviewABTesting {
 
   async executeStrategy(strategy: string) {
     this.analytics.track('review_strategy_assigned', { strategy });
-    
+
     switch (strategy) {
       case 'immediate':
         await CapacitorNativeUpdate.requestReview();
@@ -558,15 +564,15 @@ export class ReviewAnalytics {
     PROMPT_TRIGGERED: 'review_prompt_triggered',
     PROMPT_DISPLAYED: 'review_prompt_displayed',
     PROMPT_DISMISSED: 'review_prompt_dismissed',
-    
+
     // User actions
     REVIEW_ACCEPTED: 'review_accepted',
     REVIEW_DECLINED: 'review_declined',
     REVIEW_COMPLETED: 'review_completed', // Best guess
-    
+
     // Feedback events
     FEEDBACK_PROVIDED: 'feedback_provided',
-    EXTERNAL_REVIEW: 'external_review_opened'
+    EXTERNAL_REVIEW: 'external_review_opened',
   };
 
   async trackReviewFlow(stage: string, properties?: any) {
@@ -576,22 +582,28 @@ export class ReviewAnalytics {
       sessionId: this.sessionId,
       userId: this.userId,
       platform: Capacitor.getPlatform(),
-      appVersion: this.appVersion
+      appVersion: this.appVersion,
     });
   }
 
   async generateReviewReport(): Promise<ReviewMetrics> {
     const metrics = await this.analytics.query({
       events: Object.values(this.events),
-      timeframe: 'last_30_days'
+      timeframe: 'last_30_days',
     });
 
     return {
       promptsShown: metrics[this.events.PROMPT_DISPLAYED],
-      acceptanceRate: metrics[this.events.REVIEW_ACCEPTED] / metrics[this.events.PROMPT_DISPLAYED],
-      declineRate: metrics[this.events.REVIEW_DECLINED] / metrics[this.events.PROMPT_DISPLAYED],
+      acceptanceRate:
+        metrics[this.events.REVIEW_ACCEPTED] /
+        metrics[this.events.PROMPT_DISPLAYED],
+      declineRate:
+        metrics[this.events.REVIEW_DECLINED] /
+        metrics[this.events.PROMPT_DISPLAYED],
       estimatedCompletionRate: this.estimateCompletionRate(metrics),
-      feedbackRate: metrics[this.events.FEEDBACK_PROVIDED] / metrics[this.events.PROMPT_DISPLAYED]
+      feedbackRate:
+        metrics[this.events.FEEDBACK_PROVIDED] /
+        metrics[this.events.PROMPT_DISPLAYED],
     };
   }
 }
@@ -606,22 +618,22 @@ export class ReviewTestingUtils {
   async enableTestMode() {
     // Enable debug mode
     await CapacitorNativeUpdate.setReviewDebugMode({ enabled: true });
-    
+
     // Reset all preferences
     await this.clearReviewPreferences();
-    
+
     // Set up test conditions
     await this.setupTestConditions();
   }
 
   async simulateReviewFlow() {
     console.log('Simulating review flow...');
-    
+
     // Force display of review prompt
     const result = await CapacitorNativeUpdate.requestReview({
-      force: true // Only works in debug mode
+      force: true, // Only works in debug mode
     });
-    
+
     console.log('Review simulation result:', result);
   }
 
@@ -630,13 +642,15 @@ export class ReviewTestingUtils {
       { name: 'First time user', daysSinceInstall: 0 },
       { name: 'Happy user', positiveActions: 10 },
       { name: 'Frustrated user', errors: 5 },
-      { name: 'Returning user', sessions: 20 }
+      { name: 'Returning user', sessions: 20 },
     ];
 
     for (const scenario of scenarios) {
       await this.setupScenario(scenario);
       const shouldShow = await this.reviewManager.shouldAskForReview();
-      console.log(`Scenario "${scenario.name}": ${shouldShow ? 'SHOW' : 'HIDE'}`);
+      console.log(
+        `Scenario "${scenario.name}": ${shouldShow ? 'SHOW' : 'HIDE'}`
+      );
     }
   }
 }
@@ -645,12 +659,14 @@ export class ReviewTestingUtils {
 ### Platform-Specific Testing
 
 #### iOS Testing
+
 1. Use development build (not TestFlight)
 2. Reviews work in debug mode
 3. Can test multiple times
 4. Check console for SKStoreReviewController logs
 
 #### Android Testing
+
 1. Use internal test track
 2. Sign in with test account
 3. Clear Play Store cache between tests
@@ -668,11 +684,11 @@ async function debugReviewPrompt() {
   // Check if available on platform
   const isAvailable = await CapacitorNativeUpdate.isReviewAvailable();
   console.log('Review available:', isAvailable);
-  
+
   // Check system throttling
   const debugInfo = await CapacitorNativeUpdate.getReviewDebugInfo();
   console.log('Debug info:', debugInfo);
-  
+
   // Check your conditions
   const conditions = await this.checkAllConditions();
   console.log('App conditions:', conditions);
@@ -686,12 +702,12 @@ async function debugReviewPrompt() {
 class ReviewOptimizer {
   async analyzeAndOptimize() {
     const metrics = await this.getReviewMetrics();
-    
+
     if (metrics.promptsShown < 100) {
       console.log('Not enough data yet');
       return;
     }
-    
+
     if (metrics.acceptanceRate < 0.1) {
       // Less than 10% accepting
       console.log('Consider:');
@@ -699,7 +715,7 @@ class ReviewOptimizer {
       console.log('- Using two-step flow');
       console.log('- Checking for negative experiences');
     }
-    
+
     if (metrics.promptsShown / metrics.eligibleUsers < 0.5) {
       console.log('Not reaching enough users');
       console.log('- Relax conditions');
@@ -716,7 +732,7 @@ class ReviewOptimizer {
 async function requestReviewWithFallback() {
   try {
     const result = await CapacitorNativeUpdate.requestReview();
-    
+
     if (!result.displayed) {
       // System didn't show prompt
       if (Capacitor.getPlatform() === 'web') {

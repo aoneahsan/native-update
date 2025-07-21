@@ -5,6 +5,7 @@ The App Updates feature provides a seamless way to manage native app store updat
 ## Overview
 
 While Live Updates handle web assets, App Updates manage the native app binary itself. This feature integrates with:
+
 - **Google Play Store** on Android (using Play Core Library)
 - **Apple App Store** on iOS (using manual version checking)
 - **Web platforms** with fallback notifications
@@ -12,21 +13,25 @@ While Live Updates handle web assets, App Updates manage the native app binary i
 ## Key Features
 
 ### 🎯 Update Priority Management
+
 - Configure update urgency (0-5 scale)
 - Force critical updates
 - Flexible update scheduling
 
 ### 📱 Native UI Integration
+
 - Platform-specific update dialogs
 - In-app download progress
 - Seamless installation flow
 
 ### 🔄 Update Types
+
 - **Immediate Updates**: Blocking updates for critical fixes
 - **Flexible Updates**: Background downloads with user control
 - **Manual Updates**: Direct app store navigation
 
 ### 📊 Version Intelligence
+
 - Semantic version comparison
 - Minimum version enforcement
 - Update availability detection
@@ -40,10 +45,10 @@ While Live Updates handle web assets, App Updates manage the native app binary i
 async function checkForAppUpdates() {
   try {
     const updateInfo = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
-    
+
     if (updateInfo.updateAvailable) {
       console.log(`Update available: ${updateInfo.availableVersion}`);
-      
+
       // Handle based on priority
       if (updateInfo.updatePriority >= 4) {
         // High priority - immediate update
@@ -65,7 +70,7 @@ async function checkForAppUpdates() {
 class AppUpdateManager {
   private updateInfo: AppUpdateInfo | null = null;
   private downloadProgress = 0;
-  
+
   async initialize() {
     // Configure app updates
     await CapacitorNativeUpdate.configure({
@@ -75,18 +80,18 @@ class AppUpdateManager {
         updatePriority: 3,
         storeUrl: {
           android: 'https://play.google.com/store/apps/details?id=com.myapp',
-          ios: 'https://apps.apple.com/app/id123456789'
-        }
-      }
+          ios: 'https://apps.apple.com/app/id123456789',
+        },
+      },
     });
-    
+
     // Set up listeners
     this.setupUpdateListeners();
-    
+
     // Check for updates
     await this.checkForUpdates();
   }
-  
+
   private setupUpdateListeners() {
     // Android flexible update state changes
     CapacitorNativeUpdate.AppUpdate.addListener(
@@ -95,7 +100,7 @@ class AppUpdateManager {
         this.handleFlexibleUpdateState(state);
       }
     );
-    
+
     // Download progress for flexible updates
     CapacitorNativeUpdate.AppUpdate.addListener(
       'flexibleUpdateProgress',
@@ -105,19 +110,20 @@ class AppUpdateManager {
       }
     );
   }
-  
+
   async checkForUpdates() {
     try {
-      this.updateInfo = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
-      
+      this.updateInfo =
+        await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+
       if (!this.updateInfo.updateAvailable) {
         console.log('App is up to date');
         return;
       }
-      
+
       // Analyze update type needed
       const updateType = this.determineUpdateType(this.updateInfo);
-      
+
       switch (updateType) {
         case 'IMMEDIATE':
           await this.performImmediateUpdate();
@@ -133,35 +139,35 @@ class AppUpdateManager {
       this.handleUpdateError(error);
     }
   }
-  
+
   private determineUpdateType(info: AppUpdateInfo): string {
     // Force immediate update for critical priority
     if (info.updatePriority === 5) {
       return 'IMMEDIATE';
     }
-    
+
     // Check if current version is below minimum
     if (this.isVersionBelowMinimum(info.currentVersion, info.minimumVersion)) {
       return 'IMMEDIATE';
     }
-    
+
     // High priority gets flexible update
     if (info.updatePriority >= 3) {
       return 'FLEXIBLE';
     }
-    
+
     // Low priority is optional
     return 'OPTIONAL';
   }
-  
+
   async performImmediateUpdate() {
     try {
       // Show blocking update UI
       this.showImmediateUpdateUI();
-      
+
       // Start immediate update
       await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
-      
+
       // App will restart automatically after update
     } catch (error) {
       if (error.code === 'UPDATE_CANCELLED') {
@@ -173,48 +179,48 @@ class AppUpdateManager {
       }
     }
   }
-  
+
   async startFlexibleUpdate() {
     try {
       // Start background download
       await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
-      
+
       // Show download progress UI
       this.showFlexibleUpdateUI();
     } catch (error) {
       this.handleUpdateError(error);
     }
   }
-  
+
   private handleFlexibleUpdateState(state: FlexibleUpdateState) {
     switch (state.status) {
       case 'PENDING':
         console.log('Update pending');
         break;
-        
+
       case 'DOWNLOADING':
         console.log('Downloading update...');
         break;
-        
+
       case 'DOWNLOADED':
         // Update ready to install
         this.showInstallPrompt();
         break;
-        
+
       case 'INSTALLING':
         console.log('Installing update...');
         break;
-        
+
       case 'INSTALLED':
         console.log('Update installed successfully');
         break;
-        
+
       case 'FAILED':
         this.handleUpdateError(new Error(state.error));
         break;
     }
   }
-  
+
   async completeFlexibleUpdate() {
     try {
       await CapacitorNativeUpdate.AppUpdate.completeFlexibleUpdate();
@@ -223,7 +229,7 @@ class AppUpdateManager {
       console.error('Failed to complete update:', error);
     }
   }
-  
+
   private showInstallPrompt() {
     // Show snackbar or dialog
     this.showDialog({
@@ -232,16 +238,16 @@ class AppUpdateManager {
       buttons: [
         {
           text: 'Restart',
-          handler: () => this.completeFlexibleUpdate()
+          handler: () => this.completeFlexibleUpdate(),
         },
         {
           text: 'Later',
           handler: () => {
             // Schedule reminder
             this.scheduleUpdateReminder();
-          }
-        }
-      ]
+          },
+        },
+      ],
     });
   }
 }
@@ -262,23 +268,25 @@ const androidUpdate = {
     await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
     // App restarts automatically
   },
-  
+
   // Flexible update flow
   flexible: async () => {
     // Download in background
     await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
-    
+
     // Monitor progress
     const listener = await CapacitorNativeUpdate.AppUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
-        console.log(`Downloaded: ${progress.bytesDownloaded}/${progress.totalBytes}`);
+        console.log(
+          `Downloaded: ${progress.bytesDownloaded}/${progress.totalBytes}`
+        );
       }
     );
-    
+
     // Complete when ready
     await CapacitorNativeUpdate.AppUpdate.completeFlexibleUpdate();
-  }
+  },
 };
 ```
 
@@ -292,17 +300,17 @@ const iosUpdate = {
   // Check version manually
   check: async () => {
     const info = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
-    
+
     if (info.updateAvailable) {
       // Show custom update dialog
       const shouldUpdate = await showUpdateDialog(info);
-      
+
       if (shouldUpdate) {
         // Open App Store
         await CapacitorNativeUpdate.AppUpdate.openAppStore();
       }
     }
-  }
+  },
 };
 ```
 
@@ -315,19 +323,21 @@ Web platforms show update notifications:
 const webUpdate = {
   notify: async () => {
     const info = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
-    
+
     if (info.updateAvailable) {
       // Show notification
       new Notification('Update Available', {
         body: `Version ${info.availableVersion} is available`,
         icon: '/icon.png',
-        actions: [{
-          action: 'update',
-          title: 'Update Now'
-        }]
+        actions: [
+          {
+            action: 'update',
+            title: 'Update Now',
+          },
+        ],
       });
     }
-  }
+  },
 };
 ```
 
@@ -337,36 +347,42 @@ Configure update behavior based on priority:
 
 ```typescript
 const updatePriorities = {
-  0: { // Low priority
+  0: {
+    // Low priority
     name: 'Optional',
     behavior: 'Show notification only',
-    userControl: 'full'
+    userControl: 'full',
   },
-  1: { // Minor improvements
+  1: {
+    // Minor improvements
     name: 'Recommended',
     behavior: 'Show dialog on app start',
-    userControl: 'dismissible'
+    userControl: 'dismissible',
   },
-  2: { // Important features
+  2: {
+    // Important features
     name: 'Important',
     behavior: 'Prompt after key actions',
-    userControl: 'postponable'
+    userControl: 'postponable',
   },
-  3: { // Significant changes
+  3: {
+    // Significant changes
     name: 'High',
     behavior: 'Flexible update with reminders',
-    userControl: 'limited'
+    userControl: 'limited',
   },
-  4: { // Critical fixes
+  4: {
+    // Critical fixes
     name: 'Critical',
     behavior: 'Immediate update prompt',
-    userControl: 'minimal'
+    userControl: 'minimal',
   },
-  5: { // Security updates
+  5: {
+    // Security updates
     name: 'Mandatory',
     behavior: 'Force immediate update',
-    userControl: 'none'
-  }
+    userControl: 'none',
+  },
 };
 ```
 
@@ -380,46 +396,46 @@ class VersionManager {
   compareVersions(v1: string, v2: string): number {
     const parts1 = v1.split('.').map(Number);
     const parts2 = v2.split('.').map(Number);
-    
+
     for (let i = 0; i < 3; i++) {
       if (parts1[i] > parts2[i]) return 1;
       if (parts1[i] < parts2[i]) return -1;
     }
-    
+
     return 0;
   }
-  
+
   // Check if update is major/minor/patch
   getUpdateType(oldVersion: string, newVersion: string): string {
     const [oldMajor, oldMinor, oldPatch] = oldVersion.split('.').map(Number);
     const [newMajor, newMinor, newPatch] = newVersion.split('.').map(Number);
-    
+
     if (newMajor > oldMajor) return 'major';
     if (newMinor > oldMinor) return 'minor';
     if (newPatch > oldPatch) return 'patch';
     return 'none';
   }
-  
+
   // Determine update strategy based on version change
   async determineStrategy(info: AppUpdateInfo) {
     const updateType = this.getUpdateType(
       info.currentVersion,
       info.availableVersion
     );
-    
+
     switch (updateType) {
       case 'major':
         // Major updates might need immediate update
         return info.updatePriority >= 3 ? 'immediate' : 'flexible';
-        
+
       case 'minor':
         // Minor updates are usually flexible
         return 'flexible';
-        
+
       case 'patch':
         // Patches can be optional unless critical
         return info.updatePriority >= 4 ? 'flexible' : 'optional';
-        
+
       default:
         return 'none';
     }
@@ -435,12 +451,12 @@ async function enforceMinimumVersion() {
   const config = {
     appUpdate: {
       minimumVersion: '2.0.0',
-      forceUpdateBelow: '1.5.0' // Force update for very old versions
-    }
+      forceUpdateBelow: '1.5.0', // Force update for very old versions
+    },
   };
-  
+
   const info = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
-  
+
   // Check if current version is below minimum
   if (isVersionBelow(info.currentVersion, config.appUpdate.minimumVersion)) {
     // Force immediate update
@@ -466,25 +482,29 @@ class UpdateUI {
     const dialog = {
       title: this.getUpdateTitle(info),
       message: this.getUpdateMessage(info),
-      buttons: this.getUpdateButtons(info)
+      buttons: this.getUpdateButtons(info),
     };
-    
+
     return this.presentDialog(dialog);
   }
-  
+
   private getUpdateTitle(info: AppUpdateInfo): string {
     switch (info.updatePriority) {
-      case 5: return '🚨 Critical Update Required';
-      case 4: return '⚠️ Important Update Available';
-      case 3: return '🎯 Recommended Update';
-      default: return '✨ New Version Available';
+      case 5:
+        return '🚨 Critical Update Required';
+      case 4:
+        return '⚠️ Important Update Available';
+      case 3:
+        return '🎯 Recommended Update';
+      default:
+        return '✨ New Version Available';
     }
   }
-  
+
   private getUpdateMessage(info: AppUpdateInfo): string {
     const size = this.formatBytes(info.updateSize);
     const features = info.releaseNotes?.slice(0, 3).join('\n• ');
-    
+
     return `Version ${info.availableVersion} is available (${size})
     
 What's new:
@@ -492,26 +512,28 @@ What's new:
     
 ${this.getUpdateUrgency(info)}`;
   }
-  
+
   private getUpdateButtons(info: AppUpdateInfo): DialogButton[] {
     if (info.updatePriority === 5) {
       // Mandatory update - no cancel option
-      return [{
-        text: 'Update Now',
-        handler: () => this.startUpdate(info)
-      }];
+      return [
+        {
+          text: 'Update Now',
+          handler: () => this.startUpdate(info),
+        },
+      ];
     }
-    
+
     return [
       {
         text: 'Update',
-        handler: () => this.startUpdate(info)
+        handler: () => this.startUpdate(info),
       },
       {
         text: 'Later',
         role: 'cancel',
-        handler: () => this.scheduleReminder(info)
-      }
+        handler: () => this.scheduleReminder(info),
+      },
     ];
   }
 }
@@ -524,10 +546,10 @@ ${this.getUpdateUrgency(info)}`;
 class UpdateProgressUI {
   private progressBar: HTMLElement;
   private statusText: HTMLElement;
-  
+
   showProgress() {
     this.createProgressUI();
-    
+
     CapacitorNativeUpdate.AppUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
@@ -535,22 +557,22 @@ class UpdateProgressUI {
       }
     );
   }
-  
+
   private updateProgress(progress: UpdateProgress) {
     // Update progress bar
     this.progressBar.style.width = `${progress.percent}%`;
-    
+
     // Update status text
     const downloaded = this.formatBytes(progress.bytesDownloaded);
     const total = this.formatBytes(progress.totalBytes);
     this.statusText.textContent = `Downloading: ${downloaded} / ${total}`;
-    
+
     // Show completion
     if (progress.percent === 100) {
       this.showCompletionUI();
     }
   }
-  
+
   private showCompletionUI() {
     this.statusText.textContent = 'Update ready to install';
     this.showInstallButton();
@@ -571,29 +593,29 @@ async function handleAppUpdateErrors() {
       case 'UPDATE_NOT_AVAILABLE':
         console.log('No update available');
         break;
-        
+
       case 'UPDATE_CANCELLED':
         // User cancelled the update
         if (isCriticalUpdate()) {
           showMandatoryUpdateMessage();
         }
         break;
-        
+
       case 'UPDATE_FAILED':
         // Update failed to install
         showRetryDialog();
         break;
-        
+
       case 'PLATFORM_NOT_SUPPORTED':
         // Feature not available on this platform
         fallbackToManualUpdate();
         break;
-        
+
       case 'PLAY_STORE_NOT_FOUND':
         // Google Play Store not installed
         showAlternativeUpdateMethod();
         break;
-        
+
       case 'NETWORK_ERROR':
         // No internet connection
         showOfflineMessage();
@@ -610,7 +632,7 @@ async function handleAppUpdateErrors() {
 class UpdateRetryStrategy {
   private retryCount = 0;
   private maxRetries = 3;
-  
+
   async retryUpdate() {
     try {
       await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
@@ -619,7 +641,7 @@ class UpdateRetryStrategy {
       if (this.shouldRetry(error)) {
         this.retryCount++;
         const delay = this.calculateBackoff();
-        
+
         setTimeout(() => {
           this.retryUpdate();
         }, delay);
@@ -629,7 +651,7 @@ class UpdateRetryStrategy {
       }
     }
   }
-  
+
   private calculateBackoff(): number {
     // Exponential backoff: 2s, 4s, 8s
     return Math.pow(2, this.retryCount) * 1000;
@@ -652,23 +674,23 @@ const mockUpdateInfo: AppUpdateInfo = {
   releaseNotes: [
     'New feature: Dark mode',
     'Performance improvements',
-    'Bug fixes'
+    'Bug fixes',
   ],
   isFlexibleUpdateAllowed: true,
-  isImmediateUpdateAllowed: true
+  isImmediateUpdateAllowed: true,
 };
 
 // Test different scenarios
 async function testUpdateScenarios() {
   // Test immediate update
   await testImmediateUpdate();
-  
+
   // Test flexible update
   await testFlexibleUpdate();
-  
+
   // Test update cancellation
   await testUpdateCancellation();
-  
+
   // Test network errors
   await testNetworkErrors();
 }
@@ -700,10 +722,10 @@ const updateMessage = {
   features: [
     '🎨 Beautiful new design',
     '⚡ 2x faster performance',
-    '🐛 Bug fixes and improvements'
+    '🐛 Bug fixes and improvements',
   ],
   size: '12 MB',
-  time: 'Less than 1 minute'
+  time: 'Less than 1 minute',
 };
 ```
 
@@ -718,10 +740,10 @@ class SmartUpdateScheduler {
       this.scheduleForLater();
       return;
     }
-    
+
     // Check device conditions
     const conditions = await this.checkDeviceConditions();
-    
+
     if (conditions.isCharging && conditions.onWifi) {
       // Ideal conditions - start update
       await this.startUpdate();
@@ -745,8 +767,8 @@ async function trackUpdateMetrics(event: string, data: any) {
       availableVersion: data.availableVersion,
       updatePriority: data.updatePriority,
       userAction: data.userAction,
-      timestamp: Date.now()
-    }
+      timestamp: Date.now(),
+    },
   });
 }
 ```

@@ -14,23 +14,27 @@ Live Updates, also known as Over-The-Air (OTA) updates, allow you to deploy Java
 ## Key Features
 
 ### 🚀 Instant Deployment
+
 - Deploy updates within minutes
 - No app store review delays
 - Fix critical bugs immediately
 
 ### 🔒 Secure Updates
+
 - Cryptographic signature verification
 - Checksum validation
 - HTTPS enforcement
 - Certificate pinning support
 
 ### 📦 Smart Bundle Management
+
 - Automatic cleanup of old bundles
 - Storage usage optimization
 - Version history tracking
 - Rollback capabilities
 
 ### 🎯 Targeted Deployments
+
 - Multiple update channels
 - Gradual rollouts
 - A/B testing support
@@ -46,8 +50,8 @@ await CapacitorNativeUpdate.configure({
   liveUpdate: {
     appId: 'com.myapp.example',
     serverUrl: 'https://updates.myserver.com',
-    autoUpdate: true
-  }
+    autoUpdate: true,
+  },
 });
 
 // 2. Sync updates (automatic with autoUpdate: true)
@@ -69,7 +73,7 @@ switch (result.status) {
 ```typescript
 class LiveUpdateManager {
   private updateAvailable = false;
-  
+
   async initialize() {
     // Configure with advanced options
     await CapacitorNativeUpdate.configure({
@@ -80,34 +84,40 @@ class LiveUpdateManager {
         updateStrategy: 'BACKGROUND',
         publicKey: this.getPublicKey(),
         requireSignature: true,
-        checksumAlgorithm: 'SHA-512'
-      }
+        checksumAlgorithm: 'SHA-512',
+      },
     });
-    
+
     // Set up listeners
     this.setupUpdateListeners();
-    
+
     // Initial check
     await this.checkForUpdates();
   }
-  
+
   private setupUpdateListeners() {
     // Download progress
-    CapacitorNativeUpdate.LiveUpdate.addListener('downloadProgress', (progress) => {
-      this.updateDownloadProgress(progress.percent);
-    });
-    
+    CapacitorNativeUpdate.LiveUpdate.addListener(
+      'downloadProgress',
+      (progress) => {
+        this.updateDownloadProgress(progress.percent);
+      }
+    );
+
     // State changes
-    CapacitorNativeUpdate.LiveUpdate.addListener('updateStateChanged', (event) => {
-      this.handleStateChange(event);
-    });
+    CapacitorNativeUpdate.LiveUpdate.addListener(
+      'updateStateChanged',
+      (event) => {
+        this.handleStateChange(event);
+      }
+    );
   }
-  
+
   async checkForUpdates() {
     try {
       const latest = await CapacitorNativeUpdate.LiveUpdate.getLatest();
       const current = await CapacitorNativeUpdate.LiveUpdate.current();
-      
+
       if (this.isNewerVersion(latest.version, current.version)) {
         this.updateAvailable = true;
         this.notifyUpdateAvailable(latest);
@@ -116,23 +126,23 @@ class LiveUpdateManager {
       console.error('Update check failed:', error);
     }
   }
-  
+
   async downloadUpdate() {
     if (!this.updateAvailable) return;
-    
+
     try {
       const bundle = await CapacitorNativeUpdate.LiveUpdate.download({
         version: 'latest',
         onProgress: (progress) => {
           console.log(`Download: ${progress.percent}%`);
-        }
+        },
       });
-      
+
       // Validate the bundle
       const validation = await CapacitorNativeUpdate.LiveUpdate.validateUpdate({
-        bundleId: bundle.bundleId
+        bundleId: bundle.bundleId,
       });
-      
+
       if (validation.valid) {
         await this.installUpdate(bundle);
       } else {
@@ -142,29 +152,29 @@ class LiveUpdateManager {
       this.handleUpdateError(error);
     }
   }
-  
+
   async installUpdate(bundle: BundleInfo) {
     // Set the bundle as active
     await CapacitorNativeUpdate.LiveUpdate.set(bundle);
-    
+
     // Notify app is ready (important for rollback mechanism)
     await CapacitorNativeUpdate.LiveUpdate.notifyAppReady();
-    
+
     // Schedule reload based on user preference
     this.scheduleReload();
   }
-  
+
   private scheduleReload() {
     // Option 1: Immediate reload
     // await CapacitorNativeUpdate.LiveUpdate.reload();
-    
+
     // Option 2: Reload on next app resume
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
         CapacitorNativeUpdate.LiveUpdate.reload();
       }
     });
-    
+
     // Option 3: User-triggered reload
     this.showUpdateReadyDialog();
   }
@@ -185,6 +195,7 @@ Updates are downloaded and applied immediately when detected.
 ```
 
 **Use when:**
+
 - Critical bug fixes
 - Security patches
 - Time-sensitive content
@@ -202,6 +213,7 @@ Updates download in the background and install based on install mode.
 ```
 
 **Use when:**
+
 - Regular feature updates
 - Non-critical improvements
 - Large bundle sizes
@@ -218,6 +230,7 @@ Full control over download and installation timing.
 ```
 
 **Use when:**
+
 - User-initiated updates
 - Specific update windows
 - Custom update UI
@@ -237,7 +250,7 @@ console.log(current.version); // "1.2.3"
 function getUpdateType(oldVersion: string, newVersion: string) {
   const [oldMajor, oldMinor, oldPatch] = oldVersion.split('.').map(Number);
   const [newMajor, newMinor, newPatch] = newVersion.split('.').map(Number);
-  
+
   if (newMajor > oldMajor) return 'major';
   if (newMinor > oldMinor) return 'minor';
   if (newPatch > oldPatch) return 'patch';
@@ -251,7 +264,7 @@ function getUpdateType(oldVersion: string, newVersion: string) {
 // List all downloaded bundles
 const bundles = await CapacitorNativeUpdate.LiveUpdate.list();
 
-bundles.forEach(bundle => {
+bundles.forEach((bundle) => {
   console.log(`Version: ${bundle.version}`);
   console.log(`Downloaded: ${new Date(bundle.downloadTime)}`);
   console.log(`Size: ${bundle.size} bytes`);
@@ -260,7 +273,7 @@ bundles.forEach(bundle => {
 
 // Clean up old bundles
 await CapacitorNativeUpdate.LiveUpdate.delete({
-  keepNewest: 3 // Keep only 3 most recent bundles
+  keepNewest: 3, // Keep only 3 most recent bundles
 });
 ```
 
@@ -276,7 +289,7 @@ async function onAppReady() {
   try {
     // Verify app is working correctly
     await performHealthCheck();
-    
+
     // Notify that app started successfully
     await CapacitorNativeUpdate.LiveUpdate.notifyAppReady();
   } catch (error) {
@@ -326,7 +339,7 @@ await CapacitorNativeUpdate.LiveUpdate.setChannel(channel);
 // Enable features based on channel
 async function getFeatureFlags() {
   const bundle = await CapacitorNativeUpdate.LiveUpdate.current();
-  
+
   switch (bundle.metadata?.channel) {
     case 'alpha':
       return { experimentalFeatures: true, debugMode: true };
@@ -343,10 +356,11 @@ async function getFeatureFlags() {
 ### Bundle Size Optimization
 
 1. **Minimize bundle size**:
+
    ```bash
    # Use production builds
    npm run build -- --mode production
-   
+
    # Enable compression
    gzip -9 bundle.js
    ```
@@ -356,7 +370,7 @@ async function getFeatureFlags() {
    // Future API
    const delta = await CapacitorNativeUpdate.LiveUpdate.downloadDelta({
      fromVersion: current.version,
-     toVersion: latest.version
+     toVersion: latest.version,
    });
    ```
 
@@ -368,13 +382,13 @@ async function getFeatureFlags() {
   liveUpdate: {
     // Download only on WiFi
     downloadOnWifiOnly: true,
-    
+
     // Limit concurrent downloads
     maxConcurrentDownloads: 1,
-    
+
     // Set reasonable timeout
     timeout: 30000,
-    
+
     // Enable resume capability
     resumableDownloads: true
   }
@@ -391,7 +405,7 @@ console.log(`Used: ${storage.usedBytes} / ${storage.totalBytes}`);
 // Clean up when needed
 if (storage.usedBytes > storage.totalBytes * 0.8) {
   await CapacitorNativeUpdate.LiveUpdate.delete({
-    olderThan: Date.now() - 30 * 24 * 60 * 60 * 1000 // 30 days
+    olderThan: Date.now() - 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 }
 ```
@@ -409,29 +423,29 @@ try {
       // No internet connection
       showOfflineMessage();
       break;
-      
+
     case 'SERVER_ERROR':
       // Update server is down
       scheduleRetry();
       break;
-      
+
     case 'CHECKSUM_ERROR':
       // Bundle corrupted
       await CapacitorNativeUpdate.LiveUpdate.delete({
-        bundleId: error.bundleId
+        bundleId: error.bundleId,
       });
       break;
-      
+
     case 'SIGNATURE_ERROR':
       // Security validation failed
       logSecurityEvent(error);
       break;
-      
+
     case 'STORAGE_ERROR':
       // Not enough space
       await cleanupStorage();
       break;
-      
+
     case 'VERSION_MISMATCH':
       // Incompatible update
       promptForAppUpdate();
@@ -446,7 +460,7 @@ try {
 class UpdateRetryManager {
   private retryCount = 0;
   private maxRetries = 3;
-  
+
   async syncWithRetry() {
     try {
       await CapacitorNativeUpdate.LiveUpdate.sync();
@@ -455,9 +469,11 @@ class UpdateRetryManager {
       if (this.shouldRetry(error)) {
         this.retryCount++;
         const delay = this.getRetryDelay();
-        
-        console.log(`Retry ${this.retryCount}/${this.maxRetries} in ${delay}ms`);
-        
+
+        console.log(
+          `Retry ${this.retryCount}/${this.maxRetries} in ${delay}ms`
+        );
+
         setTimeout(() => {
           this.syncWithRetry();
         }, delay);
@@ -466,12 +482,14 @@ class UpdateRetryManager {
       }
     }
   }
-  
+
   private shouldRetry(error: any): boolean {
-    return this.retryCount < this.maxRetries &&
-           ['NETWORK_ERROR', 'TIMEOUT_ERROR', 'SERVER_ERROR'].includes(error.code);
+    return (
+      this.retryCount < this.maxRetries &&
+      ['NETWORK_ERROR', 'TIMEOUT_ERROR', 'SERVER_ERROR'].includes(error.code)
+    );
   }
-  
+
   private getRetryDelay(): number {
     // Exponential backoff
     return Math.min(1000 * Math.pow(2, this.retryCount), 30000);
@@ -492,8 +510,8 @@ const devConfig = {
     channel: 'development',
     allowEmulator: true,
     requireSignature: false, // Disable in dev
-    autoUpdate: false // Manual control
-  }
+    autoUpdate: false, // Manual control
+  },
 };
 
 // Force update check
@@ -531,10 +549,11 @@ npm run dev
 // Roll out to percentage of users
 function shouldReceiveUpdate(userId: string, percentage: number): boolean {
   const hash = hashCode(userId);
-  return (hash % 100) < percentage;
+  return hash % 100 < percentage;
 }
 
-if (shouldReceiveUpdate(user.id, 10)) { // 10% rollout
+if (shouldReceiveUpdate(user.id, 10)) {
+  // 10% rollout
   await CapacitorNativeUpdate.LiveUpdate.setChannel('beta');
 }
 ```
@@ -550,8 +569,8 @@ CapacitorNativeUpdate.LiveUpdate.addListener('updateStateChanged', (event) => {
       body: 'A new version is available. Restart to apply.',
       actions: [
         { id: 'restart', title: 'Restart Now' },
-        { id: 'later', title: 'Later' }
-      ]
+        { id: 'later', title: 'Later' },
+      ],
     });
   }
 });
@@ -568,9 +587,9 @@ async function trackUpdateMetrics(result: SyncResult) {
     version: result.bundle?.version,
     downloadTime: result.downloadTime,
     installTime: result.installTime,
-    bundleSize: result.bundle?.size
+    bundleSize: result.bundle?.size,
   };
-  
+
   await analytics.track(metrics);
 }
 ```

@@ -12,14 +12,14 @@ export class BundleManager {
    */
   static saveBundleInfo(bundle: BundleInfo): void {
     const bundles = this.getAllBundles();
-    const index = bundles.findIndex(b => b.bundleId === bundle.bundleId);
-    
+    const index = bundles.findIndex((b) => b.bundleId === bundle.bundleId);
+
     if (index >= 0) {
       bundles[index] = bundle;
     } else {
       bundles.push(bundle);
     }
-    
+
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(bundles));
   }
 
@@ -40,7 +40,7 @@ export class BundleManager {
    */
   static getBundle(bundleId: string): BundleInfo | null {
     const bundles = this.getAllBundles();
-    return bundles.find(b => b.bundleId === bundleId) || null;
+    return bundles.find((b) => b.bundleId === bundleId) || null;
   }
 
   /**
@@ -48,9 +48,9 @@ export class BundleManager {
    */
   static deleteBundle(bundleId: string): void {
     const bundles = this.getAllBundles();
-    const filtered = bundles.filter(b => b.bundleId !== bundleId);
+    const filtered = bundles.filter((b) => b.bundleId !== bundleId);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
-    
+
     // If this was the active bundle, clear it
     if (this.getActiveBundleId() === bundleId) {
       this.clearActiveBundle();
@@ -63,7 +63,7 @@ export class BundleManager {
   static getActiveBundle(): BundleInfo | null {
     const activeBundleId = this.getActiveBundleId();
     if (!activeBundleId) return null;
-    
+
     return this.getBundle(activeBundleId);
   }
 
@@ -75,18 +75,18 @@ export class BundleManager {
     if (!bundle) {
       throw new Error(`Bundle ${bundleId} not found`);
     }
-    
+
     // Update previous active bundle status
     const previousActive = this.getActiveBundle();
     if (previousActive) {
       previousActive.status = 'READY' as BundleStatus;
       this.saveBundleInfo(previousActive);
     }
-    
+
     // Set new active bundle
     bundle.status = 'ACTIVE' as BundleStatus;
     this.saveBundleInfo(bundle);
-    
+
     localStorage.setItem(this.ACTIVE_BUNDLE_KEY, bundleId);
   }
 
@@ -118,16 +118,16 @@ export class BundleManager {
   static cleanupOldBundles(keepCount: number): void {
     const bundles = this.getAllBundles();
     const activeBundleId = this.getActiveBundleId();
-    
+
     // Sort by download time (newest first)
     const sorted = bundles.sort((a, b) => b.downloadTime - a.downloadTime);
-    
+
     // Keep the active bundle and the most recent ones
     const toKeep = new Set<string>();
     if (activeBundleId) {
       toKeep.add(activeBundleId);
     }
-    
+
     let kept = toKeep.size;
     for (const bundle of sorted) {
       if (kept >= keepCount) break;
@@ -136,7 +136,7 @@ export class BundleManager {
         kept++;
       }
     }
-    
+
     // Delete bundles not in the keep set
     for (const bundle of bundles) {
       if (!toKeep.has(bundle.bundleId)) {
@@ -150,7 +150,7 @@ export class BundleManager {
    */
   static getBundlesOlderThan(timestamp: number): BundleInfo[] {
     const bundles = this.getAllBundles();
-    return bundles.filter(b => b.downloadTime < timestamp);
+    return bundles.filter((b) => b.downloadTime < timestamp);
   }
 
   /**

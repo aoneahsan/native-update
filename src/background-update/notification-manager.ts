@@ -5,9 +5,7 @@ import type {
   LatestVersion,
 } from '../definitions';
 
-import {
-  NotificationPriority,
-} from '../definitions';
+import { NotificationPriority } from '../definitions';
 
 export interface NotificationData {
   title: string;
@@ -49,7 +47,7 @@ export abstract class NotificationManager {
 
   async sendUpdateNotification(
     appUpdate?: AppUpdateInfo,
-    liveUpdate?: LatestVersion,
+    liveUpdate?: LatestVersion
   ): Promise<boolean> {
     const permissions = await this.getPermissionStatus();
     if (!permissions.granted) {
@@ -62,11 +60,12 @@ export abstract class NotificationManager {
 
   protected createNotificationData(
     appUpdate?: AppUpdateInfo,
-    liveUpdate?: LatestVersion,
+    liveUpdate?: LatestVersion
   ): NotificationData {
     let title = this.preferences.title || 'App Update Available';
-    let body = this.preferences.description || 'A new version of the app is available';
-    
+    let body =
+      this.preferences.description || 'A new version of the app is available';
+
     if (appUpdate?.updateAvailable && liveUpdate?.available) {
       title = 'App Updates Available';
       body = `App version ${appUpdate.availableVersion} and content updates are available`;

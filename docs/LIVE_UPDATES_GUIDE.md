@@ -3,6 +3,7 @@
 This comprehensive guide explains how to implement Live Updates (Over-The-Air updates) in your Capacitor application using the CapacitorNativeUpdate plugin.
 
 ## Table of Contents
+
 - [Overview](#overview)
 - [How Live Updates Work](#how-live-updates-work)
 - [Setup Guide](#setup-guide)
@@ -25,6 +26,7 @@ Live Updates allow you to push JavaScript, HTML, CSS, and asset updates to your 
 ### What Can Be Updated
 
 ✅ **Can Update:**
+
 - JavaScript bundles
 - HTML files
 - CSS stylesheets
@@ -33,6 +35,7 @@ Live Updates allow you to push JavaScript, HTML, CSS, and asset updates to your 
 - Web fonts
 
 ❌ **Cannot Update:**
+
 - Native code (Java/Kotlin/Swift/Objective-C)
 - Native plugins
 - Platform-specific configurations
@@ -46,7 +49,7 @@ sequenceDiagram
     participant Plugin
     participant Server
     participant Storage
-    
+
     App->>Plugin: checkForUpdate()
     Plugin->>Server: GET /check?version=1.0.0
     Server-->>Plugin: Update available (1.0.1)
@@ -73,6 +76,7 @@ npx cap sync
 ### 2. Configure the Plugin
 
 #### capacitor.config.json
+
 ```json
 {
   "appId": "com.example.app",
@@ -96,6 +100,7 @@ npx cap sync
 ### 3. iOS Additional Setup
 
 Add to `Info.plist`:
+
 ```xml
 <key>CapacitorNativeUpdateEnabled</key>
 <true/>
@@ -106,6 +111,7 @@ Add to `Info.plist`:
 ### 4. Android Additional Setup
 
 Add to `AndroidManifest.xml`:
+
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -122,18 +128,19 @@ export class UpdateManager {
   async checkAndUpdate() {
     try {
       // Check for updates
-      const { available, version } = await CapacitorNativeUpdate.checkForUpdate();
-      
+      const { available, version } =
+        await CapacitorNativeUpdate.checkForUpdate();
+
       if (available) {
         console.log(`Update available: ${version}`);
-        
+
         // Download the update
         const { success } = await CapacitorNativeUpdate.downloadUpdate({
           onProgress: (progress) => {
             console.log(`Download progress: ${progress.percent}%`);
-          }
+          },
         });
-        
+
         if (success) {
           // Apply the update
           await CapacitorNativeUpdate.applyUpdate();
@@ -161,9 +168,9 @@ export class UpdateService {
 
   async checkForUpdates(silent = false) {
     try {
-      const { available, version, mandatory, notes } = 
+      const { available, version, mandatory, notes } =
         await CapacitorNativeUpdate.checkForUpdate();
-      
+
       if (!available) {
         if (!silent) {
           await this.showAlert('No Updates', 'Your app is up to date!');
@@ -185,16 +192,16 @@ export class UpdateService {
                 this.downloadAndApplyUpdate();
                 return false;
               }
-            }
+            },
           },
           {
             text: 'Update',
             handler: () => {
               this.downloadAndApplyUpdate();
-            }
-          }
+            },
+          },
         ],
-        backdropDismiss: !mandatory
+        backdropDismiss: !mandatory,
       });
 
       await alert.present();
@@ -206,7 +213,7 @@ export class UpdateService {
   private async downloadAndApplyUpdate() {
     const loading = await this.loadingCtrl.create({
       message: 'Downloading update...',
-      backdropDismiss: false
+      backdropDismiss: false,
     });
 
     await loading.present();
@@ -216,14 +223,14 @@ export class UpdateService {
       await CapacitorNativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           loading.message = `Downloading... ${Math.round(progress.percent)}%`;
-        }
+        },
       });
 
       loading.message = 'Applying update...';
 
       // Apply the update
       await CapacitorNativeUpdate.applyUpdate();
-      
+
       // The app will restart automatically
     } catch (error) {
       await loading.dismiss();
@@ -235,7 +242,7 @@ export class UpdateService {
     const alert = await this.alertCtrl.create({
       header,
       message,
-      buttons: ['OK']
+      buttons: ['OK'],
     });
     await alert.present();
   }
@@ -252,7 +259,7 @@ import { UpdateService } from './services/update.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html'
+  templateUrl: 'app.component.html',
 })
 export class AppComponent implements OnInit {
   constructor(
@@ -262,14 +269,17 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     await this.platform.ready();
-    
+
     // Check for updates on app start
     await this.updateService.checkForUpdates(true);
-    
+
     // Set up periodic checks
-    setInterval(() => {
-      this.updateService.checkForUpdates(true);
-    }, 60 * 60 * 1000); // Every hour
+    setInterval(
+      () => {
+        this.updateService.checkForUpdates(true);
+      },
+      60 * 60 * 1000
+    ); // Every hour
   }
 }
 ```
@@ -293,8 +303,8 @@ export class UpdateStrategies {
     const { available } = await CapacitorNativeUpdate.checkForUpdate();
     if (available) {
       await CapacitorNativeUpdate.downloadUpdate();
-      await CapacitorNativeUpdate.applyUpdate({ 
-        reloadStrategy: 'on-next-restart' 
+      await CapacitorNativeUpdate.applyUpdate({
+        reloadStrategy: 'on-next-restart',
       });
       // Update will be applied next time app starts
     }
@@ -305,7 +315,7 @@ export class UpdateStrategies {
     const { available } = await CapacitorNativeUpdate.checkForUpdate();
     if (available) {
       await CapacitorNativeUpdate.downloadUpdate();
-      
+
       // Show confirmation dialog
       const confirmed = await this.showUpdateReadyDialog();
       if (confirmed) {
@@ -329,6 +339,7 @@ npm start
 ### Option 2: Implement Your Own
 
 #### Bundle Structure
+
 ```
 bundle-1.0.1.zip
 ├── www/
@@ -343,27 +354,26 @@ bundle-1.0.1.zip
 ```
 
 #### manifest.json
+
 ```json
 {
   "version": "1.0.1",
   "minNativeVersion": "1.0.0",
   "timestamp": "2023-12-01T00:00:00Z",
-  "files": [
-    "www/index.html",
-    "www/js/app.bundle.js",
-    "www/css/styles.css"
-  ]
+  "files": ["www/index.html", "www/js/app.bundle.js", "www/css/styles.css"]
 }
 ```
 
 #### Server API Requirements
 
 **Check Endpoint:**
+
 ```http
 GET /api/v1/check?version=1.0.0&channel=production&appId=com.example.app
 ```
 
 Response:
+
 ```json
 {
   "available": true,
@@ -422,7 +432,7 @@ await CapacitorNativeUpdate.setChannel({ channel: 'beta' });
 // Enable delta updates to reduce download size
 await CapacitorNativeUpdate.configureDeltaUpdates({
   enabled: true,
-  threshold: 0.3 // Use delta if size < 30% of full bundle
+  threshold: 0.3, // Use delta if size < 30% of full bundle
 });
 ```
 
@@ -438,8 +448,8 @@ if (versions.length > 1) {
 }
 
 // Rollback to specific version
-await CapacitorNativeUpdate.switchVersion({ 
-  version: '1.0.0' 
+await CapacitorNativeUpdate.switchVersion({
+  version: '1.0.0',
 });
 ```
 
@@ -449,14 +459,14 @@ await CapacitorNativeUpdate.switchVersion({
 // Track update success
 await CapacitorNativeUpdate.reportUpdateSuccess({
   version: '1.0.1',
-  duration: 5000
+  duration: 5000,
 });
 
 // Track update failure
 await CapacitorNativeUpdate.reportUpdateFailure({
   version: '1.0.1',
   error: 'DOWNLOAD_FAILED',
-  details: 'Network timeout'
+  details: 'Network timeout',
 });
 ```
 
@@ -465,7 +475,7 @@ await CapacitorNativeUpdate.reportUpdateFailure({
 ```typescript
 // Disable auto-check
 await CapacitorNativeUpdate.configure({
-  autoCheck: false
+  autoCheck: false,
 });
 
 // Implement custom UI
@@ -473,14 +483,14 @@ class CustomUpdateUI {
   async showUpdateFlow() {
     // Custom check
     const update = await CapacitorNativeUpdate.checkForUpdate();
-    
+
     if (update.available) {
       // Show custom UI
       const modal = await this.modalCtrl.create({
         component: UpdateModalComponent,
-        componentProps: { update }
+        componentProps: { update },
       });
-      
+
       await modal.present();
     }
   }
@@ -496,7 +506,7 @@ class CustomUpdateUI {
 const versions = {
   major: '2.0.0', // Breaking changes
   minor: '1.1.0', // New features
-  patch: '1.0.1'  // Bug fixes
+  patch: '1.0.1', // Bug fixes
 };
 
 // Skip versions if needed
@@ -534,14 +544,14 @@ if (environment.development) {
   // Force check against staging server
   await CapacitorNativeUpdate.configure({
     updateUrl: 'https://staging-updates.yourdomain.com',
-    channel: 'development'
+    channel: 'development',
   });
 }
 
 // A/B testing
 const testGroup = user.id % 2 === 0 ? 'A' : 'B';
-await CapacitorNativeUpdate.setChannel({ 
-  channel: `production-${testGroup}` 
+await CapacitorNativeUpdate.setChannel({
+  channel: `production-${testGroup}`,
 });
 ```
 
@@ -552,7 +562,7 @@ await CapacitorNativeUpdate.setChannel({
 const now = new Date().getHours();
 if (now >= 2 && now <= 6) {
   await CapacitorNativeUpdate.downloadUpdate({
-    priority: 'low'
+    priority: 'low',
   });
 }
 
@@ -567,6 +577,7 @@ await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
 ### Common Issues
 
 1. **Update not applying**
+
    ```typescript
    // Check if update was downloaded
    const { ready } = await CapacitorNativeUpdate.isUpdateReady();
@@ -577,6 +588,7 @@ await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
    ```
 
 2. **Signature verification fails**
+
    ```typescript
    // Verify public key configuration
    const config = await CapacitorNativeUpdate.getConfiguration();
@@ -587,7 +599,7 @@ await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
    ```typescript
    // Clear old versions
    await CapacitorNativeUpdate.cleanup({
-     keepVersions: 1
+     keepVersions: 1,
    });
    ```
 
@@ -617,7 +629,7 @@ console.log('Update system health:', {
   lastCheck: health.lastCheck,
   lastUpdate: health.lastUpdate,
   currentVersion: health.currentVersion,
-  availableSpace: health.availableSpace
+  availableSpace: health.availableSpace,
 });
 ```
 

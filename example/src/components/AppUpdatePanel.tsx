@@ -6,10 +6,15 @@ interface AppUpdatePanelProps {
   updateService: UpdateService;
 }
 
-export const AppUpdatePanel: React.FC<AppUpdatePanelProps> = ({ updateService }) => {
+export const AppUpdatePanel: React.FC<AppUpdatePanelProps> = ({
+  updateService,
+}) => {
   const [updateInfo, setUpdateInfo] = useState<AppUpdateInfo | null>(null);
   const [isChecking, setIsChecking] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error' | 'info';
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     // Check for app updates on component mount
@@ -19,18 +24,21 @@ export const AppUpdatePanel: React.FC<AppUpdatePanelProps> = ({ updateService })
   const checkForAppUpdates = async () => {
     setIsChecking(true);
     setMessage(null);
-    
+
     try {
       const info = await updateService.checkAppStoreUpdate();
       setUpdateInfo(info);
-      
+
       if (info.updateAvailable) {
-        setMessage({ 
-          type: 'info', 
-          text: `New version ${info.availableVersion} is available in the app store!` 
+        setMessage({
+          type: 'info',
+          text: `New version ${info.availableVersion} is available in the app store!`,
         });
       } else {
-        setMessage({ type: 'success', text: 'You have the latest app version' });
+        setMessage({
+          type: 'success',
+          text: 'You have the latest app version',
+        });
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to check for app updates' });
@@ -79,72 +87,75 @@ export const AppUpdatePanel: React.FC<AppUpdatePanelProps> = ({ updateService })
   };
 
   return (
-    <div className="panel">
+    <div className='panel'>
       <h2>Native App Updates</h2>
-      
-      {message && (
-        <div className={`alert ${message.type}`}>
-          {message.text}
-        </div>
-      )}
 
-      <div className="panel-section">
+      {message && <div className={`alert ${message.type}`}>{message.text}</div>}
+
+      <div className='panel-section'>
         <h3>Current Version</h3>
-        <div className="info-group">
-          <span className="info-label">Installed Version:</span>
-          <span className="info-value">{updateInfo?.currentVersion || 'Unknown'}</span>
+        <div className='info-group'>
+          <span className='info-label'>Installed Version:</span>
+          <span className='info-value'>
+            {updateInfo?.currentVersion || 'Unknown'}
+          </span>
         </div>
-        
+
         {updateInfo?.updateAvailable && (
           <>
-            <div className="info-group">
-              <span className="info-label">Available Version:</span>
-              <span className="info-value">{updateInfo.availableVersion}</span>
+            <div className='info-group'>
+              <span className='info-label'>Available Version:</span>
+              <span className='info-value'>{updateInfo.availableVersion}</span>
             </div>
-            
+
             {updateInfo.updatePriority !== undefined && (
-              <div className="info-group">
-                <span className="info-label">Update Priority:</span>
-                <span className={`status-badge ${getUpdatePriorityColor(updateInfo.updatePriority)}`}>
+              <div className='info-group'>
+                <span className='info-label'>Update Priority:</span>
+                <span
+                  className={`status-badge ${getUpdatePriorityColor(updateInfo.updatePriority)}`}
+                >
                   {getUpdatePriorityText(updateInfo.updatePriority)}
                 </span>
               </div>
             )}
-            
-            {updateInfo.clientVersionStalenessDays !== undefined && updateInfo.clientVersionStalenessDays > 0 && (
-              <div className="info-group">
-                <span className="info-label">Days Since Release:</span>
-                <span className="info-value">{updateInfo.clientVersionStalenessDays} days</span>
-              </div>
-            )}
+
+            {updateInfo.clientVersionStalenessDays !== undefined &&
+              updateInfo.clientVersionStalenessDays > 0 && (
+                <div className='info-group'>
+                  <span className='info-label'>Days Since Release:</span>
+                  <span className='info-value'>
+                    {updateInfo.clientVersionStalenessDays} days
+                  </span>
+                </div>
+              )}
           </>
         )}
       </div>
 
-      <div className="panel-section">
+      <div className='panel-section'>
         <h3>Update Actions</h3>
-        <div className="button-group">
-          <button 
-            className="primary" 
+        <div className='button-group'>
+          <button
+            className='primary'
             onClick={checkForAppUpdates}
             disabled={isChecking}
           >
             {isChecking ? 'Checking...' : 'Check for Updates'}
           </button>
-          
+
           {updateInfo?.updateAvailable && (
             <>
               {updateInfo.immediateUpdateAllowed && (
-                <button 
-                  className="primary" 
+                <button
+                  className='primary'
                   onClick={performImmediateUpdate}
                 >
                   Update Now
                 </button>
               )}
-              
-              <button 
-                className="secondary" 
+
+              <button
+                className='secondary'
                 onClick={openAppStore}
               >
                 Open App Store
@@ -154,46 +165,53 @@ export const AppUpdatePanel: React.FC<AppUpdatePanelProps> = ({ updateService })
         </div>
       </div>
 
-      <div className="panel-section">
+      <div className='panel-section'>
         <h3>Platform Information</h3>
-        <div className="info-group">
-          <span className="info-label">Immediate Updates:</span>
-          <span className="info-value">
+        <div className='info-group'>
+          <span className='info-label'>Immediate Updates:</span>
+          <span className='info-value'>
             {updateInfo?.immediateUpdateAllowed ? 'Supported' : 'Not Supported'}
           </span>
         </div>
-        <div className="info-group">
-          <span className="info-label">Flexible Updates:</span>
-          <span className="info-value">
+        <div className='info-group'>
+          <span className='info-label'>Flexible Updates:</span>
+          <span className='info-value'>
             {updateInfo?.flexibleUpdateAllowed ? 'Supported' : 'Not Supported'}
           </span>
         </div>
-        
+
         {updateInfo?.installStatus && (
           <>
-            <div className="info-group">
-              <span className="info-label">Install Status:</span>
-              <span className="info-value">{updateInfo.installStatus}</span>
+            <div className='info-group'>
+              <span className='info-label'>Install Status:</span>
+              <span className='info-value'>{updateInfo.installStatus}</span>
             </div>
-            
-            {updateInfo.bytesDownloaded !== undefined && updateInfo.totalBytesToDownload !== undefined && (
-              <div className="info-group">
-                <span className="info-label">Download Progress:</span>
-                <span className="info-value">
-                  {updateService.formatBytes(updateInfo.bytesDownloaded)} / 
-                  {updateService.formatBytes(updateInfo.totalBytesToDownload)}
-                </span>
-              </div>
-            )}
+
+            {updateInfo.bytesDownloaded !== undefined &&
+              updateInfo.totalBytesToDownload !== undefined && (
+                <div className='info-group'>
+                  <span className='info-label'>Download Progress:</span>
+                  <span className='info-value'>
+                    {updateService.formatBytes(updateInfo.bytesDownloaded)} /
+                    {updateService.formatBytes(updateInfo.totalBytesToDownload)}
+                  </span>
+                </div>
+              )}
           </>
         )}
       </div>
 
-      <div className="panel-section">
+      <div className='panel-section'>
         <h3>Platform Notes</h3>
-        <div className="alert info">
-          <p><strong>Android:</strong> Supports in-app updates through Google Play Core. Users can update without leaving the app.</p>
-          <p><strong>iOS:</strong> Updates must be done through the App Store. The app will open the App Store page.</p>
+        <div className='alert info'>
+          <p>
+            <strong>Android:</strong> Supports in-app updates through Google
+            Play Core. Users can update without leaving the app.
+          </p>
+          <p>
+            <strong>iOS:</strong> Updates must be done through the App Store.
+            The app will open the App Store page.
+          </p>
         </div>
       </div>
     </div>

@@ -22,22 +22,26 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 ## Setting Up Development Environment
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/aoneahsan/capacitor-native-update.git
 cd capacitor-native-update
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Build the plugin:
+
 ```bash
 npm run build
 ```
 
 4. Run tests:
+
 ```bash
 npm test
 ```
@@ -62,6 +66,7 @@ capacitor-native-update/
 ## Code Style
 
 ### TypeScript/JavaScript
+
 - Use TypeScript for all new code
 - Follow the existing code style
 - Use meaningful variable names
@@ -69,11 +74,13 @@ capacitor-native-update/
 - Keep functions small and focused
 
 ### Android (Kotlin)
+
 - Follow [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html)
 - Use meaningful variable and function names
 - Add KDoc comments for public APIs
 
 ### iOS (Swift)
+
 - Follow [Swift API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
 - Use meaningful variable and function names
 - Add documentation comments for public APIs
@@ -81,16 +88,19 @@ capacitor-native-update/
 ## Testing
 
 ### Unit Tests
+
 - Write unit tests for all new functionality
 - Maintain test coverage above 80%
 - Use descriptive test names
 
 ### Integration Tests
+
 - Test plugin functionality on all platforms
 - Test error scenarios
 - Test security features
 
 ### Manual Testing
+
 - Test on real devices when possible
 - Test on minimum supported OS versions
 - Test update scenarios thoroughly
@@ -103,6 +113,7 @@ capacitor-native-update/
 - Reference issues and pull requests liberally after the first line
 
 Examples:
+
 ```
 feat: Add delta update support for live updates
 
@@ -123,9 +134,11 @@ Fixes #123
 ## Reporting Bugs
 
 ### Security Vulnerabilities
+
 Please email aoneahsan@gmail.com instead of using the issue tracker.
 
 ### Bug Reports
+
 **Great Bug Reports** tend to have:
 
 - A quick summary and/or background
@@ -158,11 +171,11 @@ We pledge to make participation in our project and our community a harassment-fr
 
 Examples of behavior that contributes to creating a positive environment include:
 
-* Using welcoming and inclusive language
-* Being respectful of differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what is best for the community
-* Showing empathy towards other community members
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints and experiences
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the community
+- Showing empathy towards other community members
 
 ### Enforcement
 

@@ -16,11 +16,13 @@ Before installing the plugin, ensure you have:
 ### 1. Install the Plugin
 
 Using npm:
+
 ```bash
 npm install capacitor-native-update
 ```
 
 Using yarn:
+
 ```bash
 yarn add capacitor-native-update
 ```
@@ -34,6 +36,7 @@ npx cap sync
 ```
 
 This command will:
+
 - Copy the web assets to native projects
 - Install the native dependencies
 - Update native project configurations
@@ -43,6 +46,7 @@ This command will:
 #### iOS Setup
 
 1. Open your iOS project in Xcode:
+
    ```bash
    npx cap open ios
    ```
@@ -64,11 +68,13 @@ This command will:
 #### Android Setup
 
 1. Open your Android project:
+
    ```bash
    npx cap open android
    ```
 
 2. Ensure your `minSdkVersion` is 21 or higher in `android/variables.gradle`:
+
    ```gradle
    ext {
        minSdkVersion = 21
@@ -98,8 +104,8 @@ await CapacitorNativeUpdate.configure({
     appId: 'your-app-id',
     serverUrl: 'https://your-update-server.com',
     channel: 'production',
-    autoUpdate: true
-  }
+    autoUpdate: true,
+  },
 });
 ```
 
@@ -108,6 +114,7 @@ await CapacitorNativeUpdate.configure({
 To verify the installation:
 
 1. Build and run your app:
+
    ```bash
    npx cap run ios
    # or
@@ -117,11 +124,12 @@ To verify the installation:
 2. Check the console logs for initialization messages
 
 3. Test basic functionality:
+
    ```typescript
    // Get current bundle info
    const currentBundle = await CapacitorNativeUpdate.LiveUpdate.current();
    console.log('Current bundle:', currentBundle);
-   
+
    // Check for updates
    const latest = await CapacitorNativeUpdate.LiveUpdate.getLatest();
    console.log('Latest version available:', latest);
@@ -132,11 +140,12 @@ To verify the installation:
 The plugin includes comprehensive TypeScript definitions. Your IDE should provide full autocompletion and type checking.
 
 To import types:
+
 ```typescript
-import type { 
-  UpdateConfig, 
-  BundleInfo, 
-  SyncResult 
+import type {
+  UpdateConfig,
+  BundleInfo,
+  SyncResult,
 } from 'capacitor-native-update';
 ```
 

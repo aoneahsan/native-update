@@ -27,7 +27,9 @@ export class DownloadManager {
       });
 
       if (!response.ok) {
-        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Download failed: ${response.status} ${response.statusText}`
+        );
       }
 
       // Get total size from headers
@@ -118,24 +120,24 @@ export class DownloadManager {
     onProgress?: (event: DownloadProgressEvent) => void
   ): Promise<Blob> {
     let lastError: Error | null = null;
-    
+
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         // Add delay between retries (exponential backoff)
         if (attempt > 0) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 30000);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
 
         return await this.download(url, bundleId, onProgress);
       } catch (error) {
         lastError = error as Error;
-        
+
         // Don't retry if cancelled
         if (error instanceof Error && error.name === 'AbortError') {
           throw error;
         }
-        
+
         console.warn(`Download attempt ${attempt + 1} failed:`, error);
       }
     }
@@ -146,10 +148,15 @@ export class DownloadManager {
   /**
    * Validate downloaded content
    */
-  static async validateDownload(blob: Blob, expectedSize?: number): Promise<boolean> {
+  static async validateDownload(
+    blob: Blob,
+    expectedSize?: number
+  ): Promise<boolean> {
     // Check size if provided
     if (expectedSize !== undefined && blob.size !== expectedSize) {
-      console.error(`Size mismatch: expected ${expectedSize}, got ${blob.size}`);
+      console.error(
+        `Size mismatch: expected ${expectedSize}, got ${blob.size}`
+      );
       return false;
     }
 
@@ -181,7 +188,7 @@ export class DownloadManager {
     // In a real implementation, this would save to IndexedDB or similar
     // For now, we'll convert to base64 and store in localStorage
     // Note: This is not recommended for large files in production
-    
+
     const reader = new FileReader();
     const base64 = await new Promise<string>((resolve, reject) => {
       reader.onload = () => resolve(reader.result as string);

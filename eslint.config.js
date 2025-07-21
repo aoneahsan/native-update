@@ -12,7 +12,7 @@ export default [
       'example/**',
       '*.config.js',
       '*.config.ts',
-    ]
+    ],
   },
   {
     files: ['**/*.ts'],
@@ -24,12 +24,30 @@ export default [
         project: ['./tsconfig.json', './tsconfig.node.json'],
       },
       globals: {
+        // Node globals
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
-      }
+        NodeJS: 'readonly',
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        fetch: 'readonly',
+        crypto: 'readonly',
+        atob: 'readonly',
+        btoa: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        confirm: 'readonly',
+        alert: 'readonly',
+        caches: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': typescript,
@@ -40,7 +58,10 @@ export default [
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/explicit-module-boundary-types': 'off',
     },
   },

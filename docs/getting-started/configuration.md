@@ -8,10 +8,18 @@ The plugin is configured using the `configure()` method with an `UpdateConfig` o
 
 ```typescript
 await CapacitorNativeUpdate.configure({
-  liveUpdate: { /* Live update settings */ },
-  appUpdate: { /* App store update settings */ },
-  appReview: { /* Review request settings */ },
-  security: { /* Security settings */ }
+  liveUpdate: {
+    /* Live update settings */
+  },
+  appUpdate: {
+    /* App store update settings */
+  },
+  appReview: {
+    /* Review request settings */
+  },
+  security: {
+    /* Security settings */
+  },
 });
 ```
 
@@ -25,16 +33,16 @@ Configure how your app handles over-the-air updates.
 liveUpdate: {
   // Required: Your application identifier
   appId: 'com.yourcompany.app',
-  
+
   // Required: Your update server URL
   serverUrl: 'https://updates.yourserver.com',
-  
+
   // Update channel (default: 'production')
   channel: 'production',
-  
+
   // Enable automatic update checks (default: true)
   autoUpdate: true,
-  
+
   // Update strategy
   updateStrategy: 'IMMEDIATE' // or 'BACKGROUND' or 'MANUAL'
 }
@@ -47,31 +55,31 @@ liveUpdate: {
   appId: 'com.yourcompany.app',
   serverUrl: 'https://updates.yourserver.com',
   channel: 'production',
-  
+
   // Security
   publicKey: 'YOUR_RSA_PUBLIC_KEY',
   requireSignature: true,
   checksumAlgorithm: 'SHA-256', // or 'SHA-512'
-  
+
   // Update behavior
   updateStrategy: 'BACKGROUND',
   mandatoryInstallMode: 'IMMEDIATE',
   optionalInstallMode: 'ON_NEXT_RESTART',
-  
+
   // Update checks
   autoUpdate: true,
   checkInterval: 3600000, // Check every hour (in ms)
-  
+
   // Restrictions
   allowEmulator: false, // Disable updates on emulators
   maxBundleSize: 50 * 1024 * 1024, // 50MB limit
-  
+
   // Network
   allowedHosts: [
     'updates.yourserver.com',
     'cdn.yourserver.com'
   ],
-  
+
   // Retry configuration
   maxRetries: 3,
   retryDelay: 1000, // 1 second
@@ -109,10 +117,10 @@ Configure native app store update behavior.
 appUpdate: {
   // Check for updates on app start
   checkOnAppStart: true,
-  
+
   // Minimum required version
   minimumVersion: '2.0.0',
-  
+
   // Update priority (0-5, where 5 is highest)
   updatePriority: 3
 }
@@ -125,19 +133,19 @@ appUpdate: {
   checkOnAppStart: true,
   minimumVersion: '2.0.0',
   updatePriority: 4,
-  
+
   // Custom store URLs
   storeUrl: {
     android: 'https://play.google.com/store/apps/details?id=com.yourapp',
     ios: 'https://apps.apple.com/app/id123456789'
   },
-  
+
   // Allow version downgrades (not recommended)
   allowDowngrade: false,
-  
+
   // Force update if below minimum version
   forceUpdateBelow: '1.5.0',
-  
+
   // Check interval for app updates (ms)
   checkInterval: 86400000 // Once per day
 }
@@ -145,12 +153,12 @@ appUpdate: {
 
 ### Update Priority Levels
 
-| Priority | Behavior |
-|----------|----------|
-| 0-2 | Low - Optional update, can be dismissed |
-| 3 | Medium - Recommended update |
-| 4 | High - Strongly recommended |
-| 5 | Critical - Immediate update required |
+| Priority | Behavior                                |
+| -------- | --------------------------------------- |
+| 0-2      | Low - Optional update, can be dismissed |
+| 3        | Medium - Recommended update             |
+| 4        | High - Strongly recommended             |
+| 5        | Critical - Immediate update required    |
 
 ## App Review Configuration
 
@@ -162,10 +170,10 @@ Configure when and how to request user reviews.
 appReview: {
   // Days since install before first prompt
   minimumDaysSinceInstall: 7,
-  
+
   // Days between review prompts
   minimumDaysSinceLastPrompt: 60,
-  
+
   // App launches before eligible
   minimumLaunchCount: 3
 }
@@ -178,23 +186,23 @@ appReview: {
   minimumDaysSinceInstall: 7,
   minimumDaysSinceLastPrompt: 60,
   minimumLaunchCount: 5,
-  
+
   // Significant events before eligible
   minimumSignificantEvents: 3,
-  
+
   // Custom trigger events
   customTriggers: [
     'purchase_completed',
     'level_completed',
     'task_finished'
   ],
-  
+
   // Debug mode - bypass all restrictions
   debugMode: false,
-  
+
   // Maximum prompts per version
   maxPromptsPerVersion: 2,
-  
+
   // Require positive events
   requirePositiveEvents: true
 }
@@ -210,7 +218,7 @@ Configure security features for all update operations.
 security: {
   // Force HTTPS for all URLs
   enforceHttps: true,
-  
+
   // Certificate pinning
   certificatePinning: {
     enabled: true,
@@ -221,16 +229,16 @@ security: {
     includeSubdomains: true,
     maxAge: 31536000 // 1 year
   },
-  
+
   // Input validation
   validateInputs: true,
-  
+
   // Secure storage for sensitive data
   secureStorage: true,
-  
+
   // Security event logging
   logSecurityEvents: true,
-  
+
   // Content Security Policy
   contentSecurityPolicy: {
     enabled: true,
@@ -249,19 +257,19 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 await CapacitorNativeUpdate.configure({
   liveUpdate: {
     appId: 'com.yourcompany.app.dev',
-    serverUrl: isDevelopment 
-      ? 'http://localhost:3000' 
+    serverUrl: isDevelopment
+      ? 'http://localhost:3000'
       : 'https://updates.yourserver.com',
     channel: isDevelopment ? 'development' : 'production',
     allowEmulator: isDevelopment,
-    requireSignature: !isDevelopment
+    requireSignature: !isDevelopment,
   },
   appReview: {
-    debugMode: isDevelopment
+    debugMode: isDevelopment,
   },
   security: {
-    enforceHttps: !isDevelopment
-  }
+    enforceHttps: !isDevelopment,
+  },
 });
 ```
 
@@ -279,20 +287,20 @@ const environments: Record<string, Environment> = {
   development: {
     name: 'Development',
     serverUrl: 'http://localhost:3000',
-    channel: 'development'
+    channel: 'development',
   },
   staging: {
     name: 'Staging',
     serverUrl: 'https://staging-updates.yourserver.com',
     channel: 'staging',
-    publicKey: 'STAGING_PUBLIC_KEY'
+    publicKey: 'STAGING_PUBLIC_KEY',
   },
   production: {
     name: 'Production',
     serverUrl: 'https://updates.yourserver.com',
     channel: 'production',
-    publicKey: 'PRODUCTION_PUBLIC_KEY'
-  }
+    publicKey: 'PRODUCTION_PUBLIC_KEY',
+  },
 };
 
 const currentEnv = environments[process.env.APP_ENV || 'production'];
@@ -303,8 +311,8 @@ await CapacitorNativeUpdate.configure({
     serverUrl: currentEnv.serverUrl,
     channel: currentEnv.channel,
     publicKey: currentEnv.publicKey,
-    requireSignature: !!currentEnv.publicKey
-  }
+    requireSignature: !!currentEnv.publicKey,
+  },
 });
 ```
 
@@ -322,7 +330,7 @@ await CapacitorNativeUpdate.LiveUpdate.setUpdateUrl('https://new-server.com');
 // Update security settings
 await CapacitorNativeUpdate.Security.updateConfig({
   enforceHttps: true,
-  requireSignature: true
+  requireSignature: true,
 });
 ```
 
@@ -334,7 +342,7 @@ async function loadRemoteConfig() {
     // Fetch configuration from your backend
     const response = await fetch('https://api.yourserver.com/app-config');
     const remoteConfig = await response.json();
-    
+
     // Apply remote configuration
     await CapacitorNativeUpdate.configure({
       liveUpdate: {
@@ -342,12 +350,12 @@ async function loadRemoteConfig() {
         serverUrl: remoteConfig.updateServer,
         channel: remoteConfig.channel,
         updateStrategy: remoteConfig.updateStrategy,
-        publicKey: remoteConfig.publicKey
+        publicKey: remoteConfig.publicKey,
       },
       appUpdate: {
         minimumVersion: remoteConfig.minimumVersion,
-        updatePriority: remoteConfig.updatePriority
-      }
+        updatePriority: remoteConfig.updatePriority,
+      },
     });
   } catch (error) {
     // Fall back to default configuration
@@ -369,14 +377,14 @@ const productionConfig = {
   liveUpdate: {
     requireSignature: true,
     checksumAlgorithm: 'SHA-512',
-    publicKey: process.env.UPDATE_PUBLIC_KEY
+    publicKey: process.env.UPDATE_PUBLIC_KEY,
   },
   security: {
     enforceHttps: true,
     certificatePinning: { enabled: true },
     validateInputs: true,
-    secureStorage: true
-  }
+    secureStorage: true,
+  },
 };
 ```
 
@@ -389,8 +397,8 @@ Use channels for staged deployments:
 const rolloutConfig = {
   liveUpdate: {
     channel: getUserRolloutChannel(), // 'alpha', 'beta', 'production'
-    updateStrategy: isEarlyAdopter() ? 'IMMEDIATE' : 'BACKGROUND'
-  }
+    updateStrategy: isEarlyAdopter() ? 'IMMEDIATE' : 'BACKGROUND',
+  },
 };
 ```
 
@@ -404,8 +412,8 @@ const resilientConfig = {
     maxRetries: 3,
     retryDelay: 2000,
     timeout: 30000,
-    fallbackUrl: 'https://backup-updates.yourserver.com'
-  }
+    fallbackUrl: 'https://backup-updates.yourserver.com',
+  },
 };
 ```
 
@@ -419,8 +427,8 @@ const performanceConfig = {
     updateStrategy: 'BACKGROUND',
     checkInterval: 3600000, // Check hourly
     maxBundleSize: 20 * 1024 * 1024, // 20MB limit
-    installMode: 'ON_NEXT_RESTART' // Non-disruptive
-  }
+    installMode: 'ON_NEXT_RESTART', // Non-disruptive
+  },
 };
 ```
 
