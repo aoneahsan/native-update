@@ -33,7 +33,6 @@
 
 - **[Basic Usage](./docs/examples/basic-usage.md)** - Simple implementation examples
 - **[Advanced Scenarios](./docs/examples/advanced-scenarios.md)** - Complex use cases
-- **[Integration Examples](./docs/examples/integration-examples.md)** - Framework integrations
 
 ---
 
