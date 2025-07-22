@@ -3,29 +3,34 @@
 ## 📚 Documentation
 
 ### Getting Started
+
 - **[Installation Guide](./docs/getting-started/installation.md)** - Step-by-step installation instructions
 - **[Quick Start Guide](./docs/getting-started/quick-start.md)** - Get up and running in minutes
 - **[Configuration Guide](./docs/getting-started/configuration.md)** - Detailed configuration options
 
 ### Features Documentation
+
 - **[Live Updates (OTA)](./docs/features/live-updates.md)** - Deploy web updates instantly
 - **[App Updates](./docs/features/app-updates.md)** - Native app store update management
 - **[App Reviews](./docs/features/app-reviews.md)** - In-app review integration
 - **[Background Updates](./docs/background-updates.md)** - Background update management
 
 ### Guides & Best Practices
+
 - **[Security Best Practices](./docs/guides/security-best-practices.md)** - Implement secure updates
-- **[Migration Guide](./docs/guides/migration-guide.md)** - Migrate from other solutions
+- **[Migration Guide](./docs/MIGRATION.md)** - Migrate from other solutions
 - **[Production Readiness](./docs/production-readiness.md)** - Production deployment checklist
 - **[Bundle Signing](./docs/BUNDLE_SIGNING.md)** - Cryptographic signing guide
 
 ### API Reference
-- **[Live Update API](./docs/api/live-update-api.md)** - Complete API for OTA updates
-- **[App Update API](./docs/api/app-update-api.md)** - Native app update methods
-- **[App Review API](./docs/api/app-review-api.md)** - Review request methods
-- **[Events API](./docs/api/events-api.md)** - Event listeners and handlers
+
+- **[Live Update API](./docs/LIVE_UPDATES_GUIDE.md)** - Complete API for OTA updates
+- **[App Update API](./docs/NATIVE_UPDATES_GUIDE.md)** - Native app update methods
+- **[App Review API](./docs/APP_REVIEW_GUIDE.md)** - Review request methods
+- **[Events API/Background Updates](./docs/background-updates.md)** - Event listeners and handlers
 
 ### Examples
+
 - **[Basic Usage](./docs/examples/basic-usage.md)** - Simple implementation examples
 - **[Advanced Scenarios](./docs/examples/advanced-scenarios.md)** - Complex use cases
 - **[Integration Examples](./docs/examples/integration-examples.md)** - Framework integrations
@@ -262,7 +267,6 @@ This plugin implements multiple security layers:
 - **Checksum validation** before applying updates
 - **Certificate pinning** support for enhanced security
 
-
 ## Example Implementation
 
 ### Complete Example App
@@ -293,7 +297,6 @@ npm start
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
 
 ## 🏆 Production Ready
 
