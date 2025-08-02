@@ -1,30 +1,75 @@
-import { Validator } from '../security/validator';
 import type { LatestVersion } from '../definitions';
+import { ConfigManager } from '../core/config';
+import { Logger } from '../core/logger';
+import { SecurityValidator } from '../core/security';
+import { ValidationError, ErrorCode } from '../core/errors';
+import type { Preferences } from '@capacitor/preferences';
+
+interface CachedVersionInfo {
+  channel: string;
+  data: LatestVersion;
+  timestamp: number;
+}
 
 /**
  * Manages version checking and comparison
  */
 export class VersionManager {
-  private static readonly VERSION_CHECK_CACHE_KEY =
-    'capacitor_native_update_version_cache';
-  private static readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly VERSION_CHECK_CACHE_KEY = 'capacitor_native_update_version_cache';
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly logger: Logger;
+  private readonly configManager: ConfigManager;
+  private readonly securityValidator: SecurityValidator;
+  private preferences: typeof Preferences | null = null;
+  private memoryCache: Map<string, CachedVersionInfo> = new Map();
+
+  constructor() {
+    this.logger = Logger.getInstance();
+    this.configManager = ConfigManager.getInstance();
+    this.securityValidator = SecurityValidator.getInstance();
+  }
+
+  /**
+   * Initialize the version manager
+   */
+  async initialize(): Promise<void> {
+    this.preferences = this.configManager.get('preferences');
+    if (!this.preferences) {
+      throw new ValidationError(
+        ErrorCode.MISSING_DEPENDENCY,
+        'Preferences not configured. Please configure the plugin first.'
+      );
+    }
+  }
 
   /**
    * Check for latest version from server
    */
-  static async checkForUpdates(
+  async checkForUpdates(
     serverUrl: string,
     channel: string,
     currentVersion: string,
     appId: string
   ): Promise<LatestVersion | null> {
+    // Validate inputs
+    this.securityValidator.validateUrl(serverUrl);
+    this.securityValidator.validateVersion(currentVersion);
+    if (!channel || !appId) {
+      throw new ValidationError(
+        ErrorCode.INVALID_CONFIG,
+        'Channel and appId are required'
+      );
+    }
+
     // Check cache first
-    const cached = this.getCachedVersionInfo();
+    const cacheKey = `${channel}-${appId}`;
+    const cached = await this.getCachedVersionInfo(cacheKey);
     if (
       cached &&
       cached.channel === channel &&
       Date.now() - cached.timestamp < this.CACHE_DURATION
     ) {
+      this.logger.debug('Returning cached version info', { channel, version: cached.data.version });
       return cached.data;
     }
 
@@ -42,6 +87,7 @@ export class VersionManager {
           'X-App-Version': currentVersion,
           'X-App-Id': appId,
         },
+        signal: AbortSignal.timeout(this.configManager.get('downloadTimeout')),
       });
 
       if (!response.ok) {
@@ -51,16 +97,36 @@ export class VersionManager {
       const data = await response.json();
 
       // Validate response
-      if (data.version && !Validator.validateVersion(data.version).valid) {
-        throw new Error('Invalid version format in response');
+      if (!data.version) {
+        throw new ValidationError(
+          ErrorCode.INVALID_BUNDLE_FORMAT,
+          'No version in server response'
+        );
+      }
+
+      this.securityValidator.validateVersion(data.version);
+
+      // Additional validation
+      if (data.bundleUrl) {
+        this.securityValidator.validateUrl(data.bundleUrl);
+      }
+      if (data.minAppVersion) {
+        this.securityValidator.validateVersion(data.minAppVersion);
       }
 
       // Cache the result
-      this.cacheVersionInfo(channel, data);
+      await this.cacheVersionInfo(cacheKey, channel, data);
+
+      this.logger.info('Version check completed', {
+        channel,
+        currentVersion,
+        latestVersion: data.version,
+        updateAvailable: this.isNewerVersion(data.version, currentVersion),
+      });
 
       return data;
     } catch (error) {
-      console.error('Failed to check for updates:', error);
+      this.logger.error('Failed to check for updates', error);
       return null;
     }
   }
@@ -68,26 +134,52 @@ export class VersionManager {
   /**
    * Compare two versions
    */
-  static isNewerVersion(version1: string, version2: string): boolean {
-    return Validator.compareVersions(version1, version2) > 0;
+  isNewerVersion(version1: string, version2: string): boolean {
+    try {
+      const v1 = this.parseVersion(version1);
+      const v2 = this.parseVersion(version2);
+
+      if (v1.major !== v2.major) return v1.major > v2.major;
+      if (v1.minor !== v2.minor) return v1.minor > v2.minor;
+      if (v1.patch !== v2.patch) return v1.patch > v2.patch;
+
+      // If main versions are equal, check pre-release
+      if (v1.prerelease && !v2.prerelease) return false; // v1 is pre-release, v2 is not
+      if (!v1.prerelease && v2.prerelease) return true;  // v1 is not pre-release, v2 is
+      if (v1.prerelease && v2.prerelease) {
+        return v1.prerelease > v2.prerelease;
+      }
+
+      return false; // Versions are equal
+    } catch (error) {
+      this.logger.error('Failed to compare versions', { version1, version2, error });
+      return false;
+    }
   }
 
   /**
    * Check if update is mandatory based on minimum version
    */
-  static isUpdateMandatory(
+  isUpdateMandatory(
     currentVersion: string,
     minimumVersion?: string
   ): boolean {
     if (!minimumVersion) return false;
 
-    return Validator.compareVersions(currentVersion, minimumVersion) < 0;
+    try {
+      this.securityValidator.validateVersion(currentVersion);
+      this.securityValidator.validateVersion(minimumVersion);
+      return !this.isNewerVersion(currentVersion, minimumVersion) && currentVersion !== minimumVersion;
+    } catch (error) {
+      this.logger.error('Failed to check mandatory update', error);
+      return false;
+    }
   }
 
   /**
    * Parse version metadata
    */
-  static parseVersionMetadata(version: string): {
+  parseVersion(version: string): {
     major: number;
     minor: number;
     patch: number;
@@ -99,7 +191,10 @@ export class VersionManager {
     );
 
     if (!match) {
-      throw new Error('Invalid version format');
+      throw new ValidationError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Invalid version format'
+      );
     }
 
     return {
@@ -114,7 +209,7 @@ export class VersionManager {
   /**
    * Generate version string from components
    */
-  static buildVersionString(components: {
+  buildVersionString(components: {
     major: number;
     minor: number;
     patch: number;
@@ -137,58 +232,121 @@ export class VersionManager {
   /**
    * Check if version is compatible with native version requirements
    */
-  static isCompatibleWithNativeVersion(
+  isCompatibleWithNativeVersion(
     bundleVersion: string,
     nativeVersion: string,
     compatibility?: { [key: string]: string }
   ): boolean {
     if (!compatibility) return true;
 
-    // Check if there's a specific native version requirement for this bundle version
-    const requiredNativeVersion = compatibility[bundleVersion];
-    if (!requiredNativeVersion) return true;
+    try {
+      // Check if there's a specific native version requirement for this bundle version
+      const requiredNativeVersion = compatibility[bundleVersion];
+      if (!requiredNativeVersion) return true;
 
-    return Validator.compareVersions(nativeVersion, requiredNativeVersion) >= 0;
+      this.securityValidator.validateVersion(nativeVersion);
+      this.securityValidator.validateVersion(requiredNativeVersion);
+
+      return !this.isNewerVersion(requiredNativeVersion, nativeVersion);
+    } catch (error) {
+      this.logger.error('Failed to check compatibility', error);
+      return false;
+    }
   }
 
   /**
    * Get version from cache
    */
-  private static getCachedVersionInfo(): {
-    channel: string;
-    data: LatestVersion;
-    timestamp: number;
-  } | null {
-    try {
-      const cached = localStorage.getItem(this.VERSION_CHECK_CACHE_KEY);
-      return cached ? JSON.parse(cached) : null;
-    } catch {
-      return null;
+  private async getCachedVersionInfo(cacheKey: string): Promise<CachedVersionInfo | null> {
+    // Check memory cache first
+    const memCached = this.memoryCache.get(cacheKey);
+    if (memCached && Date.now() - memCached.timestamp < this.CACHE_DURATION) {
+      return memCached;
     }
+
+    // Check persistent cache
+    try {
+      const { value } = await this.preferences!.get({ key: this.VERSION_CHECK_CACHE_KEY });
+      if (!value) return null;
+
+      const allCached: Record<string, CachedVersionInfo> = JSON.parse(value);
+      const cached = allCached[cacheKey];
+      
+      if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+        // Update memory cache
+        this.memoryCache.set(cacheKey, cached);
+        return cached;
+      }
+    } catch (error) {
+      this.logger.debug('Failed to load cached version info', error);
+    }
+
+    return null;
   }
 
   /**
    * Cache version info
    */
-  private static cacheVersionInfo(channel: string, data: LatestVersion): void {
+  private async cacheVersionInfo(
+    cacheKey: string,
+    channel: string,
+    data: LatestVersion
+  ): Promise<void> {
+    const cacheEntry: CachedVersionInfo = {
+      channel,
+      data,
+      timestamp: Date.now(),
+    };
+
+    // Update memory cache
+    this.memoryCache.set(cacheKey, cacheEntry);
+
+    // Update persistent cache
     try {
-      localStorage.setItem(
-        this.VERSION_CHECK_CACHE_KEY,
-        JSON.stringify({
-          channel,
-          data,
-          timestamp: Date.now(),
-        })
-      );
+      const { value } = await this.preferences!.get({ key: this.VERSION_CHECK_CACHE_KEY });
+      const allCached: Record<string, CachedVersionInfo> = value ? JSON.parse(value) : {};
+      
+      // Clean old entries
+      const now = Date.now();
+      for (const key in allCached) {
+        if (now - allCached[key].timestamp > this.CACHE_DURATION * 2) {
+          delete allCached[key];
+        }
+      }
+
+      allCached[cacheKey] = cacheEntry;
+
+      await this.preferences!.set({
+        key: this.VERSION_CHECK_CACHE_KEY,
+        value: JSON.stringify(allCached)
+      });
     } catch (error) {
-      console.warn('Failed to cache version info:', error);
+      this.logger.warn('Failed to cache version info', error);
     }
   }
 
   /**
    * Clear version cache
    */
-  static clearVersionCache(): void {
-    localStorage.removeItem(this.VERSION_CHECK_CACHE_KEY);
+  async clearVersionCache(): Promise<void> {
+    this.memoryCache.clear();
+    try {
+      await this.preferences!.remove({ key: this.VERSION_CHECK_CACHE_KEY });
+    } catch (error) {
+      this.logger.warn('Failed to clear version cache', error);
+    }
+  }
+
+  /**
+   * Check if downgrade protection should block update
+   */
+  shouldBlockDowngrade(currentVersion: string, newVersion: string): boolean {
+    try {
+      return this.securityValidator.isVersionDowngrade(currentVersion, newVersion);
+    } catch (error) {
+      this.logger.error('Failed to check downgrade', error);
+      // Default to safe behavior - block if we can't determine
+      return true;
+    }
   }
 }

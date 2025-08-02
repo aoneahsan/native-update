@@ -1,33 +1,74 @@
-import { registerPlugin } from '@capacitor/core';
+// Main plugin export
+export { CapacitorNativeUpdate } from './plugin';
 
-import type {
+// Type exports
+export type {
+  // Main plugin types
+  CapacitorNativeUpdatePlugin,
   NativeUpdateCombinedPlugin,
   NativeUpdateListeners,
+  LiveUpdatePlugin,
+  AppUpdatePlugin,
+  AppReviewPlugin,
+  
+  // Configuration
+  PluginConfig,
+  UpdateConfig,
+  LiveUpdateConfig,
+  AppUpdateConfig,
+  AppReviewConfig,
+  
+  // Live update types
+  BundleInfo,
+  BundleStatus,
+  UpdateStrategy,
+  InstallMode,
+  DownloadOptions,
+  DownloadProgressEvent,
+  SyncOptions,
+  SyncResult,
+  DeleteOptions,
+  LatestVersion,
+  ValidateOptions,
+  ValidationResult,
+  
+  // App update types
+  AppUpdateInfo,
+  OpenAppStoreOptions,
+  
+  // App review types
+  ReviewResult,
+  CanRequestReviewResult,
+  
+  // Events
+  UpdateStateChangedEvent,
+  
+  // Error types
+  UpdateError,
+  UpdateErrorCode,
 } from './definitions';
 
-const CapacitorNativeUpdate = registerPlugin<
-  NativeUpdateCombinedPlugin & NativeUpdateListeners
->('CapacitorNativeUpdate', {
-  web: () => import('./web').then((m) => new m.NativeUpdateWeb()),
-});
+// Error exports
+export {
+  ErrorCode,
+  CapacitorNativeUpdateError,
+  ConfigurationError,
+  DownloadError,
+  ValidationError,
+  StorageError,
+  UpdateError as UpdateErrorClass,
+} from './core/errors';
 
-// Main plugin export
-export { CapacitorNativeUpdate };
+// Core exports for advanced users
+export { ConfigManager } from './core/config';
+export { Logger, LogLevel } from './core/logger';
+export { SecurityValidator } from './core/security';
+export { PluginManager } from './core/plugin-manager';
+export { CacheManager } from './core/cache-manager';
 
-// Export all type definitions, interfaces, and enums
-export * from './definitions';
-
-// Export background update utilities
-export * from './background-update';
-
-// Export security utilities
-export { CryptoUtils } from './security/crypto';
-export { Validator } from './security/validator';
-
-// Export live update utilities
+// Manager exports for advanced users
 export { BundleManager } from './live-update/bundle-manager';
 export { DownloadManager } from './live-update/download-manager';
 export { VersionManager } from './live-update/version-manager';
+export { UpdateManager } from './live-update/update-manager';
 
-// Export web implementation for advanced users
-export { NativeUpdateWeb } from './web';

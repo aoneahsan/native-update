@@ -303,6 +303,12 @@ export interface DeleteOptions {
   olderThan?: number;
 }
 
+export interface UpdateOptions {
+  allowDowngrade?: boolean;
+  cleanupOldBundles?: boolean;
+  keepBundleCount?: number;
+}
+
 export interface LatestVersion {
   available: boolean;
   version?: string;
@@ -615,4 +621,94 @@ export interface NativeUpdateListeners {
    * Remove all listeners
    */
   removeAllListeners(): Promise<void>;
+}
+
+/**
+ * Plugin configuration options
+ */
+export interface PluginConfig {
+  /**
+   * Capacitor Filesystem instance (required)
+   */
+  filesystem?: typeof import('@capacitor/filesystem').Filesystem;
+  
+  /**
+   * Capacitor Preferences instance (required)
+   */
+  preferences?: typeof import('@capacitor/preferences').Preferences;
+  
+  /**
+   * Base URL for update server
+   */
+  baseUrl?: string;
+  
+  /**
+   * List of allowed hosts for security
+   */
+  allowedHosts?: string[];
+  
+  /**
+   * Maximum bundle size in bytes (default: 100MB)
+   */
+  maxBundleSize?: number;
+  
+  /**
+   * Download timeout in milliseconds (default: 30000)
+   */
+  downloadTimeout?: number;
+  
+  /**
+   * Number of retry attempts for failed downloads (default: 3)
+   */
+  retryAttempts?: number;
+  
+  /**
+   * Delay between retry attempts in milliseconds (default: 1000)
+   */
+  retryDelay?: number;
+  
+  /**
+   * Enable bundle signature validation (default: true)
+   */
+  enableSignatureValidation?: boolean;
+  
+  /**
+   * Public key for signature validation
+   */
+  publicKey?: string;
+  
+  /**
+   * Cache expiration time in milliseconds (default: 24 hours)
+   */
+  cacheExpiration?: number;
+  
+  /**
+   * Enable debug logging (default: false)
+   */
+  enableLogging?: boolean;
+}
+
+/**
+ * Main plugin interface with initialization
+ */
+export interface CapacitorNativeUpdatePlugin extends NativeUpdateCombinedPlugin {
+  /**
+   * Initialize the plugin with configuration
+   */
+  initialize(config: PluginConfig): Promise<void>;
+  
+  /**
+   * Check if plugin is initialized
+   */
+  isInitialized(): boolean;
+  
+  /**
+   * Reset plugin state
+   */
+  reset(): Promise<void>;
+  
+  /**
+   * Clean up resources
+   */
+  cleanup(): Promise<void>;
 }
