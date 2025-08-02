@@ -12,6 +12,7 @@
     "android/build.gradle",
     "android/variables.gradle",
     "android/gradle.properties",
+    "android/gradle/",
     "android/settings.gradle",
     "android/proguard-rules.pro",
     "dist/",

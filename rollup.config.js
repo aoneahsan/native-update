@@ -17,7 +17,7 @@ export default {
       },
       sourcemap: true,
       inlineDynamicImports: true,
-      banner: '/*! Capacitor Native Update Plugin v1.0.0 | MIT License */',
+      banner: '/*! Capacitor Native Update Plugin v1.4.0 | MIT License */',
     },
     {
       file: 'dist/plugin.cjs.js',
