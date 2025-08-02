@@ -16,7 +16,7 @@ import android.Manifest
         )
     ]
 )
-class NativeUpdatePlugin : Plugin() {
+class CapacitorNativeUpdatePlugin : Plugin() {
     
     private lateinit var liveUpdatePlugin: LiveUpdatePlugin
     private lateinit var appUpdatePlugin: AppUpdatePlugin

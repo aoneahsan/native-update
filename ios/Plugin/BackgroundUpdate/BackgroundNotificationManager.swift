@@ -20,8 +20,8 @@ class BackgroundNotificationManager: NSObject {
         setupNotificationCategories()
     }
     
-    func setPreferences(_ preferencesData: JSObject) {
-        preferences = NotificationPreferences.fromJSObject(preferencesData)
+    func setPreferences(_ preferencesData: [String: Any]) {
+        preferences = NotificationPreferences.from[String: Any](preferencesData)
     }
     
     func getPermissionStatus(completion: @escaping (NotificationPermissionStatus) -> Void) {
@@ -123,8 +123,8 @@ class BackgroundNotificationManager: NSObject {
         // Set user info
         content.userInfo = [
             "type": "update_available",
-            "appUpdate": appUpdate?.toJSObject() ?? [:],
-            "liveUpdate": liveUpdate?.toJSObject() ?? [:]
+            "appUpdate": appUpdate?.to[String: Any]() ?? [:],
+            "liveUpdate": liveUpdate?.to[String: Any]() ?? [:]
         ]
         
         return content
@@ -261,8 +261,8 @@ struct NotificationPreferences {
         )
     }
     
-    static func fromJSObject(_ obj: JSObject) -> NotificationPreferences {
-        let actionLabelsObj = obj["actionLabels"] as? JSObject
+    static func from[String: Any](_ obj: [String: Any]) -> NotificationPreferences {
+        let actionLabelsObj = obj["actionLabels"] as? [String: Any]
         
         return NotificationPreferences(
             title: obj["title"] as? String,
@@ -271,7 +271,7 @@ struct NotificationPreferences {
             soundEnabled: obj["soundEnabled"] as? Bool ?? true,
             vibrationEnabled: obj["vibrationEnabled"] as? Bool ?? true,
             showActions: obj["showActions"] as? Bool ?? true,
-            actionLabels: actionLabelsObj != nil ? ActionLabels.fromJSObject(actionLabelsObj!) : ActionLabels.default(),
+            actionLabels: actionLabelsObj != nil ? ActionLabels.from[String: Any](actionLabelsObj!) : ActionLabels.default(),
             channelId: obj["channelId"] as? String,
             channelName: obj["channelName"] as? String,
             priority: NotificationPriority(rawValue: obj["priority"] as? String ?? "default") ?? .default
@@ -292,7 +292,7 @@ struct ActionLabels {
         )
     }
     
-    static func fromJSObject(_ obj: JSObject) -> ActionLabels {
+    static func from[String: Any](_ obj: [String: Any]) -> ActionLabels {
         return ActionLabels(
             updateNow: obj["updateNow"] as? String,
             updateLater: obj["updateLater"] as? String,
@@ -314,8 +314,8 @@ struct NotificationPermissionStatus {
     let canRequest: Bool
     let shouldShowRationale: Bool?
     
-    func toJSObject() -> JSObject {
-        var obj: JSObject = [
+    func to[String: Any]() -> [String: Any] {
+        var obj: [String: Any] = [
             "granted": granted,
             "canRequest": canRequest
         ]

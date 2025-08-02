@@ -3,12 +3,12 @@ ext {
     targetSdkVersion = 34
     minSdkVersion = 21
     androidxAppCompatVersion = '1.6.1'
-    androidxCoreVersion = '1.12.0'
+    androidxCoreVersion = '1.13.1'
     androidxWorkVersion = '2.9.0'
     playServicesVersion = '18.2.0'
     playReviewVersion = '2.0.1'
     okhttpVersion = '4.12.0'
-    kotlinVersion = '1.9.10'
+    kotlinVersion = '2.0.21'
 }
 
 buildscript {
@@ -17,7 +17,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath 'com.android.tools.build:gradle:8.7.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
@@ -44,7 +44,7 @@ android {
         }
     }
     
-    lintOptions {
+    lint {
         abortOnError false
     }
     

@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-01-02
+
+### Added
+
+- Complete TypeScript implementation with strict typing
+- Core plugin architecture with modular design
+- Comprehensive error handling system
+- Security validation framework
+- Bundle management system
+- Download manager with retry logic
+- Version management capabilities
+- Configuration manager
+- Logging system with multiple log levels
+- Cache management
+- Background update support
+- Plugin initialization system
+
+### Changed
+
+- Migrated from class-based to functional architecture
+- Improved type definitions and interfaces
+- Enhanced security with input validation
+- Better error messages and error codes
+
+### Fixed
+
+- Removed circular dependencies
+- Fixed TypeScript compilation issues
+- Proper exclusion of test files in tsconfig
+- Removed console.log statements in favor of Logger
+
 ## [0.0.2] - 2024-12-01
 
 ### Added

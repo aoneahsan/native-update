@@ -69,7 +69,7 @@ export class NativeUpdateWeb
 
     this.config = { ...this.config, ...options };
     this.saveConfiguration();
-    console.log('CapacitorNativeUpdate configured:', this.config);
+    // console.log('CapacitorNativeUpdate configured:', this.config);
   }
 
   async getSecurityInfo(): Promise<SecurityInfo> {
@@ -88,8 +88,8 @@ export class NativeUpdateWeb
   /**
    * Live Update Methods
    */
-  async sync(options?: SyncOptions): Promise<SyncResult> {
-    console.log('Web: Checking for updates...', options);
+  async sync(_options?: SyncOptions): Promise<SyncResult> {
+    // console.log('Web: Checking for updates...', options);
 
     try {
       // In web, we can check for service worker updates
@@ -197,7 +197,7 @@ export class NativeUpdateWeb
   }
 
   async reload(): Promise<void> {
-    console.log('Web: Reloading application...');
+    // console.log('Web: Reloading application...');
 
     // In web, we can reload the page
     if (typeof window !== 'undefined') {
@@ -206,7 +206,7 @@ export class NativeUpdateWeb
   }
 
   async reset(): Promise<void> {
-    console.log('Web: Resetting to original bundle...');
+    // console.log('Web: Resetting to original bundle...');
 
     this.currentBundle = null;
     this.bundles.clear();
@@ -248,7 +248,7 @@ export class NativeUpdateWeb
   }
 
   async notifyAppReady(): Promise<void> {
-    console.log('Web: App ready notification received');
+    // console.log('Web: App ready notification received');
 
     if (this.currentBundle) {
       this.currentBundle.verified = true;
@@ -329,7 +329,7 @@ export class NativeUpdateWeb
    * App Update Methods
    */
   async getAppUpdateInfo(): Promise<AppUpdateInfo> {
-    console.log('Web: App updates not supported on web platform');
+    // console.log('Web: App updates not supported on web platform');
 
     return {
       updateAvailable: false,
@@ -360,8 +360,8 @@ export class NativeUpdateWeb
     );
   }
 
-  async openAppStore(options?: OpenAppStoreOptions): Promise<void> {
-    console.log('Web: Opening app store fallback URL', options);
+  async openAppStore(_options?: OpenAppStoreOptions): Promise<void> {
+    // console.log('Web: Opening app store fallback URL', options);
 
     // Fallback to website or app landing page
     const fallbackUrl =
@@ -385,7 +385,7 @@ export class NativeUpdateWeb
       };
     }
 
-    console.log('Web: Showing review request fallback');
+    // console.log('Web: Showing review request fallback');
 
     // Update last request time
     this.lastReviewRequest = Date.now();
@@ -458,7 +458,7 @@ export class NativeUpdateWeb
    * Background Update Methods
    */
   async enableBackgroundUpdates(config: BackgroundUpdateConfig): Promise<void> {
-    console.log('Web: Enabling background updates', config);
+    // console.log('Web: Enabling background updates', config);
 
     if (!this.config.backgroundUpdate) {
       this.config.backgroundUpdate = config;
@@ -481,7 +481,7 @@ export class NativeUpdateWeb
   }
 
   async disableBackgroundUpdates(): Promise<void> {
-    console.log('Web: Disabling background updates');
+    // console.log('Web: Disabling background updates');
 
     if (this.backgroundCheckInterval) {
       clearInterval(this.backgroundCheckInterval);
@@ -504,7 +504,7 @@ export class NativeUpdateWeb
   }
 
   async scheduleBackgroundCheck(interval: number): Promise<void> {
-    console.log('Web: Scheduling background check with interval', interval);
+    // console.log('Web: Scheduling background check with interval', interval);
 
     if (this.backgroundCheckInterval) {
       clearInterval(this.backgroundCheckInterval);
@@ -523,7 +523,7 @@ export class NativeUpdateWeb
   }
 
   async triggerBackgroundCheck(): Promise<BackgroundCheckResult> {
-    console.log('Web: Triggering background check');
+    // console.log('Web: Triggering background check');
 
     if (!this.backgroundUpdateStatus.enabled) {
       return {
@@ -588,7 +588,7 @@ export class NativeUpdateWeb
   async setNotificationPreferences(
     preferences: NotificationPreferences
   ): Promise<void> {
-    console.log('Web: Setting notification preferences', preferences);
+    // console.log('Web: Setting notification preferences', preferences);
 
     if (!this.config.backgroundUpdate) {
       this.config.backgroundUpdate = {} as BackgroundUpdateConfig;
@@ -712,19 +712,19 @@ export class NativeUpdateWeb
 
   private async validateChecksum(
     _data: string,
-    expectedChecksum: string
+    _expectedChecksum: string
   ): Promise<boolean> {
     // In a real implementation, would calculate actual checksum
-    console.log('Web: Validating checksum...', expectedChecksum);
+    // console.log('Web: Validating checksum...', expectedChecksum);
     return true;
   }
 
   private async validateSignature(
     _data: string,
-    signature: string
+    _signature: string
   ): Promise<boolean> {
     // In a real implementation, would verify signature
-    console.log('Web: Validating signature...', signature);
+    // console.log('Web: Validating signature...', signature);
     return true;
   }
 

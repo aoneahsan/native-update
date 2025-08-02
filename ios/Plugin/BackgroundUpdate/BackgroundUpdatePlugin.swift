@@ -40,7 +40,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
         }
         
         do {
-            let config = try BackgroundUpdateConfig.fromJSObject(configData)
+            let config = try BackgroundUpdateConfig.from[String: Any](configData)
             backgroundUpdateConfig = config
             backgroundUpdateStatus.enabled = config.enabled
             
@@ -62,7 +62,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     }
     
     @objc func getBackgroundUpdateStatus(_ call: CAPPluginCall) {
-        call.resolve(backgroundUpdateStatus.toJSObject())
+        call.resolve(backgroundUpdateStatus.to[String: Any]())
     }
     
     @objc func scheduleBackgroundCheck(_ call: CAPPluginCall) {
@@ -78,7 +78,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     @objc func triggerBackgroundCheck(_ call: CAPPluginCall) {
         Task {
             let result = await performBackgroundCheck()
-            call.resolve(result.toJSObject())
+            call.resolve(result.to[String: Any]())
         }
     }
     
@@ -94,7 +94,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     
     @objc func getNotificationPermissions(_ call: CAPPluginCall) {
         notificationManager?.getPermissionStatus { status in
-            call.resolve(status.toJSObject())
+            call.resolve(status.to[String: Any]())
         }
     }
     
@@ -280,7 +280,7 @@ struct BackgroundUpdateConfig {
     let retryDelay: Int
     let taskIdentifier: String?
     
-    static func fromJSObject(_ obj: JSObject) throws -> BackgroundUpdateConfig {
+    static func from[String: Any](_ obj: [String: Any]) throws -> BackgroundUpdateConfig {
         guard let enabled = obj["enabled"] as? Bool,
               let checkInterval = obj["checkInterval"] as? Int,
               let updateTypesArray = obj["updateTypes"] as? [String] else {
@@ -288,14 +288,14 @@ struct BackgroundUpdateConfig {
         }
         
         let updateTypes = updateTypesArray.compactMap { BackgroundUpdateType(rawValue: $0) }
-        let notificationPreferences = obj["notificationPreferences"] as? JSObject
+        let notificationPreferences = obj["notificationPreferences"] as? [String: Any]
         
         return BackgroundUpdateConfig(
             enabled: enabled,
             checkInterval: checkInterval,
             updateTypes: updateTypes,
             autoInstall: obj["autoInstall"] as? Bool ?? false,
-            notificationPreferences: notificationPreferences != nil ? NotificationPreferences.fromJSObject(notificationPreferences!) : nil,
+            notificationPreferences: notificationPreferences != nil ? NotificationPreferences.from[String: Any](notificationPreferences!) : nil,
             respectBatteryOptimization: obj["respectBatteryOptimization"] as? Bool ?? true,
             allowMeteredConnection: obj["allowMeteredConnection"] as? Bool ?? false,
             minimumBatteryLevel: obj["minimumBatteryLevel"] as? Int ?? 20,
@@ -324,8 +324,8 @@ struct BackgroundUpdateStatus {
     var failureCount: Int
     var lastError: UpdateError?
     
-    func toJSObject() -> JSObject {
-        var obj: JSObject = [
+    func to[String: Any]() -> [String: Any] {
+        var obj: [String: Any] = [
             "enabled": enabled,
             "isRunning": isRunning,
             "checkCount": checkCount,
@@ -349,7 +349,7 @@ struct BackgroundUpdateStatus {
         }
         
         if let lastError = lastError {
-            obj["lastError"] = lastError.toJSObject()
+            obj["lastError"] = lastError.to[String: Any]()
         }
         
         return obj
@@ -364,23 +364,23 @@ struct BackgroundCheckResult {
     let notificationSent: Bool
     let error: UpdateError?
     
-    func toJSObject() -> JSObject {
-        var obj: JSObject = [
+    func to[String: Any]() -> [String: Any] {
+        var obj: [String: Any] = [
             "success": success,
             "updatesFound": updatesFound,
             "notificationSent": notificationSent
         ]
         
         if let appUpdate = appUpdate {
-            obj["appUpdate"] = appUpdate.toJSObject()
+            obj["appUpdate"] = appUpdate.to[String: Any]()
         }
         
         if let liveUpdate = liveUpdate {
-            obj["liveUpdate"] = liveUpdate.toJSObject()
+            obj["liveUpdate"] = liveUpdate.to[String: Any]()
         }
         
         if let error = error {
-            obj["error"] = error.toJSObject()
+            obj["error"] = error.to[String: Any]()
         }
         
         return obj
@@ -391,7 +391,7 @@ struct UpdateError {
     let code: String
     let message: String
     
-    func toJSObject() -> JSObject {
+    func to[String: Any]() -> [String: Any] {
         return [
             "code": code,
             "message": message
@@ -405,8 +405,8 @@ struct AppUpdateInfo {
     let currentVersion: String
     let availableVersion: String?
     
-    func toJSObject() -> JSObject {
-        var obj: JSObject = [
+    func to[String: Any]() -> [String: Any] {
+        var obj: [String: Any] = [
             "updateAvailable": updateAvailable,
             "currentVersion": currentVersion
         ]
@@ -423,8 +423,8 @@ struct LatestVersion {
     let available: Bool
     let version: String?
     
-    func toJSObject() -> JSObject {
-        var obj: JSObject = [
+    func to[String: Any]() -> [String: Any] {
+        var obj: [String: Any] = [
             "available": available
         ]
         
