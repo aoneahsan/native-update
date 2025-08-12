@@ -1,6 +1,15 @@
 # Capacitor Native Update - Documentation
 
-Welcome to the comprehensive documentation for **Capacitor Native Update**, a powerful plugin that provides a complete update lifecycle management solution for Capacitor applications.
+> ⚠️ **IMPORTANT: Backend Infrastructure Required** ⚠️
+> 
+> This plugin requires you to build your own backend infrastructure including:
+> - Update server with API endpoints
+> - Bundle storage and CDN
+> - Signing and security services
+> 
+> See [ROADMAP.md](../ROADMAP.md) for complete requirements.
+
+Welcome to the comprehensive documentation for **Capacitor Native Update**, a foundation plugin that provides architecture for a complete update lifecycle management solution for Capacitor applications.
 
 Created by **Ahsan Mahmood** and open-sourced for the developer community, this plugin combines three essential update features:
 
