@@ -7,23 +7,42 @@ class LiveUpdatePlugin {
     private var config: [String: Any]?
     private var progressListener: (([String: Any]) -> Void)?
     private var stateChangeListener: (([String: Any]) -> Void)?
-    private let session: URLSession
+    private var session: URLSession
     private var downloadTask: URLSessionDownloadTask?
+    private let securityManager = SecurityManager()
     
     init(plugin: CAPPlugin) {
         self.plugin = plugin
         
-        // Configure URLSession with security settings
+        // Create initial session with default configuration
+        self.session = createURLSession()
+    }
+    
+    private func createURLSession() -> URLSession {
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
         config.timeoutIntervalForResource = 300
         config.tlsMinimumSupportedProtocolVersion = .TLSv12
         
-        self.session = URLSession(configuration: config)
+        // Configure certificate pinning if available
+        if let securityConfig = self.config?["security"] as? [String: Any],
+           let certificatePinning = securityConfig["certificatePinning"] as? [String: Any],
+           certificatePinning["enabled"] as? Bool == true {
+            
+            return URLSession(configuration: config, delegate: CertificatePinningDelegate(securityManager: securityManager), delegateQueue: nil)
+        }
+        
+        return URLSession(configuration: config)
     }
     
     func configure(_ config: [String: Any]) throws {
         self.config = config
+        
+        // Configure security manager
+        try securityManager.configure(config)
+        
+        // Recreate URLSession with new configuration
+        self.session = createURLSession()
         
         // Validate configuration
         if let serverUrl = config["serverUrl"] as? String,
@@ -121,6 +140,21 @@ class LiveUpdatePlugin {
                     return
                 }
                 
+                // Verify signature if provided
+                if let signature = call.getString("signature"),
+                   let publicKey = (config?["security"] as? [String: Any])?["publicKey"] as? String,
+                   (config?["security"] as? [String: Any])?["enableSignatureValidation"] as? Bool == true {
+                    
+                    let fileData = try Data(contentsOf: downloadedFile)
+                    let securityManager = SecurityManager()
+                    
+                    if !securityManager.verifySignature(data: fileData, signature: signature, publicKeyString: publicKey) {
+                        try FileManager.default.removeItem(at: downloadedFile)
+                        call.reject("SIGNATURE_ERROR", "Bundle signature validation failed")
+                        return
+                    }
+                }
+                
                 // Create bundle info
                 let bundleInfo: [String: Any] = [
                     "bundleId": bundleId,
@@ -135,6 +169,9 @@ class LiveUpdatePlugin {
                 
                 // Save bundle info
                 saveBundleInfo(bundleInfo)
+                
+                // Extract the bundle
+                try extractAndApplyBundle(downloadedFile, bundleId: bundleId)
                 
                 // Notify state change
                 stateChangeListener?([
@@ -161,9 +198,24 @@ class LiveUpdatePlugin {
     }
     
     func reload(_ call: CAPPluginCall) {
-        // In iOS, we need to reload the WebView
+        // In iOS, we need to reload the WebView with the new bundle path
         DispatchQueue.main.async { [weak self] in
-            if let webView = self?.plugin?.webView {
+            guard let self = self,
+                  let webView = self.plugin?.webView else {
+                return
+            }
+            
+            // Get the active bundle path
+            if let activeBundleId = UserDefaults.standard.string(forKey: "native_update_active_bundle"),
+               let bundles = UserDefaults.standard.dictionary(forKey: "native_update_bundles"),
+               let bundleInfo = bundles[activeBundleId] as? [String: Any],
+               let extractedPath = bundleInfo["extractedPath"] as? String {
+                
+                // Load from extracted bundle path
+                let indexPath = URL(fileURLWithPath: extractedPath).appendingPathComponent("index.html")
+                webView.load(URLRequest(url: indexPath))
+            } else {
+                // Fallback to regular reload
                 webView.reload()
             }
         }
@@ -277,6 +329,34 @@ class LiveUpdatePlugin {
             ])
         } catch {
             call.reject("VALIDATION_ERROR", error.localizedDescription)
+        }
+    }
+    
+    // MARK: - Async Methods for Background Updates
+    
+    func getLatestVersionAsync() async -> LatestVersion? {
+        do {
+            guard let serverUrl = config?["serverUrl"] as? String else {
+                NSLog("Server URL not configured")
+                return nil
+            }
+            
+            let channel = config?["channel"] as? String ?? "production"
+            
+            if let latestVersion = try await checkForUpdates(serverUrl: serverUrl, channel: channel) {
+                return LatestVersion(
+                    available: true,
+                    version: latestVersion["version"] as? String
+                )
+            } else {
+                return LatestVersion(
+                    available: false,
+                    version: nil
+                )
+            }
+        } catch {
+            NSLog("Failed to check live update: \(error.localizedDescription)")
+            return nil
         }
     }
     
@@ -451,5 +531,159 @@ class LiveUpdatePlugin {
     
     private func markBundleAsVerified() {
         UserDefaults.standard.set(true, forKey: "native_update_current_bundle_verified")
+    }
+    
+    // MARK: - Bundle Extraction and WebView Configuration
+    
+    private func extractAndApplyBundle(_ bundleUrl: URL, bundleId: String) throws {
+        let extractedPath = getUpdatesDirectory().appendingPathComponent(bundleId).appendingPathComponent("www")
+        
+        // Extract the zip bundle
+        try extractZipBundle(from: bundleUrl, to: extractedPath)
+        
+        // Update bundle info with extracted path
+        var bundleInfo = getAllBundles().first { $0["bundleId"] as? String == bundleId } ?? [:]
+        bundleInfo["extractedPath"] = extractedPath.path
+        bundleInfo["status"] = "READY"
+        saveBundleInfo(bundleInfo)
+        
+        // Configure WebView to use new path
+        configureWebViewPath(extractedPath.path)
+    }
+    
+    private func extractZipBundle(from zipUrl: URL, to destinationUrl: URL) throws {
+        // Create destination directory
+        try FileManager.default.createDirectory(at: destinationUrl, withIntermediateDirectories: true)
+        
+        // Use system unzip command
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
+        process.arguments = ["-o", zipUrl.path, "-d", destinationUrl.path]
+        
+        try process.run()
+        process.waitUntilExit()
+        
+        if process.terminationStatus != 0 {
+            throw NSError(domain: "LiveUpdatePlugin", code: 5, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to extract bundle"
+            ])
+        }
+    }
+    
+    private func configureWebViewPath(_ path: String) {
+        // Store the active bundle path
+        UserDefaults.standard.set(path, forKey: "native_update_webview_path")
+        
+        // The actual WebView path configuration happens in the main plugin
+        // when the WebView is loaded or reloaded
+    }
+}
+
+// MARK: - Data Models
+
+struct LatestVersion {
+    let available: Bool
+    let version: String?
+    
+    func toDictionary() -> [String: Any] {
+        var obj: [String: Any] = [
+            "available": available
+        ]
+        
+        if let version = version {
+            obj["version"] = version
+        }
+        
+        return obj
+    }
+}
+
+// MARK: - Certificate Pinning Delegate
+
+class CertificatePinningDelegate: NSObject, URLSessionDelegate {
+    private let securityManager: SecurityManager
+    
+    init(securityManager: SecurityManager) {
+        self.securityManager = securityManager
+        super.init()
+    }
+    
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+              let serverTrust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        // Get certificate pins from security manager configuration
+        let certificatePins = getCertificatePins(for: challenge.protectionSpace.host)
+        
+        if certificatePins.isEmpty {
+            // No pins configured for this host, use default handling
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        
+        // Evaluate server trust
+        var error: CFError?
+        let isValid = SecTrustEvaluateWithError(serverTrust, &error)
+        
+        if !isValid {
+            print("Certificate validation failed: \(error?.localizedDescription ?? "Unknown error")")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
+        // Check certificate pinning
+        if validateCertificatePins(serverTrust: serverTrust, expectedPins: certificatePins) {
+            let credential = URLCredential(trust: serverTrust)
+            completionHandler(.useCredential, credential)
+        } else {
+            print("Certificate pinning validation failed for host: \(challenge.protectionSpace.host)")
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+    }
+    
+    private func getCertificatePins(for host: String) -> [String] {
+        // Get pins from security manager configuration
+        guard let securityInfo = securityManager.getSecurityInfo(),
+              let certificatePinning = securityInfo["certificatePinning"] as? [String: Any],
+              certificatePinning["enabled"] as? Bool == true,
+              let hostPins = certificatePinning["pins"] as? [String: [String]] else {
+            return []
+        }
+        
+        // Return pins for the specific host
+        return hostPins[host] ?? []
+    }
+    
+    private func validateCertificatePins(serverTrust: SecTrust, expectedPins: [String]) -> Bool {
+        let certificateCount = SecTrustGetCertificateCount(serverTrust)
+        
+        for i in 0..<certificateCount {
+            guard let certificate = SecTrustGetCertificateAtIndex(serverTrust, i) else { continue }
+            
+            let certificateData = SecCertificateCopyData(certificate) as Data
+            let hash = certificateData.sha256()
+            let pin = "sha256/" + hash.base64EncodedString()
+            
+            if expectedPins.contains(pin) {
+                return true
+            }
+        }
+        
+        return false
+    }
+}
+
+// MARK: - Data Extension for SHA256
+
+extension Data {
+    func sha256() -> Data {
+        var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+        self.withUnsafeBytes { bytes in
+            _ = CC_SHA256(bytes.baseAddress, CC_LONG(self.count), &hash)
+        }
+        return Data(hash)
     }
 }

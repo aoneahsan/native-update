@@ -102,16 +102,21 @@ class BackgroundUpdateWorker(
     private suspend fun checkForAppUpdate(): AppUpdateInfo? {
         return withContext(Dispatchers.IO) {
             try {
-                // This would typically call the App Update Plugin
-                // For now, we'll simulate app update checking
-                val currentVersion = getCurrentAppVersion()
-                val availableVersion = getAvailableAppVersion()
-                
-                AppUpdateInfo(
-                    updateAvailable = availableVersion != currentVersion,
-                    currentVersion = currentVersion,
-                    availableVersion = if (availableVersion != currentVersion) availableVersion else null
-                )
+                val appUpdatePlugin = BackgroundUpdateManager.getAppUpdatePlugin()
+                if (appUpdatePlugin != null) {
+                    // Use actual plugin to check for updates
+                    appUpdatePlugin.getAppUpdateInfoAsync()
+                } else {
+                    // Fallback to basic implementation
+                    val currentVersion = getCurrentAppVersion()
+                    val availableVersion = getAvailableAppVersion()
+                    
+                    AppUpdateInfo(
+                        updateAvailable = availableVersion != currentVersion,
+                        currentVersion = currentVersion,
+                        availableVersion = if (availableVersion != currentVersion) availableVersion else null
+                    )
+                }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "App update check failed", e)
                 null
@@ -122,14 +127,19 @@ class BackgroundUpdateWorker(
     private suspend fun checkForLiveUpdate(): LatestVersion? {
         return withContext(Dispatchers.IO) {
             try {
-                // This would typically call the Live Update Plugin
-                // For now, we'll simulate live update checking
-                val hasUpdate = checkForLiveUpdateAvailable()
-                
-                LatestVersion(
-                    available = hasUpdate,
-                    version = if (hasUpdate) "2.0.0" else null
-                )
+                val liveUpdatePlugin = BackgroundUpdateManager.getLiveUpdatePlugin()
+                if (liveUpdatePlugin != null) {
+                    // Use actual plugin to check for updates
+                    liveUpdatePlugin.getLatestVersionAsync()
+                } else {
+                    // Fallback to basic implementation
+                    val hasUpdate = checkForLiveUpdateAvailable()
+                    
+                    LatestVersion(
+                        available = hasUpdate,
+                        version = if (hasUpdate) "2.0.0" else null
+                    )
+                }
             } catch (e: Exception) {
                 android.util.Log.e(TAG, "Live update check failed", e)
                 null
@@ -232,10 +242,7 @@ class BackgroundUpdateWorker(
     
     private fun getBackgroundUpdatePlugin(): BackgroundUpdatePlugin? {
         return try {
-            // This would typically get the plugin from the Bridge
-            // For now, we'll return null - in a real implementation,
-            // you'd need to access the plugin instance
-            null
+            BackgroundUpdateManager.getBackgroundUpdatePlugin()
         } catch (e: Exception) {
             android.util.Log.e(TAG, "Failed to get plugin", e)
             null

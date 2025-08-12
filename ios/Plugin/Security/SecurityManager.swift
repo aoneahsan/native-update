@@ -22,11 +22,32 @@ class SecurityManager {
             "enforceHttps": config?["enforceHttps"] as? Bool ?? true,
             "certificatePinning": [
                 "enabled": (config?["certificatePinning"] as? [String: Any])?["enabled"] as? Bool ?? false,
-                "certificates": (config?["certificatePinning"] as? [String: Any])?["certificates"] as? [String] ?? []
+                "pins": getCertificatePins()
             ],
             "validateInputs": config?["validateInputs"] as? Bool ?? true,
             "secureStorage": config?["secureStorage"] as? Bool ?? true
         ]
+    }
+    
+    func getCertificatePins() -> [String: [String]] {
+        guard let pinningConfig = config?["certificatePinning"] as? [String: Any],
+              pinningConfig["enabled"] as? Bool == true,
+              let pins = pinningConfig["pins"] as? [[String: Any]] else {
+            return [:]
+        }
+        
+        var hostPins: [String: [String]] = [:]
+        
+        for pin in pins {
+            guard let hostname = pin["hostname"] as? String,
+                  let sha256Pins = pin["sha256"] as? [String] else {
+                continue
+            }
+            
+            hostPins[hostname] = sha256Pins
+        }
+        
+        return hostPins
     }
     
     func validateUrl(_ url: String) -> Bool {
@@ -47,8 +68,33 @@ class SecurityManager {
     }
     
     func verifySignature(data: Data, signature: String, publicKeyString: String) -> Bool {
-        guard let publicKeyData = Data(base64Encoded: publicKeyString),
-              let signatureData = Data(base64Encoded: signature) else {
+        // Handle PEM format or base64 encoded public key
+        let publicKeyData: Data
+        if publicKeyString.contains("-----BEGIN PUBLIC KEY-----") {
+            // Convert PEM to base64
+            let base64String = publicKeyString
+                .replacingOccurrences(of: "-----BEGIN PUBLIC KEY-----", with: "")
+                .replacingOccurrences(of: "-----END PUBLIC KEY-----", with: "")
+                .replacingOccurrences(of: "\n", with: "")
+                .replacingOccurrences(of: "\r", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            guard let data = Data(base64Encoded: base64String) else {
+                print("Failed to decode PEM public key")
+                return false
+            }
+            publicKeyData = data
+        } else {
+            // Already base64 encoded
+            guard let data = Data(base64Encoded: publicKeyString) else {
+                print("Failed to decode base64 public key")
+                return false
+            }
+            publicKeyData = data
+        }
+        
+        guard let signatureData = Data(base64Encoded: signature) else {
+            print("Failed to decode signature")
             return false
         }
         
@@ -61,14 +107,21 @@ class SecurityManager {
             ]
             
             guard let secKey = SecKeyCreateWithData(publicKeyData as CFData, attributes as CFDictionary, nil) else {
+                print("Failed to create SecKey from public key data")
                 return false
             }
             
-            // Verify signature
-            let algorithm = SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256
-            return SecKeyVerifySignature(secKey, algorithm, data as CFData, signatureData as CFData, nil)
+            // Verify signature using RSA-PSS (matching web implementation)
+            let algorithm = SecKeyAlgorithm.rsaSignatureMessagePSSSHA256
+            let result = SecKeyVerifySignature(secKey, algorithm, data as CFData, signatureData as CFData, nil)
+            
+            if !result {
+                print("Signature verification failed")
+            }
+            
+            return result
         } catch {
-            print("Signature verification failed: \(error)")
+            print("Signature verification error: \(error)")
             return false
         }
     }

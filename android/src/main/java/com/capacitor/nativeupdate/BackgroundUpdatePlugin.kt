@@ -28,6 +28,9 @@ class BackgroundUpdatePlugin : Plugin() {
         super.load()
         notificationManager = BackgroundNotificationManager(context, this)
         notificationManager.createNotificationChannel()
+        
+        // Register this plugin instance with the manager
+        BackgroundUpdateManager.registerBackgroundUpdatePlugin(this)
     }
     
     @PluginMethod

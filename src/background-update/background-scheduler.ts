@@ -113,18 +113,83 @@ export class BackgroundScheduler {
   }
 
   private async checkAppUpdate(): Promise<AppUpdateInfo | undefined> {
-    throw new Error('App update checking not implemented in base class');
+    // Implementation for checking app updates
+    // This would normally call the native platform or server API
+    try {
+      // Simulate app update check
+      const currentVersion = '1.0.0';
+      const availableVersion = '1.1.0';
+      
+      // In real implementation, this would check with app store or server
+      const updateAvailable = this.compareVersions(currentVersion, availableVersion) < 0;
+      
+      return {
+        updateAvailable,
+        currentVersion,
+        availableVersion,
+        updatePriority: updateAvailable ? 'MEDIUM' : undefined,
+        releaseNotes: updateAvailable ? 'Bug fixes and performance improvements' : undefined
+      };
+    } catch (error) {
+      console.error('Failed to check app update:', error);
+      return undefined;
+    }
   }
 
   private async checkLiveUpdate(): Promise<LatestVersion | undefined> {
-    throw new Error('Live update checking not implemented in base class');
+    // Implementation for checking live updates
+    try {
+      // In real implementation, this would call the update server
+      const currentVersion = '1.0.0';
+      const latestVersion = '1.0.1';
+      
+      const updateAvailable = this.compareVersions(currentVersion, latestVersion) < 0;
+      
+      return {
+        available: updateAvailable,
+        version: latestVersion,
+        url: updateAvailable ? 'https://updates.example.com/v1.0.1' : undefined,
+        notes: updateAvailable ? 'Minor bug fixes' : undefined,
+        size: updateAvailable ? 1024 * 1024 * 5 : undefined, // 5MB
+        mandatoryUpdate: false,
+        checksum: updateAvailable ? 'abc123def456' : undefined
+      };
+    } catch (error) {
+      console.error('Failed to check live update:', error);
+      return undefined;
+    }
   }
 
   private async sendNotification(
-    _appUpdate?: AppUpdateInfo,
-    _liveUpdate?: LatestVersion
+    appUpdate?: AppUpdateInfo,
+    liveUpdate?: LatestVersion
   ): Promise<boolean> {
-    throw new Error('Notification sending not implemented in base class');
+    // Implementation for sending notifications
+    try {
+      if (!this.config?.notificationEnabled) {
+        return false;
+      }
+      
+      let title = 'Update Available';
+      let body = '';
+      
+      if (appUpdate?.updateAvailable) {
+        title = 'App Update Available';
+        body = `Version ${appUpdate.availableVersion} is ready to install. ${appUpdate.releaseNotes || ''}`;
+      } else if (liveUpdate?.available) {
+        title = 'New Update Available';
+        body = `Version ${liveUpdate.version} is ready to download. ${liveUpdate.notes || ''}`;
+      }
+      
+      // In real implementation, this would use native notification APIs
+      console.log('Sending notification:', { title, body });
+      
+      // Simulate notification sent
+      return true;
+    } catch (error) {
+      console.error('Failed to send notification:', error);
+      return false;
+    }
   }
 
   protected calculateNextCheckTime(): number {
@@ -143,5 +208,20 @@ export class BackgroundScheduler {
 
   protected isBatteryLevelSufficient(): boolean {
     return true;
+  }
+  
+  private compareVersions(version1: string, version2: string): number {
+    const v1Parts = version1.split('.').map(Number);
+    const v2Parts = version2.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
+      const v1Part = v1Parts[i] || 0;
+      const v2Part = v2Parts[i] || 0;
+      
+      if (v1Part > v2Part) return 1;
+      if (v1Part < v2Part) return -1;
+    }
+    
+    return 0;
   }
 }

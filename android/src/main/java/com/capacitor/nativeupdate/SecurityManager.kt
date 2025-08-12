@@ -51,7 +51,20 @@ class SecurityManager(private val context: Context) {
         val certificatePinning = JSObject()
         val pinningConfig = config?.getJSObject("certificatePinning")
         certificatePinning.put("enabled", pinningConfig?.getBool("enabled") ?: false)
-        certificatePinning.put("certificates", pinningConfig?.getJSONArray("certificates") ?: emptyArray<String>())
+        
+        // Convert pins to proper format
+        val pins = mutableListOf<JSObject>()
+        val pinsArray = pinningConfig?.getJSONArray("pins")
+        if (pinsArray != null) {
+            for (i in 0 until pinsArray.length()) {
+                val pin = pinsArray.getJSONObject(i)
+                val pinObject = JSObject()
+                pinObject.put("hostname", pin.getString("hostname"))
+                pinObject.put("sha256", pin.getJSONArray("sha256"))
+                pins.add(pinObject)
+            }
+        }
+        certificatePinning.put("pins", pins.toTypedArray())
         result.put("certificatePinning", certificatePinning)
         
         result.put("validateInputs", config?.getBool("validateInputs") ?: true)
@@ -83,19 +96,22 @@ class SecurityManager(private val context: Context) {
             return null
         }
         
-        val certificates = pinningConfig.getJSONArray("certificates") ?: return null
-        if (certificates.length() == 0) {
+        val pins = pinningConfig.getJSONArray("pins") ?: return null
+        if (pins.length() == 0) {
             return null
         }
         
         val builder = CertificatePinner.Builder()
         
-        // Add certificate pins
-        val hosts = getAllowedHosts()
-        for (host in hosts) {
-            for (i in 0 until certificates.length()) {
-                val pin = certificates.getString(i)
-                builder.add(host, pin)
+        // Add certificate pins for each host
+        for (i in 0 until pins.length()) {
+            val pin = pins.getJSONObject(i)
+            val hostname = pin.getString("hostname") ?: continue
+            val sha256Pins = pin.getJSONArray("sha256") ?: continue
+            
+            for (j in 0 until sha256Pins.length()) {
+                val sha256Pin = sha256Pins.getString(j)
+                builder.add(hostname, sha256Pin)
             }
         }
         
@@ -104,12 +120,25 @@ class SecurityManager(private val context: Context) {
     
     fun verifySignature(data: ByteArray, signature: String, publicKeyString: String): Boolean {
         return try {
-            val publicKeyBytes = Base64.decode(publicKeyString, Base64.DEFAULT)
+            // Handle PEM format or base64 encoded public key
+            val publicKeyBase64 = if (publicKeyString.contains("-----BEGIN PUBLIC KEY-----")) {
+                publicKeyString
+                    .replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .replace("\n", "")
+                    .replace("\r", "")
+                    .trim()
+            } else {
+                publicKeyString
+            }
+            
+            val publicKeyBytes = Base64.decode(publicKeyBase64, Base64.DEFAULT)
             val keySpec = X509EncodedKeySpec(publicKeyBytes)
             val keyFactory = KeyFactory.getInstance("RSA")
             val publicKey = keyFactory.generatePublic(keySpec)
             
-            val sig = Signature.getInstance("SHA256withRSA")
+            // Use RSA-PSS to match web implementation
+            val sig = Signature.getInstance("SHA256withRSA/PSS")
             sig.initVerify(publicKey)
             sig.update(data)
             

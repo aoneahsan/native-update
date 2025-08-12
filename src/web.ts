@@ -77,8 +77,8 @@ export class NativeUpdateWeb
       enforceHttps: this.config.security?.enforceHttps !== false,
       certificatePinning: {
         enabled: this.config.security?.certificatePinning?.enabled || false,
-        certificates:
-          this.config.security?.certificatePinning?.certificates || [],
+        pins:
+          this.config.security?.certificatePinning?.pins || [],
       },
       validateInputs: this.config.security?.validateInputs !== false,
       secureStorage: this.config.security?.secureStorage !== false,

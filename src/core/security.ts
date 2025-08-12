@@ -346,6 +346,50 @@ export class SecurityValidator {
   }
 
   /**
+   * Validate certificate pinning for HTTPS connections
+   * Note: This is a placeholder for web implementation as certificate pinning
+   * is primarily implemented at the native layer
+   */
+  async validateCertificatePin(hostname: string, certificate: string): Promise<boolean> {
+    const certificatePins = this.configManager.get('certificatePins');
+    if (!certificatePins || certificatePins.length === 0) {
+      // No pins configured, allow connection
+      return true;
+    }
+
+    const hostPins = certificatePins.filter((pin: any) => pin.hostname === hostname);
+    if (hostPins.length === 0) {
+      // No pins for this host, allow connection
+      return true;
+    }
+
+    // Check if certificate matches any of the pins
+    const certificateHash = await this.calculateCertificateHash(certificate);
+    const isValid = hostPins.some((pin: any) => pin.sha256 === certificateHash);
+
+    if (!isValid) {
+      this.logger.error('Certificate pinning validation failed', {
+        hostname,
+        expectedPins: hostPins.map((p: any) => p.sha256),
+        actualHash: certificateHash
+      });
+    }
+
+    return isValid;
+  }
+
+  /**
+   * Calculate SHA-256 hash of certificate
+   */
+  private async calculateCertificateHash(certificate: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(certificate);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return 'sha256/' + btoa(String.fromCharCode(...hashArray));
+  }
+
+  /**
    * Validate metadata object
    */
   validateMetadata(metadata: unknown): void {

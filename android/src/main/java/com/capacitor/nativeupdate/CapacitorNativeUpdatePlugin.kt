@@ -34,6 +34,10 @@ class CapacitorNativeUpdatePlugin : Plugin() {
         backgroundUpdatePlugin = BackgroundUpdatePlugin()
         securityManager = SecurityManager(context)
         
+        // Register plugins with manager for background access
+        BackgroundUpdateManager.registerLiveUpdatePlugin(liveUpdatePlugin)
+        BackgroundUpdateManager.registerAppUpdatePlugin(appUpdatePlugin)
+        
         // Set up listeners
         liveUpdatePlugin.setProgressListener { progress ->
             notifyListeners("downloadProgress", progress)

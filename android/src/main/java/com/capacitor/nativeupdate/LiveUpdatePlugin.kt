@@ -21,21 +21,39 @@ class LiveUpdatePlugin(
     private var progressListener: ((JSObject) -> Unit)? = null
     private var stateChangeListener: ((JSObject) -> Unit)? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val okHttpClient: OkHttpClient
+    private lateinit var okHttpClient: OkHttpClient
+    private val securityManager = SecurityManager(context)
     
     init {
-        // Initialize OkHttp with security settings
+        // Initialize OkHttp with default settings
+        okHttpClient = createOkHttpClient()
+    }
+    
+    private fun createOkHttpClient(): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
         
-        // Configure certificate pinning if needed
-        okHttpClient = builder.build()
+        // Configure certificate pinning if config is available
+        if (config != null) {
+            val certificatePinner = securityManager.getCertificatePinner()
+            if (certificatePinner != null) {
+                builder.certificatePinner(certificatePinner)
+            }
+        }
+        
+        return builder.build()
     }
     
     fun configure(config: JSObject) {
         this.config = config
+        
+        // Configure security manager
+        securityManager.configure(config)
+        
+        // Recreate OkHttpClient with new configuration
+        okHttpClient = createOkHttpClient()
         
         // Validate configuration
         val serverUrl = config.getString("serverUrl")
@@ -128,6 +146,23 @@ class LiveUpdatePlugin(
                     downloadedFile.delete()
                     call.reject("CHECKSUM_ERROR", "Bundle checksum validation failed")
                     return@launch
+                }
+                
+                // Verify signature if provided
+                val signature = call.getString("signature")
+                if (signature != null) {
+                    val securityConfig = config?.getJSObject("security")
+                    val publicKey = securityConfig?.getString("publicKey")
+                    val enableSignatureValidation = securityConfig?.getBoolean("enableSignatureValidation", false) ?: false
+                    
+                    if (enableSignatureValidation && publicKey != null) {
+                        val fileBytes = downloadedFile.readBytes()
+                        if (!securityManager.verifySignature(fileBytes, signature, publicKey)) {
+                            downloadedFile.delete()
+                            call.reject("SIGNATURE_ERROR", "Bundle signature validation failed")
+                            return@launch
+                        }
+                    }
                 }
                 
                 // Create bundle info
@@ -463,5 +498,29 @@ class LiveUpdatePlugin(
     private fun markBundleAsVerified() {
         val prefs = context.getSharedPreferences("native_update", Context.MODE_PRIVATE)
         prefs.edit().putBoolean("current_bundle_verified", true).apply()
+    }
+    
+    // Async method for background update checks
+    suspend fun getLatestVersionAsync(): LatestVersion? {
+        return try {
+            val serverUrl = config?.getString("serverUrl") ?: return null
+            val channel = config?.getString("channel") ?: "production"
+            
+            val latestVersion = checkForUpdates(serverUrl, channel)
+            
+            if (latestVersion != null) {
+                LatestVersion(
+                    available = true,
+                    version = latestVersion.getString("version")
+                )
+            } else {
+                LatestVersion(
+                    available = false,
+                    version = null
+                )
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 }

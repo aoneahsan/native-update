@@ -117,6 +117,30 @@ class AppUpdatePlugin {
         }
     }
     
+    // MARK: - Async Methods for Background Updates
+    
+    func getAppUpdateInfoAsync() async -> AppUpdateInfo? {
+        do {
+            let bundleId = Bundle.main.bundleIdentifier ?? ""
+            let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+            
+            // Check iTunes for app info
+            let appInfo = try await checkAppStoreVersion(bundleId: bundleId)
+            
+            let storeVersion = appInfo["version"] as? String ?? "0.0.0"
+            let updateAvailable = isVersionNewer(storeVersion, than: currentVersion)
+            
+            return AppUpdateInfo(
+                updateAvailable: updateAvailable,
+                currentVersion: currentVersion,
+                availableVersion: updateAvailable ? storeVersion : nil
+            )
+        } catch {
+            NSLog("Failed to check app update: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func checkAppStoreVersion(bundleId: String) async throws -> [String: Any] {
@@ -185,5 +209,26 @@ class AppUpdatePlugin {
         
         // Try to get from Info.plist
         return Bundle.main.infoDictionary?["AppStoreId"] as? String
+    }
+}
+
+// MARK: - Data Models
+
+struct AppUpdateInfo {
+    let updateAvailable: Bool
+    let currentVersion: String
+    let availableVersion: String?
+    
+    func toDictionary() -> [String: Any] {
+        var obj: [String: Any] = [
+            "updateAvailable": updateAvailable,
+            "currentVersion": currentVersion
+        ]
+        
+        if let availableVersion = availableVersion {
+            obj["availableVersion"] = availableVersion
+        }
+        
+        return obj
     }
 }

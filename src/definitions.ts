@@ -267,9 +267,12 @@ export interface SecurityConfig {
 
 export interface CertificatePinning {
   enabled: boolean;
-  certificates: string[];
-  includeSubdomains?: boolean;
-  maxAge?: number;
+  pins: CertificatePin[];
+}
+
+export interface CertificatePin {
+  hostname: string;
+  sha256: string[];
 }
 
 /**
@@ -434,10 +437,7 @@ export interface NotificationPermissionStatus {
  */
 export interface SecurityInfo {
   enforceHttps: boolean;
-  certificatePinning: {
-    enabled: boolean;
-    certificates: string[];
-  };
+  certificatePinning: CertificatePinning;
   validateInputs: boolean;
   secureStorage: boolean;
 }

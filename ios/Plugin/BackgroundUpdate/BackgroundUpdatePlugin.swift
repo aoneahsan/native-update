@@ -40,7 +40,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
         }
         
         do {
-            let config = try BackgroundUpdateConfig.from[String: Any](configData)
+            let config = try BackgroundUpdateConfig.from(configData)
             backgroundUpdateConfig = config
             backgroundUpdateStatus.enabled = config.enabled
             
@@ -62,7 +62,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     }
     
     @objc func getBackgroundUpdateStatus(_ call: CAPPluginCall) {
-        call.resolve(backgroundUpdateStatus.to[String: Any]())
+        call.resolve(backgroundUpdateStatus.toDictionary())
     }
     
     @objc func scheduleBackgroundCheck(_ call: CAPPluginCall) {
@@ -78,7 +78,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     @objc func triggerBackgroundCheck(_ call: CAPPluginCall) {
         Task {
             let result = await performBackgroundCheck()
-            call.resolve(result.to[String: Any]())
+            call.resolve(result.toDictionary())
         }
     }
     
@@ -94,7 +94,7 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     
     @objc func getNotificationPermissions(_ call: CAPPluginCall) {
         notificationManager?.getPermissionStatus { status in
-            call.resolve(status.to[String: Any]())
+            call.resolve(status.toDictionary())
         }
     }
     
@@ -237,19 +237,15 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     }
     
     private func checkForAppUpdate() async -> AppUpdateInfo? {
-        // Call the main app update plugin to check for updates
-        if let appUpdatePlugin = self.bridge?.plugin(withName: "AppUpdatePlugin") as? AppUpdatePlugin {
-            return await appUpdatePlugin.getAppUpdateInfoAsync()
-        }
-        return nil
+        // Create an instance of AppUpdatePlugin to check for updates
+        let appUpdatePlugin = AppUpdatePlugin(plugin: self)
+        return await appUpdatePlugin.getAppUpdateInfoAsync()
     }
     
     private func checkForLiveUpdate() async -> LatestVersion? {
-        // Call the main live update plugin to check for updates
-        if let liveUpdatePlugin = self.bridge?.plugin(withName: "LiveUpdatePlugin") as? LiveUpdatePlugin {
-            return await liveUpdatePlugin.getLatestVersionAsync()
-        }
-        return nil
+        // Create an instance of LiveUpdatePlugin to check for updates
+        let liveUpdatePlugin = LiveUpdatePlugin(plugin: self)
+        return await liveUpdatePlugin.getLatestVersionAsync()
     }
     
     private func sendNotification(appUpdate: AppUpdateInfo?, liveUpdate: LatestVersion?) async -> Bool {
@@ -280,7 +276,7 @@ struct BackgroundUpdateConfig {
     let retryDelay: Int
     let taskIdentifier: String?
     
-    static func from[String: Any](_ obj: [String: Any]) throws -> BackgroundUpdateConfig {
+    static func from(_ obj: [String: Any]) throws -> BackgroundUpdateConfig {
         guard let enabled = obj["enabled"] as? Bool,
               let checkInterval = obj["checkInterval"] as? Int,
               let updateTypesArray = obj["updateTypes"] as? [String] else {
@@ -295,7 +291,7 @@ struct BackgroundUpdateConfig {
             checkInterval: checkInterval,
             updateTypes: updateTypes,
             autoInstall: obj["autoInstall"] as? Bool ?? false,
-            notificationPreferences: notificationPreferences != nil ? NotificationPreferences.from[String: Any](notificationPreferences!) : nil,
+            notificationPreferences: notificationPreferences != nil ? NotificationPreferences.from(notificationPreferences!) : nil,
             respectBatteryOptimization: obj["respectBatteryOptimization"] as? Bool ?? true,
             allowMeteredConnection: obj["allowMeteredConnection"] as? Bool ?? false,
             minimumBatteryLevel: obj["minimumBatteryLevel"] as? Int ?? 20,
@@ -324,7 +320,7 @@ struct BackgroundUpdateStatus {
     var failureCount: Int
     var lastError: UpdateError?
     
-    func to[String: Any]() -> [String: Any] {
+    func toDictionary() -> [String: Any] {
         var obj: [String: Any] = [
             "enabled": enabled,
             "isRunning": isRunning,
@@ -349,7 +345,7 @@ struct BackgroundUpdateStatus {
         }
         
         if let lastError = lastError {
-            obj["lastError"] = lastError.to[String: Any]()
+            obj["lastError"] = lastError.toDictionary()
         }
         
         return obj
@@ -364,7 +360,7 @@ struct BackgroundCheckResult {
     let notificationSent: Bool
     let error: UpdateError?
     
-    func to[String: Any]() -> [String: Any] {
+    func toDictionary() -> [String: Any] {
         var obj: [String: Any] = [
             "success": success,
             "updatesFound": updatesFound,
@@ -372,15 +368,15 @@ struct BackgroundCheckResult {
         ]
         
         if let appUpdate = appUpdate {
-            obj["appUpdate"] = appUpdate.to[String: Any]()
+            obj["appUpdate"] = appUpdate.toDictionary()
         }
         
         if let liveUpdate = liveUpdate {
-            obj["liveUpdate"] = liveUpdate.to[String: Any]()
+            obj["liveUpdate"] = liveUpdate.toDictionary()
         }
         
         if let error = error {
-            obj["error"] = error.to[String: Any]()
+            obj["error"] = error.toDictionary()
         }
         
         return obj
@@ -391,47 +387,10 @@ struct UpdateError {
     let code: String
     let message: String
     
-    func to[String: Any]() -> [String: Any] {
+    func toDictionary() -> [String: Any] {
         return [
             "code": code,
             "message": message
         ]
-    }
-}
-
-// These would be defined in other plugins
-struct AppUpdateInfo {
-    let updateAvailable: Bool
-    let currentVersion: String
-    let availableVersion: String?
-    
-    func to[String: Any]() -> [String: Any] {
-        var obj: [String: Any] = [
-            "updateAvailable": updateAvailable,
-            "currentVersion": currentVersion
-        ]
-        
-        if let availableVersion = availableVersion {
-            obj["availableVersion"] = availableVersion
-        }
-        
-        return obj
-    }
-}
-
-struct LatestVersion {
-    let available: Bool
-    let version: String?
-    
-    func to[String: Any]() -> [String: Any] {
-        var obj: [String: Any] = [
-            "available": available
-        ]
-        
-        if let version = version {
-            obj["version"] = version
-        }
-        
-        return obj
     }
 }

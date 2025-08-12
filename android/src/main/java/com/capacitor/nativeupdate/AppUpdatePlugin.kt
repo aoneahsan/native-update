@@ -17,6 +17,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.google.android.play.core.ktx.isImmediateUpdateAllowed
+import kotlinx.coroutines.tasks.await
 
 class AppUpdatePlugin(
     private val activity: Activity,
@@ -246,6 +247,29 @@ class AppUpdatePlugin(
                     updateOptions
                 )
             }
+        }
+    }
+    
+    // Async method for background update checks
+    suspend fun getAppUpdateInfoAsync(): AppUpdateInfo? {
+        return try {
+            val appUpdateInfo = appUpdateManager.appUpdateInfo.await()
+            
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                AppUpdateInfo(
+                    updateAvailable = true,
+                    currentVersion = getCurrentAppVersion(),
+                    availableVersion = appUpdateInfo.availableVersionCode().toString()
+                )
+            } else {
+                AppUpdateInfo(
+                    updateAvailable = false,
+                    currentVersion = getCurrentAppVersion(),
+                    availableVersion = null
+                )
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 }

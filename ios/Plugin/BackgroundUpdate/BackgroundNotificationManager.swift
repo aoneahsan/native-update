@@ -21,7 +21,7 @@ class BackgroundNotificationManager: NSObject {
     }
     
     func setPreferences(_ preferencesData: [String: Any]) {
-        preferences = NotificationPreferences.from[String: Any](preferencesData)
+        preferences = NotificationPreferences.from(preferencesData)
     }
     
     func getPermissionStatus(completion: @escaping (NotificationPermissionStatus) -> Void) {
@@ -123,8 +123,8 @@ class BackgroundNotificationManager: NSObject {
         // Set user info
         content.userInfo = [
             "type": "update_available",
-            "appUpdate": appUpdate?.to[String: Any]() ?? [:],
-            "liveUpdate": liveUpdate?.to[String: Any]() ?? [:]
+            "appUpdate": appUpdate?.toDictionary() ?? [:],
+            "liveUpdate": liveUpdate?.toDictionary() ?? [:]
         ]
         
         return content
@@ -261,7 +261,7 @@ struct NotificationPreferences {
         )
     }
     
-    static func from[String: Any](_ obj: [String: Any]) -> NotificationPreferences {
+    static func from(_ obj: [String: Any]) -> NotificationPreferences {
         let actionLabelsObj = obj["actionLabels"] as? [String: Any]
         
         return NotificationPreferences(
@@ -271,7 +271,7 @@ struct NotificationPreferences {
             soundEnabled: obj["soundEnabled"] as? Bool ?? true,
             vibrationEnabled: obj["vibrationEnabled"] as? Bool ?? true,
             showActions: obj["showActions"] as? Bool ?? true,
-            actionLabels: actionLabelsObj != nil ? ActionLabels.from[String: Any](actionLabelsObj!) : ActionLabels.default(),
+            actionLabels: actionLabelsObj != nil ? ActionLabels.from(actionLabelsObj!) : ActionLabels.default(),
             channelId: obj["channelId"] as? String,
             channelName: obj["channelName"] as? String,
             priority: NotificationPriority(rawValue: obj["priority"] as? String ?? "default") ?? .default
@@ -292,7 +292,7 @@ struct ActionLabels {
         )
     }
     
-    static func from[String: Any](_ obj: [String: Any]) -> ActionLabels {
+    static func from(_ obj: [String: Any]) -> ActionLabels {
         return ActionLabels(
             updateNow: obj["updateNow"] as? String,
             updateLater: obj["updateLater"] as? String,
@@ -314,7 +314,7 @@ struct NotificationPermissionStatus {
     let canRequest: Bool
     let shouldShowRationale: Bool?
     
-    func to[String: Any]() -> [String: Any] {
+    func toDictionary() -> [String: Any] {
         var obj: [String: Any] = [
             "granted": granted,
             "canRequest": canRequest
