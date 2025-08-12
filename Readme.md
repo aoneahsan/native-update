@@ -294,6 +294,29 @@ The [example app](./example) demonstrates the plugin integration but **requires 
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
+## 🛠️ New Development Tools
+
+### Available Tools
+
+✅ **Testing Framework**
+- Vitest test setup with example tests
+- Run tests: `npm test`
+- Coverage: `npm run test:coverage`
+
+✅ **Bundle Creation Tool**
+- Create update bundles: `node tools/bundle-creator.js create ./dist`
+- Generates ZIP bundle with manifest
+
+✅ **Security Signing Tool**
+- Generate keys: `node tools/bundle-signer.js generate-keys`
+- Sign bundles: `node tools/bundle-signer.js sign bundle.zip private-key.pem`
+- Verify: `node tools/bundle-signer.js verify bundle.zip bundle.zip.sig public-key.pem`
+
+✅ **Minimal Backend Server**
+- Development server in `backend-template/`
+- Start: `cd backend-template && npm install && npm start`
+- Provides basic update API endpoints
+
 ## 🏗️ Development Status
 
 ### What This Package Provides

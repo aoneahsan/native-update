@@ -20,6 +20,41 @@ export class SecurityValidator {
   }
 
   /**
+   * Validate URL is HTTPS
+   */
+  static validateUrl(url: string): boolean {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Validate checksum format
+   */
+  static validateChecksum(checksum: string): boolean {
+    return /^[a-f0-9]{64}$/i.test(checksum);
+  }
+
+  /**
+   * Sanitize input string
+   */
+  static sanitizeInput(input: string): string {
+    if (!input) return '';
+    return input.replace(/<[^>]*>/g, '').replace(/[^\w\s/.-]/g, '');
+  }
+
+  /**
+   * Validate bundle size
+   */
+  static validateBundleSize(size: number): boolean {
+    const MAX_SIZE = 100 * 1024 * 1024; // 100MB
+    return size > 0 && size <= MAX_SIZE;
+  }
+
+  /**
    * Calculate SHA-256 checksum of data
    */
   async calculateChecksum(data: ArrayBuffer): Promise<string> {

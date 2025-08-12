@@ -30,6 +30,58 @@ export class VersionManager {
   }
 
   /**
+   * Compare two semantic versions
+   */
+  static compareVersions(version1: string, version2: string): number {
+    try {
+      // Split version and pre-release
+      const [v1Base, v1Pre] = version1.split('-');
+      const [v2Base, v2Pre] = version2.split('-');
+      
+      const v1Parts = v1Base.split('.').map(Number);
+      const v2Parts = v2Base.split('.').map(Number);
+      
+      // Compare major.minor.patch
+      for (let i = 0; i < 3; i++) {
+        const v1Part = v1Parts[i] || 0;
+        const v2Part = v2Parts[i] || 0;
+        
+        if (v1Part > v2Part) return 1;
+        if (v1Part < v2Part) return -1;
+      }
+      
+      // If base versions are equal, compare pre-release
+      if (v1Pre && !v2Pre) return -1; // 1.0.0-alpha < 1.0.0
+      if (!v1Pre && v2Pre) return 1;  // 1.0.0 > 1.0.0-alpha
+      if (v1Pre && v2Pre) {
+        return v1Pre.localeCompare(v2Pre);
+      }
+      
+      return 0;
+    } catch {
+      if (version1 === version2) return 0;
+      return version1 > version2 ? 1 : -1;
+    }
+  }
+
+  /**
+   * Validate semantic version format
+   */
+  static isValidVersion(version: string): boolean {
+    return /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/.test(version);
+  }
+
+  /**
+   * Check if update should be performed
+   */
+  static shouldUpdate(currentVersion: string, newVersion: string, minAppVersion?: string): boolean {
+    if (minAppVersion && VersionManager.compareVersions(currentVersion, minAppVersion) < 0) {
+      return false;
+    }
+    return VersionManager.compareVersions(currentVersion, newVersion) < 0;
+  }
+
+  /**
    * Initialize the version manager
    */
   async initialize(): Promise<void> {

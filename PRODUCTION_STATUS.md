@@ -13,6 +13,13 @@ This document summarizes the current production readiness status of the capacito
 - Created server-requirements.md detailing backend needs
 - Updated package.json description to clarify foundation status
 
+### Development Tools ✅
+- Testing framework with Vitest
+- Basic unit tests for security and version management
+- Bundle creation utility (`tools/bundle-creator.js`)
+- Bundle signing tool (`tools/bundle-signer.js`)
+- Minimal backend server template (`backend-template/`)
+
 ### Existing Assets ✅
 - Well-architected TypeScript plugin structure
 - Comprehensive interface definitions
