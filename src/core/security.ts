@@ -93,9 +93,9 @@ export class SecurityValidator {
   }
 
   /**
-   * Verify digital signature (stub for now - implement with proper crypto library)
+   * Verify digital signature using Web Crypto API
    */
-  async verifySignature(_data: ArrayBuffer, _signature: string): Promise<boolean> {
+  async verifySignature(data: ArrayBuffer, signature: string): Promise<boolean> {
     if (!this.configManager.get('enableSignatureValidation')) {
       return true;
     }
@@ -108,10 +108,62 @@ export class SecurityValidator {
       );
     }
 
-    // TODO: Implement actual signature verification using SubtleCrypto or a library
-    // For now, this is a placeholder
-    this.logger.debug('Signature verification not yet implemented');
-    return true;
+    try {
+      // Import public key
+      const cryptoKey = await crypto.subtle.importKey(
+        'spki',
+        this.pemToArrayBuffer(publicKey),
+        {
+          name: 'RSA-PSS',
+          hash: 'SHA-256',
+        },
+        false,
+        ['verify']
+      );
+
+      // Verify signature
+      const isValid = await crypto.subtle.verify(
+        {
+          name: 'RSA-PSS',
+          saltLength: 32,
+        },
+        cryptoKey,
+        this.base64ToArrayBuffer(signature),
+        data
+      );
+
+      if (!isValid) {
+        this.logger.error('Signature verification failed');
+      }
+
+      return isValid;
+    } catch (error) {
+      this.logger.error('Signature verification error', error);
+      return false;
+    }
+  }
+
+  /**
+   * Convert PEM to ArrayBuffer
+   */
+  private pemToArrayBuffer(pem: string): ArrayBuffer {
+    const base64 = pem
+      .replace(/-----BEGIN PUBLIC KEY-----/g, '')
+      .replace(/-----END PUBLIC KEY-----/g, '')
+      .replace(/\s/g, '');
+    return this.base64ToArrayBuffer(base64);
+  }
+
+  /**
+   * Convert base64 to ArrayBuffer
+   */
+  private base64ToArrayBuffer(base64: string): ArrayBuffer {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 
   /**

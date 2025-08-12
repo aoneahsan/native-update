@@ -2,7 +2,7 @@ export interface NativeUpdatePlugin {
   /**
    * Configure the plugin with initial settings
    */
-  configure(options: UpdateConfig): Promise<void>;
+  configure(options: { config: PluginConfig }): Promise<void>;
 
   /**
    * Get current security configuration
@@ -185,6 +185,19 @@ export interface NativeUpdateCombinedPlugin
 /**
  * Configuration Types
  */
+export interface PluginConfig {
+  serverUrl?: string;
+  channel?: string;
+  autoCheck?: boolean;
+  autoUpdate?: boolean;
+  updateStrategy?: UpdateStrategy;
+  publicKey?: string;
+  requireSignature?: boolean;
+  checksumAlgorithm?: ChecksumAlgorithm;
+  checkInterval?: number;
+  security?: SecurityConfig;
+}
+
 export interface UpdateConfig {
   liveUpdate?: LiveUpdateConfig;
   appUpdate?: AppUpdateConfig;

@@ -814,3 +814,6 @@ export class NativeUpdateWeb
     );
   }
 }
+
+// Alias for backward compatibility with tests
+export { NativeUpdateWeb as CapacitorNativeUpdateWeb };
