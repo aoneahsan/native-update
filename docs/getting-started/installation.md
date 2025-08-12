@@ -1,5 +1,19 @@
 # Installation Guide
 
+> **⚠️ WARNING: What's NOT Included**
+>
+> Installing this plugin gives you **client-side functionality only**. You will NOT get:
+>
+> - ❌ An update server (you must build your own)
+> - ❌ Bundle generation tools (requires custom CI/CD setup)
+> - ❌ Ready-to-use backend API (implement from scratch)
+> - ❌ Admin dashboard or management UI
+> - ❌ Bundle hosting or CDN setup
+> - ❌ Security infrastructure (certificates, signing keys)
+> - ❌ Analytics or monitoring systems
+>
+> **Before proceeding**, ensure you have the technical resources to build the complete backend infrastructure. This plugin is only useful if you can implement the extensive server-side requirements.
+
 This guide will walk you through installing and setting up the Capacitor Native Update plugin in your project.
 
 ## Prerequisites

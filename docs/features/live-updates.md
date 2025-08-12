@@ -1,5 +1,16 @@
 # Live Updates (OTA)
 
+> **⚠️ Backend Infrastructure Required**
+>
+> Live Updates require a complete backend infrastructure that you must build:
+> - **Update Server**: Host and serve update bundles
+> - **Bundle Generation**: CI/CD pipeline to create and sign bundles
+> - **Version Management**: Track versions, channels, and rollbacks
+> - **Security Infrastructure**: Implement signing and verification
+> - **CDN/Storage**: Distribute bundles globally
+>
+> This plugin provides the client-side implementation only. Without the backend, Live Updates will not function.
+
 Live Updates, also known as Over-The-Air (OTA) updates, allow you to deploy JavaScript, HTML, and CSS changes to your app instantly without going through app store review processes. This feature is perfect for bug fixes, content updates, and minor feature additions.
 
 ## How Live Updates Work

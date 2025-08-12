@@ -1,6 +1,24 @@
 # Capacitor Native Update Example App
 
-This example demonstrates all features of the Capacitor Native Update plugin.
+⚠️ **IMPORTANT: This example app requires a backend server to function properly!** ⚠️
+
+This example demonstrates all features of the Capacitor Native Update plugin. However, **it will NOT work out of the box** without setting up a compatible update server.
+
+## ⚠️ Backend Server Requirement
+
+**This example app is for demonstration purposes only and shows how to integrate the Capacitor Native Update plugin into your application. To actually test the update functionality, you MUST:**
+
+1. **Set up your own update server** that implements the required API endpoints
+2. **Configure the example app** with your server's URL and credentials
+3. **Deploy update bundles** to your server
+
+Without a backend server, the following features will NOT work:
+- ❌ Live/OTA updates (checking, downloading, installing)
+- ❌ Update version checking
+- ❌ Bundle downloads
+- ❌ Update manifests
+
+**Note:** App reviews and native app store update checks may work without a server, but live updates absolutely require a backend implementation.
 
 ## Features Demonstrated
 
@@ -53,7 +71,22 @@ npx cap run ios
 npx cap run android
 ```
 
+## Backend Server Options
+
+Since this example app requires a backend server, you have several options:
+
+### Option 1: Use the Server Example (Recommended for Testing)
+Check out the `/server-example` directory in this repository for a reference implementation. This provides a basic Node.js server that implements all required endpoints.
+
+### Option 2: Build Your Own Server
+Implement your own server following the API specification below. You can use any technology stack (Node.js, Python, Java, etc.).
+
+### Option 3: Use a Commercial Service
+Several services provide OTA update capabilities for Capacitor/Cordova apps. Research and choose one that fits your needs.
+
 ## Update Server Setup
+
+⚠️ **Remember: Without one of the above server options, this example will not demonstrate live update functionality!**
 
 You'll need an update server that implements the following endpoints:
 

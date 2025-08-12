@@ -1,6 +1,21 @@
 # Capacitor Native Update - Server Example
 
-This is a reference implementation of an update server for the Capacitor Native Update plugin.
+⚠️ **IMPORTANT: This is a REFERENCE IMPLEMENTATION only!** ⚠️
+
+This is a reference implementation of an update server for the Capacitor Native Update plugin. **It is NOT production-ready** and should be used only for:
+- Understanding the server requirements
+- Testing the plugin functionality
+- As a starting point for your own implementation
+
+## ⚠️ Production Warning
+
+**DO NOT use this server in production without significant modifications:**
+- 🔒 Security hardening required
+- 🗄️ Proper database implementation needed
+- 🔐 Authentication/authorization must be properly implemented
+- 📊 Monitoring and logging should be added
+- 🚀 Performance optimization required
+- 🛡️ Rate limiting and DDoS protection needed
 
 ## Features
 

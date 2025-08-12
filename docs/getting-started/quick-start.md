@@ -1,5 +1,17 @@
 # Quick Start Guide
 
+> **⚠️ IMPORTANT: Backend Infrastructure Required**
+>
+> This plugin is a **client-side SDK only** and requires significant backend infrastructure to function:
+>
+> - **Update Server**: You must build and host your own server to manage and serve update bundles
+> - **Bundle Generation**: You need a CI/CD pipeline to create, sign, and deploy update bundles
+> - **Security Infrastructure**: Implement bundle signing, verification, and secure distribution
+> - **Version Management**: Handle versioning, channels, and rollback mechanisms
+> - **Analytics & Monitoring**: Track update success rates and handle failures
+>
+> **This is NOT a complete solution** - it's a foundation that requires substantial additional development. See our [Server Requirements](../server-requirements.md) guide for detailed backend implementation requirements.
+
 Get up and running with Capacitor Native Update in just a few minutes! This guide covers the most common use cases.
 
 ## Basic Setup

@@ -1,5 +1,15 @@
 # Configuration Guide
 
+> **⚠️ Backend Server Required**
+>
+> All configuration options in this guide assume you have already built and deployed:
+> - A complete update server with all required API endpoints
+> - Bundle generation and signing infrastructure
+> - CDN or storage solution for bundle distribution
+> - Security infrastructure for signatures and certificates
+>
+> **Without these backend components, the plugin will not function regardless of configuration.**
+
 This guide covers all configuration options available in Capacitor Native Update. The plugin is highly configurable to meet various deployment scenarios and security requirements.
 
 ## Configuration Overview
