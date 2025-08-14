@@ -1,3 +1,5 @@
+import { Filesystem } from '@capacitor/filesystem';
+import { Preferences } from '@capacitor/preferences';
 import { ConfigManager } from './config';
 import { Logger } from './logger';
 import { SecurityValidator } from './security';
@@ -47,12 +49,12 @@ export class PluginManager {
       // Configure the plugin
       this.configManager.configure(config);
 
-      // Validate required dependencies
-      if (!config.filesystem || !config.preferences) {
-        throw new NativeUpdateError(
-          ErrorCode.MISSING_DEPENDENCY,
-          'Filesystem and Preferences are required for plugin initialization'
-        );
+      // Use Capacitor plugins directly if not provided
+      if (!config.filesystem) {
+        config.filesystem = Filesystem;
+      }
+      if (!config.preferences) {
+        config.preferences = Preferences;
       }
 
       // Initialize managers

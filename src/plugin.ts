@@ -2,6 +2,7 @@ import { registerPlugin } from '@capacitor/core';
 import type {
   NativeUpdatePlugin,
   PluginInitConfig,
+  UpdateConfig,
   // Live Update
   SyncOptions,
   SyncResult,
@@ -60,14 +61,28 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   }
 
   // NativeUpdatePlugin methods
-  async configure(options: { config: PluginInitConfig }): Promise<void> {
+  async configure(config: UpdateConfig | { config: PluginInitConfig }): Promise<void> {
+    // Handle both UpdateConfig and wrapped PluginInitConfig formats
+    let initConfig: PluginInitConfig;
+    
+    if ('config' in config && typeof config.config === 'object') {
+      // Format: { config: PluginInitConfig }
+      initConfig = config.config;
+    } else {
+      // Format: UpdateConfig - convert to PluginInitConfig
+      initConfig = {
+        // Auto-imported Capacitor plugins will be added by plugin-manager
+        baseUrl: (config as UpdateConfig).liveUpdate?.serverUrl,
+      };
+    }
+    
     if (!this.initialized) {
       // Auto-initialize with the provided config
-      await this.initialize(options.config);
+      await this.initialize(initConfig);
     } else {
       // Apply plugin configuration
       const configManager = this.pluginManager.getConfigManager();
-      configManager.configure(options.config);
+      configManager.configure(initConfig);
     }
   }
 

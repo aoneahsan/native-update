@@ -173,7 +173,7 @@ export interface NativeUpdateCombinedPlugin
   /**
    * Configure the plugin with initial settings
    */
-  configure(options: { config: PluginInitConfig }): Promise<void>;
+  configure(config: UpdateConfig | { config: PluginInitConfig }): Promise<void>;
 
   /**
    * Get current security configuration
