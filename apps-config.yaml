@@ -2,7 +2,7 @@
 
 vars:
   BUNDLE_ID:
-    default: com.aoneahsan.cap_native_update
+    default: com.aoneahsan.nativeupdate
   PRODUCT_NAME:
     default: 'Cap Native Update'
 
