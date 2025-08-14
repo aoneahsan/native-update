@@ -54,4 +54,4 @@ coverage/
 package-lock.json
 
 
-capacitor-native-update*.tgz
+native-update*.tgz

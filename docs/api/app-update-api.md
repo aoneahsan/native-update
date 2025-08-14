@@ -9,7 +9,7 @@ Complete API documentation for native app store update functionality.
 Check if a native app update is available in the app store.
 
 ```typescript
-const result = await CapacitorNativeUpdate.checkAppUpdate();
+const result = await NativeUpdate.checkAppUpdate();
 // Returns:
 {
   updateAvailable: boolean;
@@ -35,7 +35,7 @@ Start an immediate (blocking) update. Android only - shows full-screen update UI
 
 ```typescript
 try {
-  await CapacitorNativeUpdate.startImmediateUpdate();
+  await NativeUpdate.startImmediateUpdate();
   // App will restart after update
 } catch (error) {
   // User cancelled or update failed
@@ -47,7 +47,7 @@ try {
 Start a flexible (background) update. Android only - downloads in background.
 
 ```typescript
-await CapacitorNativeUpdate.startFlexibleUpdate();
+await NativeUpdate.startFlexibleUpdate();
 // Monitor progress with appUpdateProgress event
 ```
 
@@ -56,7 +56,7 @@ await CapacitorNativeUpdate.startFlexibleUpdate();
 Complete a flexible update installation. Android only.
 
 ```typescript
-await CapacitorNativeUpdate.completeFlexibleUpdate();
+await NativeUpdate.completeFlexibleUpdate();
 // App will restart
 ```
 
@@ -65,7 +65,7 @@ await CapacitorNativeUpdate.completeFlexibleUpdate();
 Get detailed version information.
 
 ```typescript
-const info = await CapacitorNativeUpdate.getVersionInfo();
+const info = await NativeUpdate.getVersionInfo();
 // Returns:
 {
   currentVersion: string;      // e.g., "1.2.3"
@@ -82,7 +82,7 @@ const info = await CapacitorNativeUpdate.getVersionInfo();
 Check if the app meets minimum version requirements.
 
 ```typescript
-const result = await CapacitorNativeUpdate.isMinimumVersionMet();
+const result = await NativeUpdate.isMinimumVersionMet();
 // Returns:
 {
   isMet: boolean;
@@ -97,7 +97,7 @@ const result = await CapacitorNativeUpdate.isMinimumVersionMet();
 Open the app store page for updates.
 
 ```typescript
-await CapacitorNativeUpdate.openAppStore();
+await NativeUpdate.openAppStore();
 ```
 
 ### getAppStoreUrl()
@@ -105,7 +105,7 @@ await CapacitorNativeUpdate.openAppStore();
 Get the app store URL without opening it.
 
 ```typescript
-const result = await CapacitorNativeUpdate.getAppStoreUrl();
+const result = await NativeUpdate.getAppStoreUrl();
 // Returns:
 {
   url: string;  // e.g., "https://apps.apple.com/app/id123456789"
@@ -118,7 +118,7 @@ const result = await CapacitorNativeUpdate.getAppStoreUrl();
 Get the current install state of a flexible update. Android only.
 
 ```typescript
-const state = await CapacitorNativeUpdate.getUpdateInstallState();
+const state = await NativeUpdate.getUpdateInstallState();
 // Returns:
 {
   installStatus: number;    // Android InstallStatus code
@@ -135,7 +135,7 @@ const state = await CapacitorNativeUpdate.getUpdateInstallState();
 Fired when app update state changes. Android only.
 
 ```typescript
-CapacitorNativeUpdate.addListener('appUpdateStateChanged', (state) => {
+NativeUpdate.addListener('appUpdateStateChanged', (state) => {
   console.log('Install status:', state.installStatus);
   // InstallStatus codes:
   // 0: Unknown
@@ -154,7 +154,7 @@ CapacitorNativeUpdate.addListener('appUpdateStateChanged', (state) => {
 Fired during flexible update download. Android only.
 
 ```typescript
-CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
+NativeUpdate.addListener('appUpdateProgress', (progress) => {
   console.log(`Downloaded: ${progress.bytesDownloaded}/${progress.totalBytesToDownload}`);
   console.log(`Progress: ${progress.percentComplete}%`);
 });
@@ -200,9 +200,9 @@ CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
 1. **Check for updates on app start**
    ```typescript
    async function checkOnStart() {
-     const result = await CapacitorNativeUpdate.checkAppUpdate();
+     const result = await NativeUpdate.checkAppUpdate();
      if (result.updateAvailable && result.updatePriority === 'IMMEDIATE') {
-       await CapacitorNativeUpdate.startImmediateUpdate();
+       await NativeUpdate.startImmediateUpdate();
      }
    }
    ```
@@ -210,15 +210,15 @@ CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
 2. **Handle flexible updates**
    ```typescript
    // Start download
-   await CapacitorNativeUpdate.startFlexibleUpdate();
+   await NativeUpdate.startFlexibleUpdate();
    
    // Monitor progress
-   const listener = CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
+   const listener = NativeUpdate.addListener('appUpdateProgress', (progress) => {
      updateProgressBar(progress.percentComplete);
    });
    
    // Complete when ready
-   const stateListener = CapacitorNativeUpdate.addListener('appUpdateStateChanged', (state) => {
+   const stateListener = NativeUpdate.addListener('appUpdateStateChanged', (state) => {
      if (state.installStatus === 11) { // Downloaded
        showUpdateReadyPrompt();
      }
@@ -228,10 +228,10 @@ CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
 3. **Fallback for iOS**
    ```typescript
    if (platform === 'ios') {
-     const result = await CapacitorNativeUpdate.checkAppUpdate();
+     const result = await NativeUpdate.checkAppUpdate();
      if (result.updateAvailable) {
        showUpdateDialog(() => {
-         CapacitorNativeUpdate.openAppStore();
+         NativeUpdate.openAppStore();
        });
      }
    }

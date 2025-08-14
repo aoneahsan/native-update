@@ -8,7 +8,7 @@ Complete documentation for all events emitted by the Capacitor Native Update plu
 
 ```typescript
 // Add a listener
-const listener = CapacitorNativeUpdate.addListener('eventName', (data) => {
+const listener = NativeUpdate.addListener('eventName', (data) => {
   console.log('Event data:', data);
 });
 
@@ -16,7 +16,7 @@ const listener = CapacitorNativeUpdate.addListener('eventName', (data) => {
 listener.remove();
 
 // Remove all listeners for an event
-CapacitorNativeUpdate.removeAllListeners('eventName');
+NativeUpdate.removeAllListeners('eventName');
 ```
 
 ## Live Update Events
@@ -26,7 +26,7 @@ CapacitorNativeUpdate.removeAllListeners('eventName');
 Fired when the update state changes during sync or download.
 
 ```typescript
-CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
+NativeUpdate.addListener('updateStateChanged', (state) => {
   console.log('Update state:', state);
 });
 ```
@@ -47,7 +47,7 @@ CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
 Fired periodically during bundle download.
 
 ```typescript
-CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+NativeUpdate.addListener('downloadProgress', (progress) => {
   console.log(`Download: ${progress.percent}%`);
 });
 ```
@@ -69,7 +69,7 @@ CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
 Fired when an update has been successfully installed.
 
 ```typescript
-CapacitorNativeUpdate.addListener('updateInstalled', (update) => {
+NativeUpdate.addListener('updateInstalled', (update) => {
   console.log('Update installed:', update.version);
 });
 ```
@@ -90,7 +90,7 @@ CapacitorNativeUpdate.addListener('updateInstalled', (update) => {
 Fired when an update fails to download or install.
 
 ```typescript
-CapacitorNativeUpdate.addListener('updateFailed', (error) => {
+NativeUpdate.addListener('updateFailed', (error) => {
   console.error('Update failed:', error);
 });
 ```
@@ -115,7 +115,7 @@ CapacitorNativeUpdate.addListener('updateFailed', (error) => {
 Fired when the app rolls back to a previous version.
 
 ```typescript
-CapacitorNativeUpdate.addListener('rollbackOccurred', (rollback) => {
+NativeUpdate.addListener('rollbackOccurred', (rollback) => {
   console.log('Rolled back from:', rollback.failedVersion);
 });
 ```
@@ -138,7 +138,7 @@ CapacitorNativeUpdate.addListener('rollbackOccurred', (rollback) => {
 Fired when native app update state changes. Android only.
 
 ```typescript
-CapacitorNativeUpdate.addListener('appUpdateStateChanged', (state) => {
+NativeUpdate.addListener('appUpdateStateChanged', (state) => {
   console.log('App update state:', state);
 });
 ```
@@ -168,7 +168,7 @@ CapacitorNativeUpdate.addListener('appUpdateStateChanged', (state) => {
 Fired during flexible app update download. Android only.
 
 ```typescript
-CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
+NativeUpdate.addListener('appUpdateProgress', (progress) => {
   console.log('App update progress:', progress.percentComplete);
 });
 ```
@@ -189,7 +189,7 @@ CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
 Fired when an app update becomes available.
 
 ```typescript
-CapacitorNativeUpdate.addListener('appUpdateAvailable', (update) => {
+NativeUpdate.addListener('appUpdateAvailable', (update) => {
   console.log('App update available:', update.version);
 });
 ```
@@ -213,7 +213,7 @@ CapacitorNativeUpdate.addListener('appUpdateAvailable', (update) => {
 Fired when a review prompt is shown to the user.
 
 ```typescript
-CapacitorNativeUpdate.addListener('reviewPromptDisplayed', (event) => {
+NativeUpdate.addListener('reviewPromptDisplayed', (event) => {
   analytics.track('review_prompt_shown');
 });
 ```
@@ -233,7 +233,7 @@ CapacitorNativeUpdate.addListener('reviewPromptDisplayed', (event) => {
 Fired when the review prompt is dismissed.
 
 ```typescript
-CapacitorNativeUpdate.addListener('reviewPromptDismissed', (event) => {
+NativeUpdate.addListener('reviewPromptDismissed', (event) => {
   console.log('Review prompt dismissed');
 });
 ```
@@ -254,7 +254,7 @@ CapacitorNativeUpdate.addListener('reviewPromptDismissed', (event) => {
 Fired when a background update check begins.
 
 ```typescript
-CapacitorNativeUpdate.addListener('backgroundCheckStarted', (event) => {
+NativeUpdate.addListener('backgroundCheckStarted', (event) => {
   console.log('Background check started');
 });
 ```
@@ -273,7 +273,7 @@ CapacitorNativeUpdate.addListener('backgroundCheckStarted', (event) => {
 Fired when a background update check completes.
 
 ```typescript
-CapacitorNativeUpdate.addListener('backgroundCheckCompleted', (result) => {
+NativeUpdate.addListener('backgroundCheckCompleted', (result) => {
   console.log('Background check result:', result);
 });
 ```
@@ -295,7 +295,7 @@ CapacitorNativeUpdate.addListener('backgroundCheckCompleted', (result) => {
 Fired when a background download completes.
 
 ```typescript
-CapacitorNativeUpdate.addListener('backgroundDownloadCompleted', (result) => {
+NativeUpdate.addListener('backgroundDownloadCompleted', (result) => {
   console.log('Background download completed');
 });
 ```
@@ -319,7 +319,7 @@ CapacitorNativeUpdate.addListener('backgroundDownloadCompleted', (result) => {
 Generic error event for any plugin errors.
 
 ```typescript
-CapacitorNativeUpdate.addListener('error', (error) => {
+NativeUpdate.addListener('error', (error) => {
   console.error('Plugin error:', error);
   errorReporting.log(error);
 });
@@ -345,7 +345,7 @@ CapacitorNativeUpdate.addListener('error', (error) => {
 Fired for analytics tracking.
 
 ```typescript
-CapacitorNativeUpdate.addListener('analyticsEvent', (event) => {
+NativeUpdate.addListener('analyticsEvent', (event) => {
   // Forward to your analytics provider
   analytics.track(event.name, event.properties);
 });
@@ -372,9 +372,9 @@ class UpdateEventManager {
   init() {
     // Register all listeners
     this.listeners.push(
-      CapacitorNativeUpdate.addListener('updateStateChanged', this.handleStateChange),
-      CapacitorNativeUpdate.addListener('downloadProgress', this.handleProgress),
-      CapacitorNativeUpdate.addListener('error', this.handleError)
+      NativeUpdate.addListener('updateStateChanged', this.handleStateChange),
+      NativeUpdate.addListener('downloadProgress', this.handleProgress),
+      NativeUpdate.addListener('error', this.handleError)
     );
   }
   
@@ -414,10 +414,10 @@ function useUpdateState() {
   
   useEffect(() => {
     const listeners = [
-      CapacitorNativeUpdate.addListener('updateStateChanged', (event) => {
+      NativeUpdate.addListener('updateStateChanged', (event) => {
         setState(event.status);
       }),
-      CapacitorNativeUpdate.addListener('downloadProgress', (event) => {
+      NativeUpdate.addListener('downloadProgress', (event) => {
         setProgress(event.percent);
       })
     ];
@@ -435,7 +435,7 @@ function useUpdateState() {
 
 ```typescript
 // Set up analytics forwarding
-CapacitorNativeUpdate.addListener('analyticsEvent', (event) => {
+NativeUpdate.addListener('analyticsEvent', (event) => {
   switch (analyticsProvider) {
     case 'firebase':
       firebase.analytics().logEvent(event.name, event.properties);

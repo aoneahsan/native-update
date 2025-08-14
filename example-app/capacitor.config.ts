@@ -1,12 +1,12 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.nativeupdate',
+  appId: 'com.aoneahsan.nativeupdate',
   appName: 'Native Update Example',
   webDir: 'dist',
   bundledWebRuntime: false,
   plugins: {
-    CapacitorNativeUpdate: {
+    NativeUpdate: {
       serverUrl: 'https://your-update-server.com/api/v1',
       autoCheck: true,
       checkInterval: 3600, // 1 hour

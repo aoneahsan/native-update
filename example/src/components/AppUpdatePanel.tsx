@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { UpdateService } from '../services/update-service';
-import type { AppUpdateInfo } from 'capacitor-native-update';
+import type { AppUpdateInfo } from 'native-update';
 
 interface AppUpdatePanelProps {
   updateService: UpdateService;

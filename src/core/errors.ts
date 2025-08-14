@@ -32,7 +32,7 @@ export enum ErrorCode {
   NATIVE_ERROR = 'NATIVE_ERROR',
 }
 
-export class CapacitorNativeUpdateError extends Error {
+export class NativeUpdateError extends Error {
   constructor(
     public code: ErrorCode,
     public message: string,
@@ -40,8 +40,8 @@ export class CapacitorNativeUpdateError extends Error {
     public originalError?: Error
   ) {
     super(message);
-    this.name = 'CapacitorNativeUpdateError';
-    Object.setPrototypeOf(this, CapacitorNativeUpdateError.prototype);
+    this.name = 'NativeUpdateError';
+    Object.setPrototypeOf(this, NativeUpdateError.prototype);
   }
 
   toJSON() {
@@ -55,14 +55,14 @@ export class CapacitorNativeUpdateError extends Error {
   }
 }
 
-export class ConfigurationError extends CapacitorNativeUpdateError {
+export class ConfigurationError extends NativeUpdateError {
   constructor(message: string, details?: unknown) {
     super(ErrorCode.INVALID_CONFIG, message, details);
     this.name = 'ConfigurationError';
   }
 }
 
-export class DownloadError extends CapacitorNativeUpdateError {
+export class DownloadError extends NativeUpdateError {
   constructor(
     code: ErrorCode,
     message: string,
@@ -74,14 +74,14 @@ export class DownloadError extends CapacitorNativeUpdateError {
   }
 }
 
-export class ValidationError extends CapacitorNativeUpdateError {
+export class ValidationError extends NativeUpdateError {
   constructor(code: ErrorCode, message: string, details?: unknown) {
     super(code, message, details);
     this.name = 'ValidationError';
   }
 }
 
-export class StorageError extends CapacitorNativeUpdateError {
+export class StorageError extends NativeUpdateError {
   constructor(
     code: ErrorCode,
     message: string,
@@ -93,7 +93,7 @@ export class StorageError extends CapacitorNativeUpdateError {
   }
 }
 
-export class UpdateError extends CapacitorNativeUpdateError {
+export class UpdateError extends NativeUpdateError {
   constructor(
     code: ErrorCode,
     message: string,

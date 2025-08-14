@@ -1,6 +1,6 @@
 # Live Updates (OTA) Implementation Guide
 
-This comprehensive guide explains how to implement Live Updates (Over-The-Air updates) in your Capacitor application using the CapacitorNativeUpdate plugin.
+This comprehensive guide explains how to implement Live Updates (Over-The-Air updates) in your Capacitor application using the NativeUpdate plugin.
 
 ## Table of Contents
 
@@ -69,7 +69,7 @@ sequenceDiagram
 ### 1. Install the Plugin
 
 ```bash
-npm install capacitor-native-update
+npm install native-update
 npx cap sync
 ```
 
@@ -82,7 +82,7 @@ npx cap sync
   "appId": "com.example.app",
   "appName": "My App",
   "plugins": {
-    "CapacitorNativeUpdate": {
+    "NativeUpdate": {
       "updateUrl": "https://updates.yourdomain.com/api/v1",
       "enabled": true,
       "autoCheck": true,
@@ -102,9 +102,9 @@ npx cap sync
 Add to `Info.plist`:
 
 ```xml
-<key>CapacitorNativeUpdateEnabled</key>
+<key>NativeUpdateEnabled</key>
 <true/>
-<key>CapacitorNativeUpdateURL</key>
+<key>NativeUpdateURL</key>
 <string>https://updates.yourdomain.com/api/v1</string>
 ```
 
@@ -122,20 +122,20 @@ Add to `AndroidManifest.xml`:
 ### Step 1: Basic Implementation
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 export class UpdateManager {
   async checkAndUpdate() {
     try {
       // Check for updates
       const { available, version } =
-        await CapacitorNativeUpdate.checkForUpdate();
+        await NativeUpdate.checkForUpdate();
 
       if (available) {
         console.log(`Update available: ${version}`);
 
         // Download the update
-        const { success } = await CapacitorNativeUpdate.downloadUpdate({
+        const { success } = await NativeUpdate.downloadUpdate({
           onProgress: (progress) => {
             console.log(`Download progress: ${progress.percent}%`);
           },
@@ -143,7 +143,7 @@ export class UpdateManager {
 
         if (success) {
           // Apply the update
-          await CapacitorNativeUpdate.applyUpdate();
+          await NativeUpdate.applyUpdate();
           // App will restart automatically
         }
       }
@@ -157,7 +157,7 @@ export class UpdateManager {
 ### Step 2: Advanced Implementation with UI
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { AlertController, LoadingController } from '@ionic/angular';
 
 export class UpdateService {
@@ -169,7 +169,7 @@ export class UpdateService {
   async checkForUpdates(silent = false) {
     try {
       const { available, version, mandatory, notes } =
-        await CapacitorNativeUpdate.checkForUpdate();
+        await NativeUpdate.checkForUpdate();
 
       if (!available) {
         if (!silent) {
@@ -220,7 +220,7 @@ export class UpdateService {
 
     try {
       // Download with progress
-      await CapacitorNativeUpdate.downloadUpdate({
+      await NativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           loading.message = `Downloading... ${Math.round(progress.percent)}%`;
         },
@@ -229,7 +229,7 @@ export class UpdateService {
       loading.message = 'Applying update...';
 
       // Apply the update
-      await CapacitorNativeUpdate.applyUpdate();
+      await NativeUpdate.applyUpdate();
 
       // The app will restart automatically
     } catch (error) {
@@ -291,19 +291,19 @@ export class AppComponent implements OnInit {
 export class UpdateStrategies {
   // Immediate update (default)
   async immediateUpdate() {
-    const { available } = await CapacitorNativeUpdate.checkForUpdate();
+    const { available } = await NativeUpdate.checkForUpdate();
     if (available) {
-      await CapacitorNativeUpdate.downloadUpdate();
-      await CapacitorNativeUpdate.applyUpdate(); // Restarts immediately
+      await NativeUpdate.downloadUpdate();
+      await NativeUpdate.applyUpdate(); // Restarts immediately
     }
   }
 
   // Update on next restart
   async updateOnRestart() {
-    const { available } = await CapacitorNativeUpdate.checkForUpdate();
+    const { available } = await NativeUpdate.checkForUpdate();
     if (available) {
-      await CapacitorNativeUpdate.downloadUpdate();
-      await CapacitorNativeUpdate.applyUpdate({
+      await NativeUpdate.downloadUpdate();
+      await NativeUpdate.applyUpdate({
         reloadStrategy: 'on-next-restart',
       });
       // Update will be applied next time app starts
@@ -312,14 +312,14 @@ export class UpdateStrategies {
 
   // Update with confirmation
   async updateWithConfirmation() {
-    const { available } = await CapacitorNativeUpdate.checkForUpdate();
+    const { available } = await NativeUpdate.checkForUpdate();
     if (available) {
-      await CapacitorNativeUpdate.downloadUpdate();
+      await NativeUpdate.downloadUpdate();
 
       // Show confirmation dialog
       const confirmed = await this.showUpdateReadyDialog();
       if (confirmed) {
-        await CapacitorNativeUpdate.applyUpdate();
+        await NativeUpdate.applyUpdate();
       }
     }
   }
@@ -417,20 +417,20 @@ curl -X POST https://updates.example.com/api/v1/bundles \
 
 ```typescript
 // Development channel for testing
-await CapacitorNativeUpdate.setChannel({ channel: 'development' });
+await NativeUpdate.setChannel({ channel: 'development' });
 
 // Production channel for users
-await CapacitorNativeUpdate.setChannel({ channel: 'production' });
+await NativeUpdate.setChannel({ channel: 'production' });
 
 // Beta channel for early adopters
-await CapacitorNativeUpdate.setChannel({ channel: 'beta' });
+await NativeUpdate.setChannel({ channel: 'beta' });
 ```
 
 ### 2. Delta Updates
 
 ```typescript
 // Enable delta updates to reduce download size
-await CapacitorNativeUpdate.configureDeltaUpdates({
+await NativeUpdate.configureDeltaUpdates({
   enabled: true,
   threshold: 0.3, // Use delta if size < 30% of full bundle
 });
@@ -440,15 +440,15 @@ await CapacitorNativeUpdate.configureDeltaUpdates({
 
 ```typescript
 // List available versions
-const { versions } = await CapacitorNativeUpdate.getVersions();
+const { versions } = await NativeUpdate.getVersions();
 
 // Rollback to previous version
 if (versions.length > 1) {
-  await CapacitorNativeUpdate.rollback();
+  await NativeUpdate.rollback();
 }
 
 // Rollback to specific version
-await CapacitorNativeUpdate.switchVersion({
+await NativeUpdate.switchVersion({
   version: '1.0.0',
 });
 ```
@@ -457,13 +457,13 @@ await CapacitorNativeUpdate.switchVersion({
 
 ```typescript
 // Track update success
-await CapacitorNativeUpdate.reportUpdateSuccess({
+await NativeUpdate.reportUpdateSuccess({
   version: '1.0.1',
   duration: 5000,
 });
 
 // Track update failure
-await CapacitorNativeUpdate.reportUpdateFailure({
+await NativeUpdate.reportUpdateFailure({
   version: '1.0.1',
   error: 'DOWNLOAD_FAILED',
   details: 'Network timeout',
@@ -474,7 +474,7 @@ await CapacitorNativeUpdate.reportUpdateFailure({
 
 ```typescript
 // Disable auto-check
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   autoCheck: false,
 });
 
@@ -482,7 +482,7 @@ await CapacitorNativeUpdate.configure({
 class CustomUpdateUI {
   async showUpdateFlow() {
     // Custom check
-    const update = await CapacitorNativeUpdate.checkForUpdate();
+    const update = await NativeUpdate.checkForUpdate();
 
     if (update.available) {
       // Show custom UI
@@ -519,7 +519,7 @@ const skipVersions = ['1.0.2', '1.0.3']; // Known bad versions
 class RobustUpdateManager {
   async safeUpdate() {
     try {
-      await CapacitorNativeUpdate.checkForUpdate();
+      await NativeUpdate.checkForUpdate();
     } catch (error) {
       if (error.code === 'NETWORK_ERROR') {
         // Retry with exponential backoff
@@ -542,7 +542,7 @@ class RobustUpdateManager {
 // Test in development
 if (environment.development) {
   // Force check against staging server
-  await CapacitorNativeUpdate.configure({
+  await NativeUpdate.configure({
     updateUrl: 'https://staging-updates.yourdomain.com',
     channel: 'development',
   });
@@ -550,7 +550,7 @@ if (environment.development) {
 
 // A/B testing
 const testGroup = user.id % 2 === 0 ? 'A' : 'B';
-await CapacitorNativeUpdate.setChannel({
+await NativeUpdate.setChannel({
   channel: `production-${testGroup}`,
 });
 ```
@@ -561,15 +561,15 @@ await CapacitorNativeUpdate.setChannel({
 // Download during off-peak hours
 const now = new Date().getHours();
 if (now >= 2 && now <= 6) {
-  await CapacitorNativeUpdate.downloadUpdate({
+  await NativeUpdate.downloadUpdate({
     priority: 'low',
   });
 }
 
 // Pause/resume downloads
-const downloadId = await CapacitorNativeUpdate.startDownload();
-await CapacitorNativeUpdate.pauseDownload({ id: downloadId });
-await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
+const downloadId = await NativeUpdate.startDownload();
+await NativeUpdate.pauseDownload({ id: downloadId });
+await NativeUpdate.resumeDownload({ id: downloadId });
 ```
 
 ## Troubleshooting
@@ -580,10 +580,10 @@ await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
 
    ```typescript
    // Check if update was downloaded
-   const { ready } = await CapacitorNativeUpdate.isUpdateReady();
+   const { ready } = await NativeUpdate.isUpdateReady();
    if (ready) {
      // Force apply
-     await CapacitorNativeUpdate.applyUpdate({ force: true });
+     await NativeUpdate.applyUpdate({ force: true });
    }
    ```
 
@@ -591,14 +591,14 @@ await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
 
    ```typescript
    // Verify public key configuration
-   const config = await CapacitorNativeUpdate.getConfiguration();
+   const config = await NativeUpdate.getConfiguration();
    console.log('Public key:', config.publicKey);
    ```
 
 3. **Storage issues**
    ```typescript
    // Clear old versions
-   await CapacitorNativeUpdate.cleanup({
+   await NativeUpdate.cleanup({
      keepVersions: 1,
    });
    ```
@@ -607,14 +607,14 @@ await CapacitorNativeUpdate.resumeDownload({ id: downloadId });
 
 ```typescript
 // Enable debug logging
-await CapacitorNativeUpdate.setDebugMode({ enabled: true });
+await NativeUpdate.setDebugMode({ enabled: true });
 
 // Monitor update events
-CapacitorNativeUpdate.addListener('updateDownloadProgress', (progress) => {
+NativeUpdate.addListener('updateDownloadProgress', (progress) => {
   console.log('Download progress:', progress);
 });
 
-CapacitorNativeUpdate.addListener('updateStateChange', (state) => {
+NativeUpdate.addListener('updateStateChange', (state) => {
   console.log('Update state:', state);
 });
 ```
@@ -623,7 +623,7 @@ CapacitorNativeUpdate.addListener('updateStateChange', (state) => {
 
 ```typescript
 // Verify update system health
-const health = await CapacitorNativeUpdate.getHealth();
+const health = await NativeUpdate.getHealth();
 console.log('Update system health:', {
   enabled: health.enabled,
   lastCheck: health.lastCheck,

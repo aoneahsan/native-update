@@ -10,7 +10,7 @@ Get up and running with Capacitor Native Update in 5 minutes! This guide covers 
 
 ```bash
 # Install the plugin
-npm install capacitor-native-update
+npm install native-update
 
 # Sync with native projects
 npx cap sync
@@ -27,7 +27,7 @@ npx cap sync
   "appId": "com.example.app",
   "appName": "MyApp",
   "plugins": {
-    "CapacitorNativeUpdate": {
+    "NativeUpdate": {
       "updateUrl": "https://updates.example.com/api/v1",
       "autoCheck": true,
       "appStoreId": "123456789"
@@ -39,7 +39,7 @@ npx cap sync
 ### 2. Import and Initialize
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 // Initialize on app start
 export class App {
@@ -65,14 +65,14 @@ Push updates without app store review!
 ### Basic Implementation
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 export class LiveUpdateService {
   async checkAndApplyUpdates() {
     try {
       // 1. Check for updates
       const { available, version } =
-        await CapacitorNativeUpdate.checkForUpdate();
+        await NativeUpdate.checkForUpdate();
 
       if (!available) {
         console.log('No updates available');
@@ -82,14 +82,14 @@ export class LiveUpdateService {
       console.log(`Update ${version} available!`);
 
       // 2. Download the update
-      await CapacitorNativeUpdate.downloadUpdate({
+      await NativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           console.log(`Download: ${progress.percent}%`);
         },
       });
 
       // 3. Apply the update (app will restart)
-      await CapacitorNativeUpdate.applyUpdate();
+      await NativeUpdate.applyUpdate();
     } catch (error) {
       console.error('Update failed:', error);
     }
@@ -108,7 +108,7 @@ export class UpdateUIService {
 
   async checkForUpdatesWithUI() {
     const { available, version, notes } =
-      await CapacitorNativeUpdate.checkForUpdate();
+      await NativeUpdate.checkForUpdate();
 
     if (!available) return;
 
@@ -135,14 +135,14 @@ export class UpdateUIService {
     await loading.present();
 
     try {
-      await CapacitorNativeUpdate.downloadUpdate({
+      await NativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           loading.message = `Downloading: ${Math.round(progress.percent)}%`;
         },
       });
 
       loading.message = 'Installing...';
-      await CapacitorNativeUpdate.applyUpdate();
+      await NativeUpdate.applyUpdate();
     } catch (error) {
       await loading.dismiss();
       // Show error
@@ -179,7 +179,7 @@ Check for app store updates and install them!
 export class NativeUpdateService {
   async checkForAppStoreUpdates() {
     try {
-      const result = await CapacitorNativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.checkAppUpdate();
 
       if (!result.updateAvailable) {
         console.log('App is up to date');
@@ -200,10 +200,10 @@ export class NativeUpdateService {
   private async handleAndroidUpdate(result: any) {
     if (result.immediateUpdateAllowed) {
       // Critical update - must install
-      await CapacitorNativeUpdate.startImmediateUpdate();
+      await NativeUpdate.startImmediateUpdate();
     } else {
       // Optional update - download in background
-      await CapacitorNativeUpdate.startFlexibleUpdate();
+      await NativeUpdate.startFlexibleUpdate();
     }
   }
 
@@ -216,7 +216,7 @@ export class NativeUpdateService {
         { text: 'Later', role: 'cancel' },
         {
           text: 'Update',
-          handler: () => CapacitorNativeUpdate.openAppStore(),
+          handler: () => NativeUpdate.openAppStore(),
         },
       ],
     });
@@ -233,10 +233,10 @@ export class AndroidUpdateProgress {
 
   async startFlexibleUpdate() {
     // Start download
-    await CapacitorNativeUpdate.startFlexibleUpdate();
+    await NativeUpdate.startFlexibleUpdate();
 
     // Track progress
-    CapacitorNativeUpdate.addListener(
+    NativeUpdate.addListener(
       'onAppUpdateDownloadProgress',
       (progress) => {
         this.downloadProgress = Math.round(
@@ -246,7 +246,7 @@ export class AndroidUpdateProgress {
     );
 
     // Handle completion
-    CapacitorNativeUpdate.addListener('onAppUpdateDownloaded', async () => {
+    NativeUpdate.addListener('onAppUpdateDownloaded', async () => {
       const alert = await this.alertController.create({
         header: 'Update Ready',
         message: 'Update has been downloaded. Install now?',
@@ -254,7 +254,7 @@ export class AndroidUpdateProgress {
           { text: 'Later' },
           {
             text: 'Install',
-            handler: () => CapacitorNativeUpdate.completeFlexibleUpdate(),
+            handler: () => NativeUpdate.completeFlexibleUpdate(),
           },
         ],
       });
@@ -274,7 +274,7 @@ Request ratings without users leaving your app!
 export class AppReviewService {
   async requestReview() {
     try {
-      const result = await CapacitorNativeUpdate.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       if (result.displayed) {
         console.log('Review prompt shown');
@@ -307,7 +307,7 @@ export class SmartReviewService {
     const enjoying = await this.askIfEnjoying();
 
     if (enjoying) {
-      await CapacitorNativeUpdate.requestReview();
+      await NativeUpdate.requestReview();
     } else {
       await this.askForFeedback();
     }
@@ -388,7 +388,7 @@ Here's everything working together:
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { Capacitor } from '@capacitor/core';
 
 @Component({
@@ -422,11 +422,11 @@ export class AppComponent implements OnInit {
   // Live Updates
   private async checkLiveUpdates() {
     try {
-      const { available } = await CapacitorNativeUpdate.checkForUpdate();
+      const { available } = await NativeUpdate.checkForUpdate();
 
       if (available) {
         // Auto-download in background
-        await CapacitorNativeUpdate.downloadUpdate();
+        await NativeUpdate.downloadUpdate();
 
         // Notify user
         const toast = await this.toastCtrl.create({
@@ -435,7 +435,7 @@ export class AppComponent implements OnInit {
           buttons: [
             {
               text: 'Restart',
-              handler: () => CapacitorNativeUpdate.applyUpdate(),
+              handler: () => NativeUpdate.applyUpdate(),
             },
           ],
         });
@@ -462,12 +462,12 @@ export class AppComponent implements OnInit {
 
   private async checkNativeUpdates() {
     try {
-      const result = await CapacitorNativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.checkAppUpdate();
 
       if (result.updateAvailable && result.flexibleUpdateAllowed) {
         // Start background download for Android
         if (Capacitor.getPlatform() === 'android') {
-          await CapacitorNativeUpdate.startFlexibleUpdate();
+          await NativeUpdate.startFlexibleUpdate();
         }
       }
     } catch (error) {
@@ -492,7 +492,7 @@ export class AppComponent implements OnInit {
     const canAsk = await this.canAskForReview();
 
     if (canAsk) {
-      await CapacitorNativeUpdate.requestReview();
+      await NativeUpdate.requestReview();
       await this.markReviewRequested();
     }
   }
@@ -545,10 +545,10 @@ curl -X POST http://localhost:3000/api/v1/bundles \
 
 ```typescript
 // Enable debug mode
-await CapacitorNativeUpdate.setReviewDebugMode({ enabled: true });
+await NativeUpdate.setReviewDebugMode({ enabled: true });
 
 // Force show review (debug only)
-await CapacitorNativeUpdate.requestReview({ force: true });
+await NativeUpdate.requestReview({ force: true });
 ```
 
 ## What's Next?
@@ -578,10 +578,10 @@ Now that you have the basics working:
 
 ```typescript
 // Enable debug logging
-await CapacitorNativeUpdate.setDebugMode({ enabled: true });
+await NativeUpdate.setDebugMode({ enabled: true });
 
 // Check configuration
-const config = await CapacitorNativeUpdate.getConfiguration();
+const config = await NativeUpdate.getConfiguration();
 console.log('Update URL:', config.updateUrl);
 ```
 
@@ -599,8 +599,8 @@ console.log('Update URL:', config.updateUrl);
 
 ## Support
 
-- 📖 [Documentation](https://github.com/aoneahsan/capacitor-native-update)
-- 🐛 [Issue Tracker](https://github.com/aoneahsan/capacitor-native-update/issues)
-- 💬 [Discussions](https://github.com/aoneahsan/capacitor-native-update/discussions)
+- 📖 [Documentation](https://github.com/aoneahsan/native-update)
+- 🐛 [Issue Tracker](https://github.com/aoneahsan/native-update/issues)
+- 💬 [Discussions](https://github.com/aoneahsan/native-update/discussions)
 
 Happy updating! 🚀

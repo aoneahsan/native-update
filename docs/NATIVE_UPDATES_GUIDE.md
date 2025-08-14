@@ -1,6 +1,6 @@
 # Native App Updates Implementation Guide
 
-This comprehensive guide explains how to implement Native App Updates (App Store and Google Play updates) in your Capacitor application using the CapacitorNativeUpdate plugin.
+This comprehensive guide explains how to implement Native App Updates (App Store and Google Play updates) in your Capacitor application using the NativeUpdate plugin.
 
 ## Table of Contents
 
@@ -61,7 +61,7 @@ Native App Updates allow your app to:
 ### Installation
 
 ```bash
-npm install capacitor-native-update
+npm install native-update
 npx cap sync
 ```
 
@@ -103,7 +103,7 @@ dependencies {
 ### Step 1: Basic Implementation
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { Capacitor } from '@capacitor/core';
 
 export class NativeUpdateService {
@@ -113,7 +113,7 @@ export class NativeUpdateService {
       const platform = Capacitor.getPlatform();
 
       // Check for native app updates
-      const result = await CapacitorNativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.checkAppUpdate();
 
       if (result.updateAvailable) {
         console.log(`Update available: ${result.availableVersion}`);
@@ -144,7 +144,7 @@ export class AndroidImmediateUpdate {
   async performImmediateUpdate() {
     try {
       // Start immediate update
-      const { started } = await CapacitorNativeUpdate.startImmediateUpdate();
+      const { started } = await NativeUpdate.startImmediateUpdate();
 
       if (started) {
         // The app will be restarted automatically after update
@@ -187,10 +187,10 @@ export class AndroidFlexibleUpdate {
   async performFlexibleUpdate() {
     try {
       // Start flexible update
-      await CapacitorNativeUpdate.startFlexibleUpdate();
+      await NativeUpdate.startFlexibleUpdate();
 
       // Listen for download progress
-      CapacitorNativeUpdate.addListener(
+      NativeUpdate.addListener(
         'onAppUpdateDownloadProgress',
         (progress) => {
           console.log(
@@ -201,7 +201,7 @@ export class AndroidFlexibleUpdate {
       );
 
       // Listen for download completion
-      CapacitorNativeUpdate.addListener('onAppUpdateDownloaded', () => {
+      NativeUpdate.addListener('onAppUpdateDownloaded', () => {
         console.log('Update downloaded');
         this.updateDownloaded = true;
         this.showInstallPrompt();
@@ -237,7 +237,7 @@ export class AndroidFlexibleUpdate {
 
   async completeFlexibleUpdate() {
     try {
-      await CapacitorNativeUpdate.completeFlexibleUpdate();
+      await NativeUpdate.completeFlexibleUpdate();
       // App will restart with new version
     } catch (error) {
       console.error('Failed to complete update:', error);
@@ -261,7 +261,7 @@ export class AndroidFlexibleUpdate {
 export class iOSAppStoreUpdate {
   async checkAndPromptUpdate() {
     try {
-      const result = await CapacitorNativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.checkAppUpdate();
 
       if (result.updateAvailable) {
         await this.showiOSUpdateDialog(result);
@@ -293,7 +293,7 @@ export class iOSAppStoreUpdate {
 
   async openAppStore() {
     try {
-      await CapacitorNativeUpdate.openAppStore();
+      await NativeUpdate.openAppStore();
     } catch (error) {
       // Fallback to browser
       const appStoreUrl = `https://apps.apple.com/app/id${YOUR_APP_STORE_ID}`;
@@ -307,14 +307,14 @@ export class iOSAppStoreUpdate {
 
 ```typescript
 import { Capacitor } from '@capacitor/core';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 export class UnifiedUpdateService {
   private platform = Capacitor.getPlatform();
 
   async checkAndUpdateApp() {
     try {
-      const updateInfo = await CapacitorNativeUpdate.checkAppUpdate();
+      const updateInfo = await NativeUpdate.checkAppUpdate();
 
       if (!updateInfo.updateAvailable) {
         console.log('App is up to date');
@@ -361,7 +361,7 @@ export class UnifiedUpdateService {
       title: 'Update Available',
       message: `Version ${updateInfo.availableVersion} is available on the App Store.`,
       mandatory: false,
-      action: () => CapacitorNativeUpdate.openAppStore(),
+      action: () => NativeUpdate.openAppStore(),
     });
   }
 
@@ -411,7 +411,7 @@ export class UpdateStatusManager {
 
   private setupUpdateListeners() {
     // Installation status
-    CapacitorNativeUpdate.addListener('onAppUpdateInstallStatus', (status) => {
+    NativeUpdate.addListener('onAppUpdateInstallStatus', (status) => {
       switch (status.status) {
         case 'PENDING':
           console.log('Update pending');
@@ -437,7 +437,7 @@ export class UpdateStatusManager {
     });
 
     // Download progress (Android flexible updates)
-    CapacitorNativeUpdate.addListener(
+    NativeUpdate.addListener(
       'onAppUpdateDownloadProgress',
       (progress) => {
         const percent = Math.round(
@@ -534,7 +534,7 @@ export class UpdateUIService {
 ```typescript
 export class SmartUpdateScheduler {
   async scheduleUpdate() {
-    const updateInfo = await CapacitorNativeUpdate.checkAppUpdate();
+    const updateInfo = await NativeUpdate.checkAppUpdate();
 
     if (!updateInfo.updateAvailable) return;
 
@@ -573,7 +573,7 @@ export class SmartUpdateScheduler {
 
 ```typescript
 // Enable internal app sharing for testing
-await CapacitorNativeUpdate.enableDebugMode({
+await NativeUpdate.enableDebugMode({
   enabled: true,
   testMode: 'internal-test',
 });
@@ -583,13 +583,13 @@ await CapacitorNativeUpdate.enableDebugMode({
 
 ```typescript
 // Test immediate update
-await CapacitorNativeUpdate.simulateUpdate({
+await NativeUpdate.simulateUpdate({
   type: 'immediate',
   version: '2.0.0',
 });
 
 // Test flexible update
-await CapacitorNativeUpdate.simulateUpdate({
+await NativeUpdate.simulateUpdate({
   type: 'flexible',
   version: '1.1.0',
 });
@@ -626,7 +626,7 @@ await CapacitorNativeUpdate.simulateUpdate({
 
 ```typescript
 // Debug update detection
-const debug = await CapacitorNativeUpdate.getDebugInfo();
+const debug = await NativeUpdate.getDebugInfo();
 console.log('Debug info:', {
   currentVersion: debug.currentVersion,
   packageName: debug.packageName,
@@ -639,11 +639,11 @@ console.log('Debug info:', {
 
 ```typescript
 // Check update state
-const state = await CapacitorNativeUpdate.getUpdateState();
+const state = await NativeUpdate.getUpdateState();
 if (state.status === 'FAILED') {
   // Clear update data and retry
-  await CapacitorNativeUpdate.clearUpdateData();
-  await CapacitorNativeUpdate.checkAppUpdate();
+  await NativeUpdate.clearUpdateData();
+  await NativeUpdate.checkAppUpdate();
 }
 ```
 
@@ -651,7 +651,7 @@ if (state.status === 'FAILED') {
 
 ```typescript
 // Verify App Store ID configuration
-const config = await CapacitorNativeUpdate.getConfiguration();
+const config = await NativeUpdate.getConfiguration();
 console.log('App Store ID:', config.appStoreId);
 
 // Manual fallback

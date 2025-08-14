@@ -3,7 +3,7 @@
 
 // Define the plugin using the CAP_PLUGIN Macro, and
 // each method the plugin supports using the CAP_PLUGIN_METHOD macro.
-CAP_PLUGIN(NativeUpdatePlugin, "CapacitorNativeUpdate",
+CAP_PLUGIN(NativeUpdatePlugin, "NativeUpdate",
     CAP_PLUGIN_METHOD(configure, CAPPluginReturnPromise);
     CAP_PLUGIN_METHOD(getSecurityInfo, CAPPluginReturnPromise);
     

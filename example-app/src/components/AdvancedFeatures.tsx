@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { useUpdateContext } from '../context/UpdateContext';
 
 export default function AdvancedFeatures() {
@@ -12,7 +12,7 @@ export default function AdvancedFeatures() {
 
   const updateConfiguration = async () => {
     try {
-      await CapacitorNativeUpdate.configure({
+      await NativeUpdate.configure({
         serverUrl: updateUrl,
         autoCheck: autoCheckEnabled,
         maxRetries: maxRetries,
@@ -27,7 +27,7 @@ export default function AdvancedFeatures() {
 
   const setUpdateServerUrl = async () => {
     try {
-      await CapacitorNativeUpdate.setUpdateUrl(updateUrl);
+      await NativeUpdate.setUpdateUrl(updateUrl);
       addLog('success', `Update URL set to: ${updateUrl}`);
     } catch (error) {
       addLog('error', `Failed to set update URL: ${error.message}`);
@@ -36,7 +36,7 @@ export default function AdvancedFeatures() {
 
   const cleanupOldBundles = async () => {
     try {
-      await CapacitorNativeUpdate.deleteBundle({ keepVersions: keepVersions });
+      await NativeUpdate.deleteBundle({ keepVersions: keepVersions });
       addLog('success', `Cleaned up old bundles, keeping ${keepVersions} versions`);
     } catch (error) {
       addLog('error', `Failed to cleanup bundles: ${error.message}`);
@@ -45,9 +45,9 @@ export default function AdvancedFeatures() {
 
   const validateBundle = async () => {
     try {
-      const current = await CapacitorNativeUpdate.getCurrentBundle();
+      const current = await NativeUpdate.getCurrentBundle();
       if (current.path) {
-        const result = await CapacitorNativeUpdate.validateUpdate({
+        const result = await NativeUpdate.validateUpdate({
           bundlePath: current.path,
           checksum: current.checksum || ''
         });
@@ -65,7 +65,7 @@ export default function AdvancedFeatures() {
 
   const pauseAutoUpdates = async () => {
     try {
-      await CapacitorNativeUpdate.pauseAutoUpdates();
+      await NativeUpdate.pauseAutoUpdates();
       addLog('info', 'Auto updates paused');
     } catch (error) {
       addLog('error', `Failed to pause auto updates: ${error.message}`);
@@ -74,7 +74,7 @@ export default function AdvancedFeatures() {
 
   const resumeAutoUpdates = async () => {
     try {
-      await CapacitorNativeUpdate.resumeAutoUpdates();
+      await NativeUpdate.resumeAutoUpdates();
       addLog('info', 'Auto updates resumed');
     } catch (error) {
       addLog('error', `Failed to resume auto updates: ${error.message}`);
@@ -83,7 +83,7 @@ export default function AdvancedFeatures() {
 
   const scheduleBackgroundCheck = async () => {
     try {
-      await CapacitorNativeUpdate.scheduleBackgroundCheck({
+      await NativeUpdate.scheduleBackgroundCheck({
         interval: 3600 // 1 hour
       });
       addLog('success', 'Background check scheduled for every hour');
@@ -94,7 +94,7 @@ export default function AdvancedFeatures() {
 
   const cancelBackgroundCheck = async () => {
     try {
-      await CapacitorNativeUpdate.cancelBackgroundCheck();
+      await NativeUpdate.cancelBackgroundCheck();
       addLog('info', 'Background check cancelled');
     } catch (error) {
       addLog('error', `Failed to cancel background check: ${error.message}`);
@@ -121,7 +121,7 @@ export default function AdvancedFeatures() {
     try {
       addLog('warning', 'Testing crash recovery...');
       // This would simulate a crash in a real scenario
-      await CapacitorNativeUpdate.testCrashRecovery();
+      await NativeUpdate.testCrashRecovery();
       addLog('success', 'Crash recovery test completed');
     } catch (error) {
       addLog('error', `Crash recovery test failed: ${error.message}`);

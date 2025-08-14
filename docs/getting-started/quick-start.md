@@ -19,11 +19,11 @@ Get up and running with Capacitor Native Update in just a few minutes! This guid
 ### 1. Import and Configure
 
 ```typescript
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 
 // Initialize the plugin with your configuration
 async function initializeUpdates() {
-  await CapacitorNativeUpdate.configure({
+  await NativeUpdate.configure({
     liveUpdate: {
       appId: 'com.yourcompany.app',
       serverUrl: 'https://updates.yourserver.com',
@@ -54,7 +54,7 @@ initializeUpdates();
 // Sync with server and apply updates if available
 async function syncUpdates() {
   try {
-    const result = await CapacitorNativeUpdate.LiveUpdate.sync();
+    const result = await NativeUpdate.LiveUpdate.sync();
 
     if (result.status === 'UPDATE_INSTALLED') {
       console.log('Update installed:', result.bundle.version);
@@ -73,8 +73,8 @@ async function syncUpdates() {
 ```typescript
 // Check for updates without downloading
 async function checkForUpdates() {
-  const latest = await CapacitorNativeUpdate.LiveUpdate.getLatest();
-  const current = await CapacitorNativeUpdate.LiveUpdate.current();
+  const latest = await NativeUpdate.LiveUpdate.getLatest();
+  const current = await NativeUpdate.LiveUpdate.current();
 
   if (latest.version !== current.version) {
     console.log(`Update available: ${latest.version}`);
@@ -87,15 +87,15 @@ async function checkForUpdates() {
 async function downloadAndInstallUpdate() {
   try {
     // Download the latest version
-    const bundle = await CapacitorNativeUpdate.LiveUpdate.download({
+    const bundle = await NativeUpdate.LiveUpdate.download({
       version: 'latest',
     });
 
     // Set it as active
-    await CapacitorNativeUpdate.LiveUpdate.set(bundle);
+    await NativeUpdate.LiveUpdate.set(bundle);
 
     // Reload the app to apply
-    await CapacitorNativeUpdate.LiveUpdate.reload();
+    await NativeUpdate.LiveUpdate.reload();
   } catch (error) {
     console.error('Update failed:', error);
   }
@@ -106,7 +106,7 @@ async function downloadAndInstallUpdate() {
 
 ```typescript
 // Add download progress listener
-const progressListener = await CapacitorNativeUpdate.LiveUpdate.addListener(
+const progressListener = await NativeUpdate.LiveUpdate.addListener(
   'downloadProgress',
   (progress) => {
     console.log(`Download: ${progress.percent}% complete`);
@@ -125,14 +125,14 @@ const progressListener = await CapacitorNativeUpdate.LiveUpdate.addListener(
 ```typescript
 async function checkAppStoreUpdate() {
   try {
-    const updateInfo = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+    const updateInfo = await NativeUpdate.AppUpdate.getAppUpdateInfo();
 
     if (updateInfo.updateAvailable) {
       console.log(`New version available: ${updateInfo.availableVersion}`);
 
       if (updateInfo.updatePriority >= 4) {
         // High priority - immediate update
-        await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
+        await NativeUpdate.AppUpdate.performImmediateUpdate();
       } else {
         // Optional update
         showUpdateDialog(updateInfo);
@@ -146,7 +146,7 @@ async function checkAppStoreUpdate() {
 function showUpdateDialog(updateInfo) {
   // Show your custom update UI
   if (userAcceptsUpdate) {
-    CapacitorNativeUpdate.AppUpdate.openAppStore();
+    NativeUpdate.AppUpdate.openAppStore();
   }
 }
 ```
@@ -156,10 +156,10 @@ function showUpdateDialog(updateInfo) {
 ```typescript
 // Start downloading in background
 async function startFlexibleUpdate() {
-  await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
+  await NativeUpdate.AppUpdate.startFlexibleUpdate();
 
   // Listen for download completion
-  const listener = await CapacitorNativeUpdate.AppUpdate.addListener(
+  const listener = await NativeUpdate.AppUpdate.addListener(
     'flexibleUpdateStateChanged',
     (state) => {
       if (state.status === 'DOWNLOADED') {
@@ -172,7 +172,7 @@ async function startFlexibleUpdate() {
 
 // Complete the update
 async function completeUpdate() {
-  await CapacitorNativeUpdate.AppUpdate.completeFlexibleUpdate();
+  await NativeUpdate.AppUpdate.completeFlexibleUpdate();
   // App will restart with new version
 }
 ```
@@ -185,11 +185,11 @@ async function completeUpdate() {
 async function requestReviewIfAppropriate() {
   try {
     // Check if we can request a review
-    const canRequest = await CapacitorNativeUpdate.AppReview.canRequestReview();
+    const canRequest = await NativeUpdate.AppReview.canRequestReview();
 
     if (canRequest.allowed) {
       // Request the review
-      const result = await CapacitorNativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.AppReview.requestReview();
 
       if (result.shown) {
         console.log('Review dialog was shown');
@@ -214,12 +214,12 @@ requestReviewIfAppropriate();
 ```typescript
 // In your main app component
 import { App } from '@capacitor/app';
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 
 App.addListener('appStateChange', async ({ isActive }) => {
   if (isActive) {
     // Check for updates when app becomes active
-    await CapacitorNativeUpdate.LiveUpdate.sync({
+    await NativeUpdate.LiveUpdate.sync({
       installMode: 'ON_NEXT_RESUME',
     });
   }
@@ -232,7 +232,7 @@ App.addListener('appStateChange', async ({ isActive }) => {
 class UpdateManager {
   async initialize() {
     // Configure plugin
-    await CapacitorNativeUpdate.configure({
+    await NativeUpdate.configure({
       liveUpdate: {
         appId: 'your-app-id',
         serverUrl: 'https://your-server.com',
@@ -249,7 +249,7 @@ class UpdateManager {
 
   setupListeners() {
     // Listen for update state changes
-    CapacitorNativeUpdate.LiveUpdate.addListener(
+    NativeUpdate.LiveUpdate.addListener(
       'updateStateChanged',
       (event) => {
         console.log('Update state:', event.status);
@@ -260,7 +260,7 @@ class UpdateManager {
 
   async checkForUpdates() {
     try {
-      const result = await CapacitorNativeUpdate.LiveUpdate.sync();
+      const result = await NativeUpdate.LiveUpdate.sync();
 
       if (result.status === 'UPDATE_INSTALLED') {
         // Notify user about update
@@ -290,13 +290,13 @@ class UpdateManager {
 ### Error Handling Best Practices
 
 ```typescript
-import { CapacitorNativeUpdateError } from 'capacitor-native-update';
+import { NativeUpdateError } from 'native-update';
 
 async function safeUpdateCheck() {
   try {
-    await CapacitorNativeUpdate.LiveUpdate.sync();
+    await NativeUpdate.LiveUpdate.sync();
   } catch (error) {
-    if (error instanceof CapacitorNativeUpdateError) {
+    if (error instanceof NativeUpdateError) {
       switch (error.code) {
         case 'NETWORK_ERROR':
           // Handle network issues
@@ -325,13 +325,13 @@ async function safeUpdateCheck() {
 1. **Use staging channel for testing**:
 
    ```typescript
-   await CapacitorNativeUpdate.LiveUpdate.setChannel('staging');
+   await NativeUpdate.LiveUpdate.setChannel('staging');
    ```
 
 2. **Enable debug mode for app reviews**:
 
    ```typescript
-   await CapacitorNativeUpdate.configure({
+   await NativeUpdate.configure({
      appReview: {
        debugMode: true, // Bypass time restrictions
      },
@@ -341,7 +341,7 @@ async function safeUpdateCheck() {
 3. **Force update check**:
    ```typescript
    // Clear cache and check
-   await CapacitorNativeUpdate.LiveUpdate.sync({
+   await NativeUpdate.LiveUpdate.sync({
      forceCheck: true,
    });
    ```

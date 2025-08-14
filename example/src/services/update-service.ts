@@ -1,4 +1,4 @@
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 import type {
   UpdateConfig,
   SyncResult,
@@ -7,7 +7,7 @@ import type {
   LatestVersion,
   DownloadProgressEvent,
   UpdateStateChangedEvent,
-} from 'capacitor-native-update';
+} from 'native-update';
 
 export class UpdateService {
   private static instance: UpdateService;

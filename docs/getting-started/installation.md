@@ -110,10 +110,10 @@ No additional setup is required for web platform. The plugin provides fallback i
 In your app's initialization code (e.g., `main.ts`, `app.component.ts`, or `App.jsx`):
 
 ```typescript
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 
 // Basic initialization
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'your-app-id',
     serverUrl: 'https://your-update-server.com',
@@ -141,11 +141,11 @@ To verify the installation:
 
    ```typescript
    // Get current bundle info
-   const currentBundle = await CapacitorNativeUpdate.LiveUpdate.current();
+   const currentBundle = await NativeUpdate.LiveUpdate.current();
    console.log('Current bundle:', currentBundle);
 
    // Check for updates
-   const latest = await CapacitorNativeUpdate.LiveUpdate.getLatest();
+   const latest = await NativeUpdate.LiveUpdate.getLatest();
    console.log('Latest version available:', latest);
    ```
 

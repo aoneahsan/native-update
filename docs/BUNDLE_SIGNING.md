@@ -78,7 +78,7 @@ Signatures are:
 // capacitor.config.json
 {
   "plugins": {
-    "CapacitorNativeUpdate": {
+    "NativeUpdate": {
       "publicKey": "base64-encoded-public-key",
       "enforceSignature": true
     }
@@ -90,9 +90,9 @@ Signatures are:
 
 ```swift
 // Info.plist
-<key>CapacitorNativeUpdatePublicKey</key>
+<key>NativeUpdatePublicKey</key>
 <string>base64-encoded-public-key</string>
-<key>CapacitorNativeUpdateEnforceSignature</key>
+<key>NativeUpdateEnforceSignature</key>
 <true/>
 ```
 
@@ -241,7 +241,7 @@ Response: {
 
 ```typescript
 // Manual verification (advanced use)
-const isValid = await CapacitorNativeUpdate.verifySignature({
+const isValid = await NativeUpdate.verifySignature({
   bundlePath: '/path/to/bundle.zip',
   signature: 'base64-signature',
   publicKey: 'base64-public-key', // Optional, uses config if not provided

@@ -24,12 +24,12 @@ The Background Update feature allows your app to check for updates automatically
 
 ```typescript
 import {
-  CapacitorNativeUpdate,
+  NativeUpdate,
   BackgroundUpdateType,
-} from 'capacitor-native-update';
+} from 'native-update';
 
 // Configure the plugin with background updates
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   backgroundUpdate: {
     enabled: true,
     checkInterval: 24 * 60 * 60 * 1000, // 24 hours
@@ -57,7 +57,7 @@ await CapacitorNativeUpdate.configure({
 
 ```typescript
 // Advanced background update configuration
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   backgroundUpdate: {
     enabled: true,
     checkInterval: 12 * 60 * 60 * 1000, // 12 hours
@@ -97,7 +97,7 @@ await CapacitorNativeUpdate.configure({
 ### Enable Background Updates
 
 ```typescript
-await CapacitorNativeUpdate.enableBackgroundUpdates({
+await NativeUpdate.enableBackgroundUpdates({
   enabled: true,
   checkInterval: 24 * 60 * 60 * 1000,
   updateTypes: [BackgroundUpdateType.BOTH],
@@ -107,13 +107,13 @@ await CapacitorNativeUpdate.enableBackgroundUpdates({
 ### Disable Background Updates
 
 ```typescript
-await CapacitorNativeUpdate.disableBackgroundUpdates();
+await NativeUpdate.disableBackgroundUpdates();
 ```
 
 ### Get Background Update Status
 
 ```typescript
-const status = await CapacitorNativeUpdate.getBackgroundUpdateStatus();
+const status = await NativeUpdate.getBackgroundUpdateStatus();
 console.log('Background updates enabled:', status.enabled);
 console.log('Last check:', new Date(status.lastCheckTime));
 console.log('Next check:', new Date(status.nextCheckTime));
@@ -122,7 +122,7 @@ console.log('Next check:', new Date(status.nextCheckTime));
 ### Trigger Manual Check
 
 ```typescript
-const result = await CapacitorNativeUpdate.triggerBackgroundCheck();
+const result = await NativeUpdate.triggerBackgroundCheck();
 if (result.updatesFound) {
   console.log('Updates found!', result.appUpdate, result.liveUpdate);
 }
@@ -132,7 +132,7 @@ if (result.updatesFound) {
 
 ```typescript
 // Set notification preferences
-await CapacitorNativeUpdate.setNotificationPreferences({
+await NativeUpdate.setNotificationPreferences({
   title: 'Custom Update Title',
   description: 'Custom update message',
   soundEnabled: true,
@@ -146,13 +146,13 @@ await CapacitorNativeUpdate.setNotificationPreferences({
 });
 
 // Request notification permissions
-const granted = await CapacitorNativeUpdate.requestNotificationPermissions();
+const granted = await NativeUpdate.requestNotificationPermissions();
 if (granted) {
   console.log('Notification permissions granted');
 }
 
 // Check permission status
-const permissions = await CapacitorNativeUpdate.getNotificationPermissions();
+const permissions = await NativeUpdate.getNotificationPermissions();
 console.log('Permissions granted:', permissions.granted);
 ```
 
@@ -161,7 +161,7 @@ console.log('Permissions granted:', permissions.granted);
 ### Background Update Progress
 
 ```typescript
-CapacitorNativeUpdate.addListener('backgroundUpdateProgress', (event) => {
+NativeUpdate.addListener('backgroundUpdateProgress', (event) => {
   console.log('Background update progress:', event.status, event.percent);
 });
 ```
@@ -169,7 +169,7 @@ CapacitorNativeUpdate.addListener('backgroundUpdateProgress', (event) => {
 ### Background Update Notifications
 
 ```typescript
-CapacitorNativeUpdate.addListener('backgroundUpdateNotification', (event) => {
+NativeUpdate.addListener('backgroundUpdateNotification', (event) => {
   console.log('Notification action:', event.action);
 
   switch (event.action) {
@@ -243,13 +243,13 @@ Add to your `AndroidManifest.xml`:
 
 ```typescript
 try {
-  await CapacitorNativeUpdate.enableBackgroundUpdates(config);
+  await NativeUpdate.enableBackgroundUpdates(config);
 } catch (error) {
   console.error('Failed to enable background updates:', error);
 }
 
 // Listen for background update errors
-CapacitorNativeUpdate.addListener('backgroundUpdateProgress', (event) => {
+NativeUpdate.addListener('backgroundUpdateProgress', (event) => {
   if (event.status === 'failed' && event.error) {
     console.error('Background update failed:', event.error);
   }
@@ -316,14 +316,14 @@ class BackgroundUpdateManager {
 
     // Request notification permissions first
     const granted =
-      await CapacitorNativeUpdate.requestNotificationPermissions();
+      await NativeUpdate.requestNotificationPermissions();
     if (!granted) {
       console.warn('Notification permissions not granted');
       return;
     }
 
     // Configure background updates
-    await CapacitorNativeUpdate.configure({
+    await NativeUpdate.configure({
       backgroundUpdate: {
         enabled: true,
         checkInterval: 24 * 60 * 60 * 1000, // 24 hours
@@ -344,7 +344,7 @@ class BackgroundUpdateManager {
     });
 
     // Set up event listeners
-    CapacitorNativeUpdate.addListener(
+    NativeUpdate.addListener(
       'backgroundUpdateNotification',
       (event) => {
         this.handleNotificationAction(event.action);

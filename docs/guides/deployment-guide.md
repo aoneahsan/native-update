@@ -100,7 +100,7 @@ const keys = await generateKeyPair();
 ### 2. Configure Plugin
 
 ```typescript
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   serverUrl: 'https://updates.your-domain.com',
   publicKey: PRODUCTION_PUBLIC_KEY,
   channel: 'production',
@@ -303,7 +303,7 @@ aws s3 sync ./storage/bundles s3://your-backup-bucket/bundles
 
 ```typescript
 // Enable debug logging in production
-CapacitorNativeUpdate.configure({
+NativeUpdate.configure({
   debug: process.env.NODE_ENV !== 'production',
   serverUrl: 'https://updates.your-domain.com',
 });

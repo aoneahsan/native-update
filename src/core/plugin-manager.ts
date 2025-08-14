@@ -4,7 +4,7 @@ import { SecurityValidator } from './security';
 import { BundleManager } from '../live-update/bundle-manager';
 import { DownloadManager } from '../live-update/download-manager';
 import { VersionManager } from '../live-update/version-manager';
-import { CapacitorNativeUpdateError, ErrorCode } from './errors';
+import { NativeUpdateError, ErrorCode } from './errors';
 import { PluginInitConfig } from '../definitions';
 
 /**
@@ -49,7 +49,7 @@ export class PluginManager {
 
       // Validate required dependencies
       if (!config.filesystem || !config.preferences) {
-        throw new CapacitorNativeUpdateError(
+        throw new NativeUpdateError(
           ErrorCode.MISSING_DEPENDENCY,
           'Filesystem and Preferences are required for plugin initialization'
         );
@@ -85,7 +85,7 @@ export class PluginManager {
    */
   private ensureInitialized(): void {
     if (!this.isInitialized()) {
-      throw new CapacitorNativeUpdateError(
+      throw new NativeUpdateError(
         ErrorCode.NOT_CONFIGURED,
         'Plugin not initialized. Please call initialize() first.'
       );

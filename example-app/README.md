@@ -1,6 +1,6 @@
 # Capacitor Native Update - Complete Example
 
-This is a comprehensive example demonstrating all features of the capacitor-native-update plugin with a React frontend and Firebase Functions backend.
+This is a comprehensive example demonstrating all features of the native-update plugin with a React frontend and Firebase Functions backend.
 
 ## 🚀 Features Demonstrated
 
@@ -97,7 +97,7 @@ Edit `capacitor.config.ts`:
 ```typescript
 {
   plugins: {
-    CapacitorNativeUpdate: {
+    NativeUpdate: {
       serverUrl: 'https://your-project.cloudfunctions.net/api',
       publicKey: 'YOUR_BASE64_PUBLIC_KEY',
       appStoreId: 'YOUR_APP_STORE_ID'

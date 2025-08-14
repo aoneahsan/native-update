@@ -9,7 +9,7 @@ Complete API documentation for in-app review functionality.
 Request an in-app review dialog.
 
 ```typescript
-const result = await CapacitorNativeUpdate.requestReview({
+const result = await NativeUpdate.requestReview({
   force?: boolean;  // Bypass rate limiting (testing only)
 });
 // Returns:
@@ -27,7 +27,7 @@ const result = await CapacitorNativeUpdate.requestReview({
 Check if a review can be requested (respects rate limits).
 
 ```typescript
-const result = await CapacitorNativeUpdate.canRequestReview();
+const result = await NativeUpdate.canRequestReview();
 // Returns:
 {
   canRequest: boolean;
@@ -43,7 +43,7 @@ const result = await CapacitorNativeUpdate.canRequestReview();
 Open the app store review page directly.
 
 ```typescript
-await CapacitorNativeUpdate.openStoreReview();
+await NativeUpdate.openStoreReview();
 // Opens app store with review section focused
 ```
 
@@ -52,7 +52,7 @@ await CapacitorNativeUpdate.openStoreReview();
 Get the store review URL without opening it.
 
 ```typescript
-const result = await CapacitorNativeUpdate.getStoreReviewUrl();
+const result = await NativeUpdate.getStoreReviewUrl();
 // Returns:
 {
   url: string;  // Direct review URL
@@ -65,7 +65,7 @@ const result = await CapacitorNativeUpdate.getStoreReviewUrl();
 Reset review request history (testing only).
 
 ```typescript
-await CapacitorNativeUpdate.resetReviewPrompts();
+await NativeUpdate.resetReviewPrompts();
 ```
 
 ### setReviewConditions(conditions)
@@ -73,7 +73,7 @@ await CapacitorNativeUpdate.resetReviewPrompts();
 Set conditions for when to show review prompts.
 
 ```typescript
-await CapacitorNativeUpdate.setReviewConditions({
+await NativeUpdate.setReviewConditions({
   minimumDaysSinceInstall?: number;    // Default: 3
   minimumDaysSinceLastPrompt?: number; // Default: 90
   minimumAppLaunches?: number;         // Default: 5
@@ -86,7 +86,7 @@ await CapacitorNativeUpdate.setReviewConditions({
 Track significant events for review timing.
 
 ```typescript
-await CapacitorNativeUpdate.trackSignificantEvent(eventName: string);
+await NativeUpdate.trackSignificantEvent(eventName: string);
 // Examples: 'purchase_completed', 'level_completed', 'content_shared'
 ```
 
@@ -97,7 +97,7 @@ await CapacitorNativeUpdate.trackSignificantEvent(eventName: string);
 Fired when review prompt is shown.
 
 ```typescript
-CapacitorNativeUpdate.addListener('reviewPromptDisplayed', (event) => {
+NativeUpdate.addListener('reviewPromptDisplayed', (event) => {
   console.log('Review prompt shown on:', event.platform);
   analytics.track('review_prompt_displayed');
 });
@@ -108,7 +108,7 @@ CapacitorNativeUpdate.addListener('reviewPromptDisplayed', (event) => {
 Fired when review prompt is dismissed.
 
 ```typescript
-CapacitorNativeUpdate.addListener('reviewPromptDismissed', (event) => {
+NativeUpdate.addListener('reviewPromptDismissed', (event) => {
   console.log('Review prompt dismissed');
   analytics.track('review_prompt_dismissed');
 });
@@ -151,9 +151,9 @@ async function onPurchaseComplete() {
   
   // Wait a bit, then request review
   setTimeout(async () => {
-    const { canRequest } = await CapacitorNativeUpdate.canRequestReview();
+    const { canRequest } = await NativeUpdate.canRequestReview();
     if (canRequest) {
-      await CapacitorNativeUpdate.requestReview();
+      await NativeUpdate.requestReview();
     }
   }, 2000);
 }
@@ -173,7 +173,7 @@ const SIGNIFICANT_EVENTS = [
 
 async function trackUserAction(action: string) {
   if (SIGNIFICANT_EVENTS.includes(action)) {
-    await CapacitorNativeUpdate.trackSignificantEvent(action);
+    await NativeUpdate.trackSignificantEvent(action);
   }
 }
 ```
@@ -182,7 +182,7 @@ async function trackUserAction(action: string) {
 
 ```typescript
 // Configure smart conditions
-await CapacitorNativeUpdate.setReviewConditions({
+await NativeUpdate.setReviewConditions({
   minimumDaysSinceInstall: 7,      // Week after install
   minimumDaysSinceLastPrompt: 120, // 4 months between
   minimumAppLaunches: 10,           // Regular user
@@ -195,13 +195,13 @@ await CapacitorNativeUpdate.setReviewConditions({
 ```typescript
 async function requestReviewSmart() {
   try {
-    const { displayed } = await CapacitorNativeUpdate.requestReview();
+    const { displayed } = await NativeUpdate.requestReview();
     
     if (!displayed) {
       // Fallback: Show custom UI with store link
       const response = await showCustomReviewDialog();
       if (response === 'yes') {
-        await CapacitorNativeUpdate.openStoreReview();
+        await NativeUpdate.openStoreReview();
       }
     }
   } catch (error) {

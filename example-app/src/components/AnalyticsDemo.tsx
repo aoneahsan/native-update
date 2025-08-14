@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { useUpdateContext } from '../context/UpdateContext';
 
 interface AnalyticsData {
@@ -28,7 +28,7 @@ export default function AnalyticsDemo() {
 
   const loadAnalytics = async () => {
     try {
-      const data = await CapacitorNativeUpdate.getAnalytics();
+      const data = await NativeUpdate.getAnalytics();
       setAnalyticsData(data);
       addLog('info', 'Analytics data loaded');
     } catch (error) {
@@ -38,7 +38,7 @@ export default function AnalyticsDemo() {
 
   const trackEvent = async (eventName: string, properties?: any) => {
     try {
-      await CapacitorNativeUpdate.trackEvent({
+      await NativeUpdate.trackEvent({
         name: eventName,
         properties: properties || {}
       });
@@ -51,7 +51,7 @@ export default function AnalyticsDemo() {
 
   const clearAnalytics = async () => {
     try {
-      await CapacitorNativeUpdate.clearAnalytics();
+      await NativeUpdate.clearAnalytics();
       addLog('success', 'Analytics data cleared');
       await loadAnalytics();
     } catch (error) {
@@ -61,7 +61,7 @@ export default function AnalyticsDemo() {
 
   const exportAnalytics = async () => {
     try {
-      const data = await CapacitorNativeUpdate.exportAnalytics();
+      const data = await NativeUpdate.exportAnalytics();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

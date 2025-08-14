@@ -1,10 +1,10 @@
 // Main plugin export
-export { CapacitorNativeUpdate } from './plugin';
+export { NativeUpdate } from './plugin';
 
 // Type exports
 export type {
   // Main plugin types
-  CapacitorNativeUpdatePlugin,
+  NativeUpdatePlugin,
   NativeUpdateCombinedPlugin,
   NativeUpdateListeners,
   LiveUpdatePlugin,
@@ -51,7 +51,7 @@ export type {
 // Error exports
 export {
   ErrorCode,
-  CapacitorNativeUpdateError,
+  NativeUpdateError,
   ConfigurationError,
   DownloadError,
   ValidationError,

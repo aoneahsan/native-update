@@ -750,7 +750,7 @@ export interface PluginInitConfig {
 /**
  * Main plugin interface with initialization
  */
-export interface CapacitorNativeUpdatePlugin
+export interface NativeUpdatePlugin
   extends NativeUpdateCombinedPlugin {
   /**
    * Initialize the plugin with configuration

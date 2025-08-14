@@ -13,7 +13,7 @@ If you're migrating from the official Capacitor Live Updates plugin:
 import { LiveUpdates } from '@capacitor/live-updates';
 
 // After
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 ```
 
 2. **Update configuration**:
@@ -27,7 +27,7 @@ await LiveUpdates.configure({
 });
 
 // After
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'your-app-id',
     serverUrl: 'https://your-server.com',
@@ -45,7 +45,7 @@ await CapacitorNativeUpdate.configure({
 const result = await LiveUpdates.sync();
 
 // After
-const result = await CapacitorNativeUpdate.sync();
+const result = await NativeUpdate.sync();
 ```
 
 ### From Capgo Capacitor Updater
@@ -65,8 +65,8 @@ import { CapacitorUpdater } from '@capgo/capacitor-updater';
 await CapacitorUpdater.download({ url, version });
 
 // Capacitor Native Update
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
-await CapacitorNativeUpdate.download({
+import { NativeUpdate } from 'native-update';
+await NativeUpdate.download({
   url,
   version,
   checksum: 'required-checksum',
@@ -90,7 +90,7 @@ If you're migrating from Ionic Appflow:
 
 ```typescript
 // Similar channel concept
-await CapacitorNativeUpdate.setChannel('production');
+await NativeUpdate.setChannel('production');
 ```
 
 3. **Additional features**:
@@ -124,13 +124,13 @@ If you have existing bundles from another solution:
 
 ```typescript
 // Clear old data and start fresh
-await CapacitorNativeUpdate.reset();
+await NativeUpdate.reset();
 
 // Or manually migrate bundles
 const oldBundles = getOldBundles(); // Your migration logic
 for (const bundle of oldBundles) {
   // Re-download with new security requirements
-  await CapacitorNativeUpdate.download({
+  await NativeUpdate.download({
     url: bundle.url,
     version: bundle.version,
     checksum: await calculateChecksum(bundle.url),
@@ -150,7 +150,7 @@ codePush.sync({
 });
 
 // Convert to:
-await CapacitorNativeUpdate.sync({
+await NativeUpdate.sync({
   updateMode: 'immediate',
 });
 ```
@@ -166,7 +166,7 @@ const config = {
   },
 };
 
-await CapacitorNativeUpdate.configure(config);
+await NativeUpdate.configure(config);
 ```
 
 ## Troubleshooting Migration

@@ -17,7 +17,7 @@ This guide covers all configuration options available in Capacitor Native Update
 The plugin is configured using the `configure()` method with an `UpdateConfig` object:
 
 ```typescript
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     /* Live update settings */
   },
@@ -264,7 +264,7 @@ security: {
 ```typescript
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'com.yourcompany.app.dev',
     serverUrl: isDevelopment
@@ -315,7 +315,7 @@ const environments: Record<string, Environment> = {
 
 const currentEnv = environments[process.env.APP_ENV || 'production'];
 
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'com.yourcompany.app',
     serverUrl: currentEnv.serverUrl,
@@ -332,13 +332,13 @@ await CapacitorNativeUpdate.configure({
 
 ```typescript
 // Change update channel
-await CapacitorNativeUpdate.LiveUpdate.setChannel('beta');
+await NativeUpdate.LiveUpdate.setChannel('beta');
 
 // Change server URL
-await CapacitorNativeUpdate.LiveUpdate.setUpdateUrl('https://new-server.com');
+await NativeUpdate.LiveUpdate.setUpdateUrl('https://new-server.com');
 
 // Update security settings
-await CapacitorNativeUpdate.Security.updateConfig({
+await NativeUpdate.Security.updateConfig({
   enforceHttps: true,
   requireSignature: true,
 });
@@ -354,7 +354,7 @@ async function loadRemoteConfig() {
     const remoteConfig = await response.json();
 
     // Apply remote configuration
-    await CapacitorNativeUpdate.configure({
+    await NativeUpdate.configure({
       liveUpdate: {
         appId: remoteConfig.appId,
         serverUrl: remoteConfig.updateServer,
@@ -448,7 +448,7 @@ The plugin validates all configuration options and will throw descriptive errors
 
 ```typescript
 try {
-  await CapacitorNativeUpdate.configure(config);
+  await NativeUpdate.configure(config);
 } catch (error) {
   if (error.code === 'INVALID_CONFIG') {
     console.error('Configuration error:', error.message);

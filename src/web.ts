@@ -60,7 +60,7 @@ export class NativeUpdateWeb
     if (options.config) {
       this.saveConfiguration();
     }
-    // console.log('CapacitorNativeUpdate configured:', options.config);
+    // console.log('NativeUpdate configured:', options.config);
   }
 
   async getSecurityInfo(): Promise<SecurityInfo> {
@@ -747,7 +747,7 @@ export class NativeUpdateWeb
 
     // Load last review request time
     const storedLastReview = localStorage.getItem(
-      'capacitor-native-update-last-review'
+      'native-update-last-review'
     );
     if (storedLastReview) {
       this.lastReviewRequest = parseInt(storedLastReview, 10);
@@ -807,4 +807,4 @@ export class NativeUpdateWeb
 }
 
 // Alias for backward compatibility with tests
-export { NativeUpdateWeb as CapacitorNativeUpdateWeb };
+export { NativeUpdateWeb };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { useUpdateContext } from '../context/UpdateContext';
 
 export default function SecurityDemo() {
@@ -26,7 +26,7 @@ export default function SecurityDemo() {
 
   const updateSecurityConfig = async () => {
     try {
-      await CapacitorNativeUpdate.configure({
+      await NativeUpdate.configure({
         security: {
           enforceHttps: true,
           validateSignatures: true,
@@ -57,12 +57,12 @@ export default function SecurityDemo() {
 
   const verifyBundleSignature = async () => {
     try {
-      const current = await CapacitorNativeUpdate.getCurrentBundle();
+      const current = await NativeUpdate.getCurrentBundle();
       
       if (current.signature) {
         addLog('info', 'Verifying bundle signature...');
         
-        const result = await CapacitorNativeUpdate.verifySignature({
+        const result = await NativeUpdate.verifySignature({
           bundleId: current.bundleId,
           signature: current.signature
         });
@@ -82,7 +82,7 @@ export default function SecurityDemo() {
 
   const checkSecurityStatus = async () => {
     try {
-      const status = await CapacitorNativeUpdate.getSecurityStatus();
+      const status = await NativeUpdate.getSecurityStatus();
       
       addLog('info', `HTTPS enforced: ${status.httpsEnforced ? 'Yes' : 'No'}`);
       addLog('info', `Signature validation: ${status.signatureValidation ? 'Enabled' : 'Disabled'}`);
@@ -101,7 +101,7 @@ export default function SecurityDemo() {
     try {
       addLog('warning', 'Testing insecure URL rejection...');
       
-      await CapacitorNativeUpdate.setUpdateUrl('http://insecure-server.com/updates');
+      await NativeUpdate.setUpdateUrl('http://insecure-server.com/updates');
       
       addLog('error', 'Insecure URL was accepted! Security may be disabled.');
     } catch (error) {
@@ -111,7 +111,7 @@ export default function SecurityDemo() {
 
   const enableStrictMode = async () => {
     try {
-      await CapacitorNativeUpdate.configure({
+      await NativeUpdate.configure({
         security: {
           enforceHttps: true,
           validateSignatures: true,
@@ -130,12 +130,12 @@ export default function SecurityDemo() {
 
   const checkBundleIntegrity = async () => {
     try {
-      const bundles = await CapacitorNativeUpdate.getBundles();
+      const bundles = await NativeUpdate.getBundles();
       
       addLog('info', `Checking integrity of ${bundles.bundles.length} bundles...`);
       
       for (const bundle of bundles.bundles) {
-        const result = await CapacitorNativeUpdate.validateUpdate({
+        const result = await NativeUpdate.validateUpdate({
           bundlePath: bundle.path,
           checksum: bundle.checksum
         });

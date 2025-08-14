@@ -44,7 +44,7 @@ While Live Updates handle web assets, App Updates manage the native app binary i
 // Check for app updates on startup
 async function checkForAppUpdates() {
   try {
-    const updateInfo = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+    const updateInfo = await NativeUpdate.AppUpdate.getAppUpdateInfo();
 
     if (updateInfo.updateAvailable) {
       console.log(`Update available: ${updateInfo.availableVersion}`);
@@ -52,7 +52,7 @@ async function checkForAppUpdates() {
       // Handle based on priority
       if (updateInfo.updatePriority >= 4) {
         // High priority - immediate update
-        await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
+        await NativeUpdate.AppUpdate.performImmediateUpdate();
       } else {
         // Optional update - show custom UI
         showUpdateDialog(updateInfo);
@@ -73,7 +73,7 @@ class AppUpdateManager {
 
   async initialize() {
     // Configure app updates
-    await CapacitorNativeUpdate.configure({
+    await NativeUpdate.configure({
       appUpdate: {
         checkOnAppStart: true,
         minimumVersion: '2.0.0',
@@ -94,7 +94,7 @@ class AppUpdateManager {
 
   private setupUpdateListeners() {
     // Android flexible update state changes
-    CapacitorNativeUpdate.AppUpdate.addListener(
+    NativeUpdate.AppUpdate.addListener(
       'flexibleUpdateStateChanged',
       (state) => {
         this.handleFlexibleUpdateState(state);
@@ -102,7 +102,7 @@ class AppUpdateManager {
     );
 
     // Download progress for flexible updates
-    CapacitorNativeUpdate.AppUpdate.addListener(
+    NativeUpdate.AppUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
         this.downloadProgress = progress.percent;
@@ -114,7 +114,7 @@ class AppUpdateManager {
   async checkForUpdates() {
     try {
       this.updateInfo =
-        await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+        await NativeUpdate.AppUpdate.getAppUpdateInfo();
 
       if (!this.updateInfo.updateAvailable) {
         console.log('App is up to date');
@@ -166,7 +166,7 @@ class AppUpdateManager {
       this.showImmediateUpdateUI();
 
       // Start immediate update
-      await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
+      await NativeUpdate.AppUpdate.performImmediateUpdate();
 
       // App will restart automatically after update
     } catch (error) {
@@ -183,7 +183,7 @@ class AppUpdateManager {
   async startFlexibleUpdate() {
     try {
       // Start background download
-      await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
+      await NativeUpdate.AppUpdate.startFlexibleUpdate();
 
       // Show download progress UI
       this.showFlexibleUpdateUI();
@@ -223,7 +223,7 @@ class AppUpdateManager {
 
   async completeFlexibleUpdate() {
     try {
-      await CapacitorNativeUpdate.AppUpdate.completeFlexibleUpdate();
+      await NativeUpdate.AppUpdate.completeFlexibleUpdate();
       // App will restart with new version
     } catch (error) {
       console.error('Failed to complete update:', error);
@@ -265,17 +265,17 @@ const androidUpdate = {
   // Immediate update flow
   immediate: async () => {
     // Blocks UI until update is installed
-    await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
+    await NativeUpdate.AppUpdate.performImmediateUpdate();
     // App restarts automatically
   },
 
   // Flexible update flow
   flexible: async () => {
     // Download in background
-    await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
+    await NativeUpdate.AppUpdate.startFlexibleUpdate();
 
     // Monitor progress
-    const listener = await CapacitorNativeUpdate.AppUpdate.addListener(
+    const listener = await NativeUpdate.AppUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
         console.log(
@@ -285,7 +285,7 @@ const androidUpdate = {
     );
 
     // Complete when ready
-    await CapacitorNativeUpdate.AppUpdate.completeFlexibleUpdate();
+    await NativeUpdate.AppUpdate.completeFlexibleUpdate();
   },
 };
 ```
@@ -299,7 +299,7 @@ iOS requires manual version checking and App Store redirection:
 const iosUpdate = {
   // Check version manually
   check: async () => {
-    const info = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+    const info = await NativeUpdate.AppUpdate.getAppUpdateInfo();
 
     if (info.updateAvailable) {
       // Show custom update dialog
@@ -307,7 +307,7 @@ const iosUpdate = {
 
       if (shouldUpdate) {
         // Open App Store
-        await CapacitorNativeUpdate.AppUpdate.openAppStore();
+        await NativeUpdate.AppUpdate.openAppStore();
       }
     }
   },
@@ -322,7 +322,7 @@ Web platforms show update notifications:
 // Web fallback
 const webUpdate = {
   notify: async () => {
-    const info = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+    const info = await NativeUpdate.AppUpdate.getAppUpdateInfo();
 
     if (info.updateAvailable) {
       // Show notification
@@ -455,13 +455,13 @@ async function enforceMinimumVersion() {
     },
   };
 
-  const info = await CapacitorNativeUpdate.AppUpdate.getAppUpdateInfo();
+  const info = await NativeUpdate.AppUpdate.getAppUpdateInfo();
 
   // Check if current version is below minimum
   if (isVersionBelow(info.currentVersion, config.appUpdate.minimumVersion)) {
     // Force immediate update
     try {
-      await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
+      await NativeUpdate.AppUpdate.performImmediateUpdate();
     } catch (error) {
       // If update fails or is cancelled, restrict app usage
       showMinimumVersionRequired();
@@ -550,7 +550,7 @@ class UpdateProgressUI {
   showProgress() {
     this.createProgressUI();
 
-    CapacitorNativeUpdate.AppUpdate.addListener(
+    NativeUpdate.AppUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
         this.updateProgress(progress);
@@ -587,7 +587,7 @@ class UpdateProgressUI {
 ```typescript
 async function handleAppUpdateErrors() {
   try {
-    await CapacitorNativeUpdate.AppUpdate.performImmediateUpdate();
+    await NativeUpdate.AppUpdate.performImmediateUpdate();
   } catch (error) {
     switch (error.code) {
       case 'UPDATE_NOT_AVAILABLE':
@@ -635,7 +635,7 @@ class UpdateRetryStrategy {
 
   async retryUpdate() {
     try {
-      await CapacitorNativeUpdate.AppUpdate.startFlexibleUpdate();
+      await NativeUpdate.AppUpdate.startFlexibleUpdate();
       this.retryCount = 0;
     } catch (error) {
       if (this.shouldRetry(error)) {

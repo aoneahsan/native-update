@@ -9,7 +9,7 @@ Complete API documentation for Live/OTA update functionality.
 Configure the Live Update plugin with server settings and behavior options.
 
 ```typescript
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   serverUrl: string;           // Update server URL (required)
   channel?: string;            // Update channel (default: "production")
   autoCheck?: boolean;         // Auto-check for updates (default: true)
@@ -30,7 +30,7 @@ await CapacitorNativeUpdate.configure({
 Check if a new update is available.
 
 ```typescript
-const result = await CapacitorNativeUpdate.checkForUpdate();
+const result = await NativeUpdate.checkForUpdate();
 // Returns:
 {
   available: boolean;          // Update available?
@@ -49,7 +49,7 @@ const result = await CapacitorNativeUpdate.checkForUpdate();
 Download an available update with progress tracking.
 
 ```typescript
-const result = await CapacitorNativeUpdate.downloadUpdate({
+const result = await NativeUpdate.downloadUpdate({
   onProgress?: (progress: {
     percent: number;          // 0-100
     bytesDownloaded: number;
@@ -71,7 +71,7 @@ const result = await CapacitorNativeUpdate.downloadUpdate({
 Apply a downloaded update (restarts the app).
 
 ```typescript
-await CapacitorNativeUpdate.applyUpdate();
+await NativeUpdate.applyUpdate();
 ```
 
 ### sync(options?)
@@ -79,7 +79,7 @@ await CapacitorNativeUpdate.applyUpdate();
 Sync with server and apply updates based on strategy.
 
 ```typescript
-const result = await CapacitorNativeUpdate.sync({
+const result = await NativeUpdate.sync({
   installMode?: 'IMMEDIATE' | 'ON_NEXT_RESTART' | 'ON_NEXT_RESUME';
   minimumBackgroundDuration?: number; // Minimum background time (ms)
 });
@@ -96,7 +96,7 @@ const result = await CapacitorNativeUpdate.sync({
 Get information about the currently active bundle.
 
 ```typescript
-const bundle = await CapacitorNativeUpdate.getCurrentBundle();
+const bundle = await NativeUpdate.getCurrentBundle();
 // Returns:
 {
   bundleId: string;
@@ -115,7 +115,7 @@ const bundle = await CapacitorNativeUpdate.getCurrentBundle();
 List all downloaded bundles.
 
 ```typescript
-const result = await CapacitorNativeUpdate.getBundles();
+const result = await NativeUpdate.getBundles();
 // Returns:
 {
   bundles: Array<{
@@ -133,7 +133,7 @@ const result = await CapacitorNativeUpdate.getBundles();
 Set a specific bundle as active.
 
 ```typescript
-await CapacitorNativeUpdate.setBundle(bundleId: string);
+await NativeUpdate.setBundle(bundleId: string);
 ```
 
 ### deleteBundle(bundleId)
@@ -142,10 +142,10 @@ Delete a specific bundle or clean up old bundles.
 
 ```typescript
 // Delete specific bundle
-await CapacitorNativeUpdate.deleteBundle(bundleId: string);
+await NativeUpdate.deleteBundle(bundleId: string);
 
 // Or cleanup old bundles
-await CapacitorNativeUpdate.deleteBundle({ 
+await NativeUpdate.deleteBundle({ 
   keepVersions: number // Keep N most recent versions
 });
 ```
@@ -155,7 +155,7 @@ await CapacitorNativeUpdate.deleteBundle({
 Reset to the original app bundle.
 
 ```typescript
-await CapacitorNativeUpdate.reset();
+await NativeUpdate.reset();
 ```
 
 ### notifyAppReady()
@@ -163,7 +163,7 @@ await CapacitorNativeUpdate.reset();
 Notify that the app has successfully started with the new bundle.
 
 ```typescript
-await CapacitorNativeUpdate.notifyAppReady();
+await NativeUpdate.notifyAppReady();
 ```
 
 ### pauseAutoUpdates()
@@ -171,7 +171,7 @@ await CapacitorNativeUpdate.notifyAppReady();
 Temporarily pause automatic update checks.
 
 ```typescript
-await CapacitorNativeUpdate.pauseAutoUpdates();
+await NativeUpdate.pauseAutoUpdates();
 ```
 
 ### resumeAutoUpdates()
@@ -179,7 +179,7 @@ await CapacitorNativeUpdate.pauseAutoUpdates();
 Resume automatic update checks.
 
 ```typescript
-await CapacitorNativeUpdate.resumeAutoUpdates();
+await NativeUpdate.resumeAutoUpdates();
 ```
 
 ### setChannel(channel)
@@ -187,7 +187,7 @@ await CapacitorNativeUpdate.resumeAutoUpdates();
 Change the update channel.
 
 ```typescript
-await CapacitorNativeUpdate.setChannel(channel: string);
+await NativeUpdate.setChannel(channel: string);
 ```
 
 ### setUpdateUrl(url)
@@ -195,7 +195,7 @@ await CapacitorNativeUpdate.setChannel(channel: string);
 Change the update server URL.
 
 ```typescript
-await CapacitorNativeUpdate.setUpdateUrl(url: string);
+await NativeUpdate.setUpdateUrl(url: string);
 ```
 
 ### validateUpdate(options)
@@ -203,7 +203,7 @@ await CapacitorNativeUpdate.setUpdateUrl(url: string);
 Validate a bundle's integrity.
 
 ```typescript
-const result = await CapacitorNativeUpdate.validateUpdate({
+const result = await NativeUpdate.validateUpdate({
   bundlePath: string;
   checksum: string;
   signature?: string;
@@ -225,7 +225,7 @@ const result = await CapacitorNativeUpdate.validateUpdate({
 Fired when update state changes.
 
 ```typescript
-CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
+NativeUpdate.addListener('updateStateChanged', (state) => {
   console.log('State:', state.status);
   // state.status: 'CHECKING' | 'DOWNLOADING' | 'READY' | 'FAILED'
 });
@@ -236,7 +236,7 @@ CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
 Fired during bundle download.
 
 ```typescript
-CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+NativeUpdate.addListener('downloadProgress', (progress) => {
   console.log(`Progress: ${progress.percent}%`);
 });
 ```
@@ -246,7 +246,7 @@ CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
 Fired when an error occurs.
 
 ```typescript
-CapacitorNativeUpdate.addListener('error', (error) => {
+NativeUpdate.addListener('error', (error) => {
   console.error('Update error:', error.code, error.message);
 });
 ```

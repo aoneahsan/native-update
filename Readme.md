@@ -93,12 +93,12 @@ npx cap sync
 ### 1. Basic Setup
 
 ```typescript
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 
 // Initialize on app start
 async function initializeApp() {
   // Configure the plugin
-  await CapacitorNativeUpdate.configure({
+  await NativeUpdate.configure({
     updateUrl: 'https://updates.yourdomain.com/api/v1',
     autoCheck: true,
     publicKey: 'your-public-key-for-security',
@@ -112,18 +112,18 @@ async function initializeApp() {
 // Check and apply live updates
 async function checkLiveUpdates() {
   try {
-    const { available, version } = await CapacitorNativeUpdate.checkForUpdate();
+    const { available, version } = await NativeUpdate.checkForUpdate();
 
     if (available) {
       // Download update with progress
-      await CapacitorNativeUpdate.downloadUpdate({
+      await NativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           console.log(`Downloading: ${progress.percent}%`);
         },
       });
 
       // Apply update (app will restart)
-      await CapacitorNativeUpdate.applyUpdate();
+      await NativeUpdate.applyUpdate();
     }
   } catch (error) {
     console.error('Update failed:', error);
@@ -136,15 +136,15 @@ async function checkLiveUpdates() {
 ```typescript
 // Check for app store updates
 async function checkNativeUpdates() {
-  const result = await CapacitorNativeUpdate.checkAppUpdate();
+  const result = await NativeUpdate.checkAppUpdate();
 
   if (result.updateAvailable) {
     if (result.immediateUpdateAllowed) {
       // Critical update - must install
-      await CapacitorNativeUpdate.startImmediateUpdate();
+      await NativeUpdate.startImmediateUpdate();
     } else if (result.flexibleUpdateAllowed) {
       // Optional update - download in background
-      await CapacitorNativeUpdate.startFlexibleUpdate();
+      await NativeUpdate.startFlexibleUpdate();
     }
   }
 }
@@ -159,7 +159,7 @@ async function requestAppReview() {
   const shouldAsk = await checkIfGoodMoment();
 
   if (shouldAsk) {
-    const result = await CapacitorNativeUpdate.requestReview();
+    const result = await NativeUpdate.requestReview();
     if (result.displayed) {
       console.log('Review prompt was shown');
     }
@@ -171,7 +171,7 @@ async function requestAppReview() {
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 import { AlertController } from '@ionic/angular';
 
 @Component({
@@ -191,14 +191,14 @@ export class AppComponent implements OnInit {
 
   async checkAllUpdates() {
     // 1. Check live updates first (fastest)
-    const liveUpdate = await CapacitorNativeUpdate.checkForUpdate();
+    const liveUpdate = await NativeUpdate.checkForUpdate();
     if (liveUpdate.available) {
       await this.promptLiveUpdate(liveUpdate);
       return; // Don't check native if live update is available
     }
 
     // 2. Check native updates
-    const nativeUpdate = await CapacitorNativeUpdate.checkAppUpdate();
+    const nativeUpdate = await NativeUpdate.checkAppUpdate();
     if (nativeUpdate.updateAvailable) {
       await this.promptNativeUpdate(nativeUpdate);
     }
@@ -221,14 +221,14 @@ export class AppComponent implements OnInit {
 
   async installLiveUpdate() {
     // Download and apply
-    await CapacitorNativeUpdate.downloadUpdate();
-    await CapacitorNativeUpdate.applyUpdate(); // App restarts
+    await NativeUpdate.downloadUpdate();
+    await NativeUpdate.applyUpdate(); // App restarts
   }
 
   // Request review after positive events
   async onPositiveEvent() {
     setTimeout(() => {
-      CapacitorNativeUpdate.requestReview();
+      NativeUpdate.requestReview();
     }, 2000);
   }
 }
@@ -241,7 +241,7 @@ export class AppComponent implements OnInit {
 ```json
 {
   "plugins": {
-    "CapacitorNativeUpdate": {
+    "NativeUpdate": {
       "updateUrl": "https://updates.yourdomain.com/api/v1",
       "autoCheck": true,
       "checkInterval": 3600,

@@ -1,6 +1,6 @@
 # App Review Implementation Guide
 
-This comprehensive guide explains how to implement in-app review functionality in your Capacitor application using the CapacitorNativeUpdate plugin.
+This comprehensive guide explains how to implement in-app review functionality in your Capacitor application using the NativeUpdate plugin.
 
 ## Table of Contents
 
@@ -76,7 +76,7 @@ The App Review feature allows users to rate and review your app without leaving 
 ### Installation
 
 ```bash
-npm install capacitor-native-update
+npm install native-update
 npx cap sync
 ```
 
@@ -93,7 +93,7 @@ No additional configuration required. The plugin automatically uses StoreKit.
 ```json
 {
   "plugins": {
-    "CapacitorNativeUpdate": {
+    "NativeUpdate": {
       "appStoreId": "YOUR_APP_STORE_ID",
       "reviewPromptDelay": 2000,
       "reviewDebugMode": false
@@ -107,12 +107,12 @@ No additional configuration required. The plugin automatically uses StoreKit.
 ### Step 1: Basic Implementation
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 export class AppReviewService {
   async requestReview() {
     try {
-      const result = await CapacitorNativeUpdate.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       if (result.displayed) {
         console.log('Review prompt was displayed');
@@ -329,7 +329,7 @@ export class TwoStepReviewFlow {
           text: 'Sure!',
           handler: async () => {
             this.analytics.track('review_accepted');
-            await CapacitorNativeUpdate.requestReview();
+            await NativeUpdate.requestReview();
           },
         },
       ],
@@ -540,7 +540,7 @@ export class ReviewABTesting {
 
     switch (strategy) {
       case 'immediate':
-        await CapacitorNativeUpdate.requestReview();
+        await NativeUpdate.requestReview();
         break;
       case 'two-step':
         await this.twoStepFlow.initiateReviewFlow();
@@ -617,7 +617,7 @@ export class ReviewAnalytics {
 export class ReviewTestingUtils {
   async enableTestMode() {
     // Enable debug mode
-    await CapacitorNativeUpdate.setReviewDebugMode({ enabled: true });
+    await NativeUpdate.setReviewDebugMode({ enabled: true });
 
     // Reset all preferences
     await this.clearReviewPreferences();
@@ -630,7 +630,7 @@ export class ReviewTestingUtils {
     console.log('Simulating review flow...');
 
     // Force display of review prompt
-    const result = await CapacitorNativeUpdate.requestReview({
+    const result = await NativeUpdate.requestReview({
       force: true, // Only works in debug mode
     });
 
@@ -682,11 +682,11 @@ export class ReviewTestingUtils {
 // Debug checklist
 async function debugReviewPrompt() {
   // Check if available on platform
-  const isAvailable = await CapacitorNativeUpdate.isReviewAvailable();
+  const isAvailable = await NativeUpdate.isReviewAvailable();
   console.log('Review available:', isAvailable);
 
   // Check system throttling
-  const debugInfo = await CapacitorNativeUpdate.getReviewDebugInfo();
+  const debugInfo = await NativeUpdate.getReviewDebugInfo();
   console.log('Debug info:', debugInfo);
 
   // Check your conditions
@@ -731,7 +731,7 @@ class ReviewOptimizer {
 // Platform fallbacks
 async function requestReviewWithFallback() {
   try {
-    const result = await CapacitorNativeUpdate.requestReview();
+    const result = await NativeUpdate.requestReview();
 
     if (!result.displayed) {
       // System didn't show prompt

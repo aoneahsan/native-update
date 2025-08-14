@@ -38,7 +38,7 @@ Replace CodePush imports:
 import codePush from 'react-native-code-push';
 
 // New (Capacitor Native Update)
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 ```
 
 ### 3. Configure Plugin
@@ -53,7 +53,7 @@ const codePushOptions = {
 };
 
 // New (Capacitor Native Update)
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   serverUrl: 'https://your-update-server.com',
   channel: 'production',
   autoCheck: true,
@@ -73,10 +73,10 @@ codePush.sync({
 });
 
 // New (Capacitor Native Update)
-const update = await CapacitorNativeUpdate.checkForUpdate();
+const update = await NativeUpdate.checkForUpdate();
 if (update.available) {
-  await CapacitorNativeUpdate.downloadUpdate();
-  await CapacitorNativeUpdate.applyUpdate();
+  await NativeUpdate.downloadUpdate();
+  await NativeUpdate.applyUpdate();
 }
 ```
 

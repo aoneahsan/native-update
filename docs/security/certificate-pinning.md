@@ -7,7 +7,7 @@ Certificate pinning provides an additional layer of security by ensuring that yo
 Certificate pinning is configured through the security configuration:
 
 ```typescript
-import { NativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 await NativeUpdate.configure({
   config: {
@@ -59,7 +59,7 @@ openssl x509 -in certificate.crt -pubkey -noout | \
 ### Using the Plugin Utility
 
 ```typescript
-import { CertificatePinning } from 'capacitor-native-update/certificate-pinning';
+import { CertificatePinning } from 'native-update/certificate-pinning';
 
 // Generate pin from PEM certificate
 const pin = await CertificatePinning.generateFingerprint(certificatePem);

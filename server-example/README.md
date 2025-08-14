@@ -122,5 +122,5 @@ node bundle-signer.js verify bundle-1.0.0.zip bundle-1.0.0.zip.sig
 For questions or issues with the update server:
 
 - Email: aoneahsan@gmail.com
-- GitHub: [https://github.com/aoneahsan/capacitor-native-update](https://github.com/aoneahsan/capacitor-native-update)
+- GitHub: [https://github.com/aoneahsan/native-update](https://github.com/aoneahsan/native-update)
 - Author: Ahsan Mahmood ([Portfolio](https://aoneahsan.com))

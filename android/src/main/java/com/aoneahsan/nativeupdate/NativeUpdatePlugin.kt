@@ -8,7 +8,7 @@ import com.getcapacitor.annotation.Permission
 import android.Manifest
 
 @CapacitorPlugin(
-    name = "CapacitorNativeUpdate",
+    name = "NativeUpdate",
     permissions = [
         Permission(
             strings = [Manifest.permission.WRITE_EXTERNAL_STORAGE],
@@ -16,7 +16,7 @@ import android.Manifest
         )
     ]
 )
-class CapacitorNativeUpdatePlugin : Plugin() {
+class NativeUpdatePlugin : Plugin() {
     
     private lateinit var liveUpdatePlugin: LiveUpdatePlugin
     private lateinit var appUpdatePlugin: AppUpdatePlugin

@@ -20,7 +20,7 @@ This document provides a complete API reference for the Native Update plugin.
 Configure the plugin with your settings.
 
 ```typescript
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'your-app-id',
     serverUrl: 'https://your-update-server.com', // HTTPS required
@@ -57,7 +57,7 @@ await CapacitorNativeUpdate.configure({
 Synchronize with the update server and apply updates if available.
 
 ```typescript
-const result = await CapacitorNativeUpdate.sync({
+const result = await NativeUpdate.sync({
   channel: 'production',
   updateMode: 'background',
 });
@@ -70,7 +70,7 @@ console.log(result.status); // 'UP_TO_DATE' | 'UPDATE_AVAILABLE' | 'UPDATE_INSTA
 Download a specific bundle version.
 
 ```typescript
-const bundle = await CapacitorNativeUpdate.download({
+const bundle = await NativeUpdate.download({
   url: 'https://updates.example.com/bundle-v2.0.0.zip', // HTTPS enforced
   version: '2.0.0',
   checksum: 'sha256:...', // Required for integrity verification
@@ -85,7 +85,7 @@ const bundle = await CapacitorNativeUpdate.download({
 Set the active bundle to a specific downloaded version.
 
 ```typescript
-await CapacitorNativeUpdate.set({
+await NativeUpdate.set({
   bundleId: 'bundle-123',
   version: '2.0.0',
   path: '/path/to/bundle',
@@ -97,7 +97,7 @@ await CapacitorNativeUpdate.set({
 Reload the app with the currently active bundle.
 
 ```typescript
-await CapacitorNativeUpdate.reload();
+await NativeUpdate.reload();
 ```
 
 ### reset(): Promise<void>
@@ -105,7 +105,7 @@ await CapacitorNativeUpdate.reload();
 Reset to the original bundle shipped with the app.
 
 ```typescript
-await CapacitorNativeUpdate.reset();
+await NativeUpdate.reset();
 ```
 
 ### current(): Promise<BundleInfo>
@@ -113,7 +113,7 @@ await CapacitorNativeUpdate.reset();
 Get information about the currently active bundle.
 
 ```typescript
-const currentBundle = await CapacitorNativeUpdate.current();
+const currentBundle = await NativeUpdate.current();
 console.log(currentBundle.version);
 ```
 
@@ -122,7 +122,7 @@ console.log(currentBundle.version);
 List all downloaded bundles.
 
 ```typescript
-const bundles = await CapacitorNativeUpdate.list();
+const bundles = await NativeUpdate.list();
 bundles.forEach((bundle) => {
   console.log(`${bundle.version} - ${bundle.downloadTime}`);
 });
@@ -134,10 +134,10 @@ Delete a specific bundle or clean up old bundles.
 
 ```typescript
 // Delete specific bundle
-await CapacitorNativeUpdate.delete({ bundleId: 'bundle-123' });
+await NativeUpdate.delete({ bundleId: 'bundle-123' });
 
 // Clean up old bundles
-await CapacitorNativeUpdate.delete({
+await NativeUpdate.delete({
   keepVersions: 2,
   olderThan: Date.now() - 7 * 24 * 60 * 60 * 1000, // 7 days
 });
@@ -149,7 +149,7 @@ Notify that the app has successfully started with the new bundle.
 
 ```typescript
 // Call this after your app has successfully initialized
-await CapacitorNativeUpdate.notifyAppReady();
+await NativeUpdate.notifyAppReady();
 ```
 
 ### getLatest(): Promise<LatestVersion>
@@ -157,7 +157,7 @@ await CapacitorNativeUpdate.notifyAppReady();
 Check for the latest available version without downloading.
 
 ```typescript
-const latest = await CapacitorNativeUpdate.getLatest();
+const latest = await NativeUpdate.getLatest();
 if (latest.available) {
   console.log(`New version ${latest.version} available`);
 }
@@ -168,7 +168,7 @@ if (latest.available) {
 Switch to a different update channel.
 
 ```typescript
-await CapacitorNativeUpdate.setChannel('beta');
+await NativeUpdate.setChannel('beta');
 ```
 
 ### setUpdateUrl(url: string): Promise<void>
@@ -176,7 +176,7 @@ await CapacitorNativeUpdate.setChannel('beta');
 Change the update server URL.
 
 ```typescript
-await CapacitorNativeUpdate.setUpdateUrl('https://new-server.com/updates');
+await NativeUpdate.setUpdateUrl('https://new-server.com/updates');
 ```
 
 ## App Update API
@@ -186,7 +186,7 @@ await CapacitorNativeUpdate.setUpdateUrl('https://new-server.com/updates');
 Check for native app updates in the app store.
 
 ```typescript
-const updateInfo = await CapacitorNativeUpdate.getAppUpdateInfo();
+const updateInfo = await NativeUpdate.getAppUpdateInfo();
 if (updateInfo.updateAvailable) {
   console.log(`Version ${updateInfo.availableVersion} is available`);
 }
@@ -198,7 +198,7 @@ Start an immediate (blocking) update from the app store.
 
 ```typescript
 try {
-  await CapacitorNativeUpdate.performImmediateUpdate();
+  await NativeUpdate.performImmediateUpdate();
   // App will restart after update
 } catch (error) {
   if (error.code === 'UPDATE_CANCELLED') {
@@ -212,7 +212,7 @@ try {
 Start a flexible (background) update from the app store.
 
 ```typescript
-await CapacitorNativeUpdate.startFlexibleUpdate();
+await NativeUpdate.startFlexibleUpdate();
 // Update downloads in background
 ```
 
@@ -221,7 +221,7 @@ await CapacitorNativeUpdate.startFlexibleUpdate();
 Complete a flexible update that has finished downloading.
 
 ```typescript
-await CapacitorNativeUpdate.completeFlexibleUpdate();
+await NativeUpdate.completeFlexibleUpdate();
 // App will restart
 ```
 
@@ -230,7 +230,7 @@ await CapacitorNativeUpdate.completeFlexibleUpdate();
 Open the app store page for the app.
 
 ```typescript
-await CapacitorNativeUpdate.openAppStore({
+await NativeUpdate.openAppStore({
   appId: 'com.example.app', // Optional, uses current app ID if not provided
 });
 ```
@@ -242,7 +242,7 @@ await CapacitorNativeUpdate.openAppStore({
 Request an in-app review from the user.
 
 ```typescript
-const result = await CapacitorNativeUpdate.requestReview();
+const result = await NativeUpdate.requestReview();
 if (result.shown) {
   console.log('Review dialog was shown');
 }
@@ -253,9 +253,9 @@ if (result.shown) {
 Check if it's appropriate to request a review.
 
 ```typescript
-const canRequest = await CapacitorNativeUpdate.canRequestReview();
+const canRequest = await NativeUpdate.canRequestReview();
 if (canRequest.allowed) {
-  await CapacitorNativeUpdate.requestReview();
+  await NativeUpdate.requestReview();
 } else {
   console.log(`Cannot request: ${canRequest.reason}`);
 }
@@ -417,17 +417,17 @@ The plugin emits events for update progress and state changes:
 
 ```typescript
 // Listen for download progress
-CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+NativeUpdate.addListener('downloadProgress', (progress) => {
   console.log(`Downloaded ${progress.percent}%`);
 });
 
 // Listen for update state changes
-CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
+NativeUpdate.addListener('updateStateChanged', (state) => {
   console.log(`Update state: ${state.status}`);
 });
 
 // Remove listeners when done
-CapacitorNativeUpdate.removeAllListeners();
+NativeUpdate.removeAllListeners();
 ```
 
 ## Security API
@@ -437,7 +437,7 @@ CapacitorNativeUpdate.removeAllListeners();
 Validate an update bundle before installation.
 
 ```typescript
-const validation = await CapacitorNativeUpdate.validateUpdate({
+const validation = await NativeUpdate.validateUpdate({
   bundlePath: '/path/to/bundle',
   checksum: 'sha256:...',
   signature: 'base64...',
@@ -454,7 +454,7 @@ if (!validation.isValid) {
 Get current security configuration and status.
 
 ```typescript
-const security = await CapacitorNativeUpdate.getSecurityInfo();
+const security = await NativeUpdate.getSecurityInfo();
 console.log(`HTTPS enforced: ${security.enforceHttps}`);
 console.log(`Certificate pinning: ${security.certificatePinning.enabled}`);
 ```
@@ -490,7 +490,7 @@ console.log(`Certificate pinning: ${security.certificatePinning.enabled}`);
 
 ```typescript
 // Recommended security configuration
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'your-app-id',
     serverUrl: 'https://updates.example.com', // Always use HTTPS
@@ -524,7 +524,7 @@ try {
     throw new Error('Invalid update URL');
   }
 
-  await CapacitorNativeUpdate.download({
+  await NativeUpdate.download({
     url: updateUrl,
     checksum: checksum,
     signature: signature,
@@ -540,7 +540,7 @@ Handle errors without exposing sensitive information:
 
 ````typescript
 try {
-  await CapacitorNativeUpdate.sync();
+  await NativeUpdate.sync();
 } catch (error) {
   // Don't expose internal paths or server details
   if (error.code === 'VERIFICATION_ERROR') {
@@ -552,6 +552,6 @@ try {
 
 For questions, issues, or contributions:
 - Email: aoneahsan@gmail.com
-- GitHub Issues: [https://github.com/aoneahsan/capacitor-native-update/issues](https://github.com/aoneahsan/capacitor-native-update/issues)
+- GitHub Issues: [https://github.com/aoneahsan/native-update/issues](https://github.com/aoneahsan/native-update/issues)
 - Author: Ahsan Mahmood ([Portfolio](https://aoneahsan.com))
 ````

@@ -1,6 +1,6 @@
 import { registerPlugin } from '@capacitor/core';
 import type {
-  CapacitorNativeUpdatePlugin,
+  NativeUpdatePlugin,
   PluginInitConfig,
   // Live Update
   SyncOptions,
@@ -28,12 +28,12 @@ import type {
 } from './definitions';
 import { SyncStatus, BundleStatus, UpdateErrorCode } from './definitions';
 import { PluginManager } from './core/plugin-manager';
-import { CapacitorNativeUpdateError, ErrorCode } from './core/errors';
+import { NativeUpdateError, ErrorCode } from './core/errors';
 
 /**
- * Web implementation of the Capacitor Native Update Plugin
+ * Web implementation of the Native Update Plugin
  */
-class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
+class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   private pluginManager: PluginManager;
   private initialized = false;
 
@@ -62,7 +62,7 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   // NativeUpdatePlugin methods
   async configure(options: { config: PluginInitConfig }): Promise<void> {
     if (!this.initialized) {
-      throw new CapacitorNativeUpdateError(
+      throw new NativeUpdateError(
         ErrorCode.NOT_CONFIGURED,
         'Plugin not initialized. Call initialize() first.'
       );
@@ -153,7 +153,7 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
     const bundleManager = this.pluginManager.getBundleManager();
     const bundle = await bundleManager.getActiveBundle();
     if (!bundle) {
-      throw new CapacitorNativeUpdateError(
+      throw new NativeUpdateError(
         ErrorCode.FILE_NOT_FOUND,
         'No active bundle found'
       );
@@ -256,28 +256,28 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   }
 
   async performImmediateUpdate(): Promise<void> {
-    throw new CapacitorNativeUpdateError(
+    throw new NativeUpdateError(
       ErrorCode.PLATFORM_NOT_SUPPORTED,
       'Native app updates are not supported on web'
     );
   }
 
   async startFlexibleUpdate(): Promise<void> {
-    throw new CapacitorNativeUpdateError(
+    throw new NativeUpdateError(
       ErrorCode.PLATFORM_NOT_SUPPORTED,
       'Native app updates are not supported on web'
     );
   }
 
   async completeFlexibleUpdate(): Promise<void> {
-    throw new CapacitorNativeUpdateError(
+    throw new NativeUpdateError(
       ErrorCode.PLATFORM_NOT_SUPPORTED,
       'Native app updates are not supported on web'
     );
   }
 
   async openAppStore(_options?: OpenAppStoreOptions): Promise<void> {
-    throw new CapacitorNativeUpdateError(
+    throw new NativeUpdateError(
       ErrorCode.PLATFORM_NOT_SUPPORTED,
       'App store is not available on web'
     );
@@ -332,7 +332,7 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
 
   async scheduleBackgroundCheck(_interval: number): Promise<void> {
     // Not supported on web
-    throw new CapacitorNativeUpdateError(
+    throw new NativeUpdateError(
       ErrorCode.PLATFORM_NOT_SUPPORTED,
       'Background updates are not supported on web'
     );
@@ -378,11 +378,11 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
 /**
  * Register the plugin
  */
-const CapacitorNativeUpdate = registerPlugin<CapacitorNativeUpdatePlugin>(
-  'CapacitorNativeUpdate',
+const NativeUpdate = registerPlugin<NativeUpdatePlugin>(
+  'NativeUpdate',
   {
-    web: () => new CapacitorNativeUpdatePluginWeb(),
+    web: () => new NativeUpdatePluginWeb(),
   }
 );
 
-export { CapacitorNativeUpdate };
+export { NativeUpdate };

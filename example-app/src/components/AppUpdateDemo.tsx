@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { useUpdateContext } from '../context/UpdateContext';
 
 export default function AppUpdateDemo() {
@@ -13,7 +13,7 @@ export default function AppUpdateDemo() {
     addLog('info', 'Checking for app store updates...');
 
     try {
-      const result = await CapacitorNativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.checkAppUpdate();
       setUpdateInfo(result);
 
       if (result.updateAvailable) {
@@ -40,12 +40,12 @@ export default function AppUpdateDemo() {
       addLog('info', 'Starting immediate update...');
       
       // Set up install state listener
-      const stateListener = CapacitorNativeUpdate.addListener('appUpdateStateChanged', (state) => {
+      const stateListener = NativeUpdate.addListener('appUpdateStateChanged', (state) => {
         setInstallStatus(state.installStatus);
         addLog('info', `Update state: ${state.installStatus}`);
       });
 
-      await CapacitorNativeUpdate.startImmediateUpdate();
+      await NativeUpdate.startImmediateUpdate();
       addLog('success', 'Immediate update started');
       
       stateListener.remove();
@@ -59,12 +59,12 @@ export default function AppUpdateDemo() {
       addLog('info', 'Starting flexible update...');
       
       // Set up progress listener
-      const progressListener = CapacitorNativeUpdate.addListener('appUpdateProgress', (progress) => {
+      const progressListener = NativeUpdate.addListener('appUpdateProgress', (progress) => {
         setInstallStatus(progress.bytesDownloaded / progress.totalBytesToDownload * 100);
         addLog('info', `Download progress: ${Math.round(progress.bytesDownloaded / progress.totalBytesToDownload * 100)}%`);
       });
 
-      await CapacitorNativeUpdate.startFlexibleUpdate();
+      await NativeUpdate.startFlexibleUpdate();
       addLog('success', 'Flexible update started');
       
       progressListener.remove();
@@ -76,7 +76,7 @@ export default function AppUpdateDemo() {
   const completeFlexibleUpdate = async () => {
     try {
       addLog('info', 'Completing flexible update...');
-      await CapacitorNativeUpdate.completeFlexibleUpdate();
+      await NativeUpdate.completeFlexibleUpdate();
       addLog('success', 'Update will be installed on next app restart');
     } catch (error) {
       addLog('error', `Failed to complete update: ${error.message}`);
@@ -86,7 +86,7 @@ export default function AppUpdateDemo() {
   const openAppStore = async () => {
     try {
       addLog('info', 'Opening app store...');
-      await CapacitorNativeUpdate.openAppStore();
+      await NativeUpdate.openAppStore();
       addLog('success', 'App store opened');
     } catch (error) {
       addLog('error', `Failed to open app store: ${error.message}`);
@@ -95,7 +95,7 @@ export default function AppUpdateDemo() {
 
   const getAppStoreUrl = async () => {
     try {
-      const result = await CapacitorNativeUpdate.getAppStoreUrl();
+      const result = await NativeUpdate.getAppStoreUrl();
       addLog('info', `App Store URL: ${result.url}`);
       navigator.clipboard.writeText(result.url);
       addLog('success', 'URL copied to clipboard');
@@ -106,7 +106,7 @@ export default function AppUpdateDemo() {
 
   const checkMinimumVersion = async () => {
     try {
-      const result = await CapacitorNativeUpdate.isMinimumVersionMet();
+      const result = await NativeUpdate.isMinimumVersionMet();
       if (result.isMet) {
         addLog('success', 'App meets minimum version requirement');
       } else {
@@ -119,7 +119,7 @@ export default function AppUpdateDemo() {
 
   const getVersionInfo = async () => {
     try {
-      const result = await CapacitorNativeUpdate.getVersionInfo();
+      const result = await NativeUpdate.getVersionInfo();
       addLog('info', `Current version: ${result.currentVersion}`);
       addLog('info', `Build number: ${result.buildNumber}`);
       if (result.availableVersion) {

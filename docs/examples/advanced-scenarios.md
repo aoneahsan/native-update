@@ -7,12 +7,12 @@ This guide covers complex use cases and advanced patterns for the Capacitor Nati
 Minimize download sizes by only downloading changed files:
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 async function checkForDeltaUpdate() {
-  const currentManifest = await CapacitorNativeUpdate.getCurrentManifest();
+  const currentManifest = await NativeUpdate.getCurrentManifest();
   
-  const result = await CapacitorNativeUpdate.checkForUpdate({
+  const result = await NativeUpdate.checkForUpdate({
     updateUrl: 'https://your-update-server.com/api/check',
     currentVersion: currentManifest.version,
     currentChecksum: currentManifest.checksum,
@@ -26,13 +26,13 @@ async function checkForDeltaUpdate() {
 }
 
 async function downloadDeltaUpdate(deltaUrl: string) {
-  const download = await CapacitorNativeUpdate.downloadUpdate({
+  const download = await NativeUpdate.downloadUpdate({
     url: deltaUrl,
     isDelta: true
   });
   
   // Apply delta patch
-  await CapacitorNativeUpdate.applyDelta({
+  await NativeUpdate.applyDelta({
     bundleId: download.bundleId,
     baseVersion: getCurrentVersion()
   });
@@ -52,7 +52,7 @@ enum UpdateChannel {
 }
 
 async function setupUpdateChannel(channel: UpdateChannel) {
-  await CapacitorNativeUpdate.configure({
+  await NativeUpdate.configure({
     updateChannel: channel,
     updateUrl: `https://updates.example.com/api/${channel}/check`
   });
@@ -63,7 +63,7 @@ async function switchToBetaChannel() {
   await setupUpdateChannel(UpdateChannel.BETA);
   
   // Check for updates in the new channel
-  const result = await CapacitorNativeUpdate.checkForUpdate({
+  const result = await NativeUpdate.checkForUpdate({
     currentVersion: await getCurrentVersion()
   });
   
@@ -82,7 +82,7 @@ async function checkStagedUpdate() {
   const deviceId = await getDeviceId();
   const rolloutPercentage = hashDeviceId(deviceId) % 100;
   
-  const result = await CapacitorNativeUpdate.checkForUpdate({
+  const result = await NativeUpdate.checkForUpdate({
     updateUrl: 'https://your-update-server.com/api/check',
     currentVersion: '1.0.0',
     metadata: {
@@ -105,13 +105,13 @@ Download updates in the background without interrupting users:
 ```typescript
 async function setupBackgroundUpdates() {
   // Configure background update behavior
-  await CapacitorNativeUpdate.configure({
+  await NativeUpdate.configure({
     backgroundUpdateMode: 'wifi-only',
     autoInstallMode: 'on-restart'
   });
   
   // Schedule background update checks
-  await CapacitorNativeUpdate.scheduleBackgroundCheck({
+  await NativeUpdate.scheduleBackgroundCheck({
     interval: 14400000, // 4 hours
     requiresWifi: true,
     requiresCharging: false
@@ -119,7 +119,7 @@ async function setupBackgroundUpdates() {
 }
 
 // Handle background update events
-CapacitorNativeUpdate.addListener('backgroundUpdateReady', (event) => {
+NativeUpdate.addListener('backgroundUpdateReady', (event) => {
   // Notify user that update is ready
   showUpdateNotification({
     version: event.version,
@@ -135,11 +135,11 @@ Implement automatic rollback on update failures:
 ```typescript
 async function safeUpdate() {
   // Save current version info before update
-  const backup = await CapacitorNativeUpdate.createBackup();
+  const backup = await NativeUpdate.createBackup();
   
   try {
     // Attempt update
-    await CapacitorNativeUpdate.installUpdate({
+    await NativeUpdate.installUpdate({
       bundleId: 'new-update-id',
       validateAfterInstall: true
     });
@@ -151,12 +151,12 @@ async function safeUpdate() {
     }
     
     // Confirm successful update
-    await CapacitorNativeUpdate.confirmUpdate();
+    await NativeUpdate.confirmUpdate();
   } catch (error) {
     console.error('Update failed, rolling back:', error);
     
     // Automatic rollback
-    await CapacitorNativeUpdate.rollback({
+    await NativeUpdate.rollback({
       backupId: backup.id
     });
     
@@ -201,7 +201,7 @@ async function setupABTest(config: ABTestConfig) {
     ? config.variants.treatment 
     : config.variants.control;
     
-  const download = await CapacitorNativeUpdate.downloadUpdate({
+  const download = await NativeUpdate.downloadUpdate({
     url: bundleUrl,
     metadata: {
       testId: config.testId,
@@ -210,7 +210,7 @@ async function setupABTest(config: ABTestConfig) {
   });
   
   // Install with test metadata
-  await CapacitorNativeUpdate.installUpdate({
+  await NativeUpdate.installUpdate({
     bundleId: download.bundleId,
     preserveData: true
   });
@@ -227,7 +227,7 @@ class UpdateManager {
   
   async checkAndPromptUpdate() {
     // Check for update
-    const result = await CapacitorNativeUpdate.checkForUpdate({
+    const result = await NativeUpdate.checkForUpdate({
       updateUrl: 'https://your-update-server.com/api/check',
       currentVersion: await this.getCurrentVersion()
     });
@@ -253,7 +253,7 @@ class UpdateManager {
     this.updateState = { status: 'downloading', progress: 0 };
     
     // Download with progress tracking
-    const downloadListener = CapacitorNativeUpdate.addListener(
+    const downloadListener = NativeUpdate.addListener(
       'downloadProgress',
       (progress) => {
         this.updateState = {
@@ -265,14 +265,14 @@ class UpdateManager {
     );
     
     try {
-      const download = await CapacitorNativeUpdate.downloadUpdate({
+      const download = await NativeUpdate.downloadUpdate({
         url: updateInfo.downloadUrl
       });
       
       this.updateState = { status: 'installing' };
       this.updateUI();
       
-      await CapacitorNativeUpdate.installUpdate({
+      await NativeUpdate.installUpdate({
         bundleId: download.bundleId
       });
       
@@ -300,7 +300,7 @@ async function secureUpdateCheck() {
     version: getCurrentVersion()
   });
   
-  const result = await CapacitorNativeUpdate.checkForUpdate({
+  const result = await NativeUpdate.checkForUpdate({
     updateUrl: 'https://your-update-server.com/api/check',
     currentVersion: getCurrentVersion(),
     headers: {
@@ -322,7 +322,7 @@ async function secureUpdateCheck() {
 }
 
 async function downloadWithIntegrityCheck(url: string, expectedHash: string) {
-  const download = await CapacitorNativeUpdate.downloadUpdate({
+  const download = await NativeUpdate.downloadUpdate({
     url,
     validateChecksum: true,
     expectedChecksum: expectedHash,
@@ -330,7 +330,7 @@ async function downloadWithIntegrityCheck(url: string, expectedHash: string) {
   });
   
   // Additional verification
-  const verified = await CapacitorNativeUpdate.verifyBundle({
+  const verified = await NativeUpdate.verifyBundle({
     bundleId: download.bundleId,
     publicKey: await getPublicKey()
   });
@@ -362,7 +362,7 @@ class UpdateMetrics {
     
     try {
       // Check phase
-      const result = await CapacitorNativeUpdate.checkForUpdate({
+      const result = await NativeUpdate.checkForUpdate({
         updateUrl: 'https://your-update-server.com/api/check',
         currentVersion: getCurrentVersion()
       });
@@ -375,7 +375,7 @@ class UpdateMetrics {
       
       // Download phase
       metrics.downloadStarted = Date.now();
-      const download = await CapacitorNativeUpdate.downloadUpdate({
+      const download = await NativeUpdate.downloadUpdate({
         url: result.downloadUrl
       });
       metrics.downloadCompleted = Date.now();
@@ -383,7 +383,7 @@ class UpdateMetrics {
       
       // Install phase
       metrics.installStarted = Date.now();
-      await CapacitorNativeUpdate.installUpdate({
+      await NativeUpdate.installUpdate({
         bundleId: download.bundleId
       });
       metrics.installCompleted = Date.now();

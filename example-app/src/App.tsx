@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 import LiveUpdateDemo from './components/LiveUpdateDemo';
 import AppUpdateDemo from './components/AppUpdateDemo';
 import AppReviewDemo from './components/AppReviewDemo';
@@ -17,7 +17,7 @@ function App() {
     // Initialize the plugin
     async function initialize() {
       try {
-        await CapacitorNativeUpdate.configure({
+        await NativeUpdate.configure({
           serverUrl: 'https://your-update-server.com/api/v1',
           autoCheck: true,
           checkInterval: 3600,
@@ -35,15 +35,15 @@ function App() {
         });
 
         // Set up global event listeners
-        CapacitorNativeUpdate.addListener('updateStateChanged', (state) => {
+        NativeUpdate.addListener('updateStateChanged', (state) => {
           console.log('Update state changed:', state);
         });
 
-        CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+        NativeUpdate.addListener('downloadProgress', (progress) => {
           console.log('Download progress:', progress);
         });
 
-        CapacitorNativeUpdate.addListener('error', (error) => {
+        NativeUpdate.addListener('error', (error) => {
           console.error('Update error:', error);
         });
 

@@ -5,19 +5,19 @@ This guide demonstrates basic usage patterns for the Capacitor Native Update plu
 ## Installation
 
 ```bash
-yarn add capacitor-native-update
+yarn add native-update
 npx cap sync
 ```
 
 ## Simple Live Update Check
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 
 // Check for updates on app startup
 async function checkForUpdates() {
   try {
-    const result = await CapacitorNativeUpdate.checkForUpdate({
+    const result = await NativeUpdate.checkForUpdate({
       updateUrl: 'https://your-update-server.com/api/check',
       currentVersion: '1.0.0'
     });
@@ -34,22 +34,22 @@ async function checkForUpdates() {
 
 async function downloadAndInstall(downloadUrl: string) {
   // Download the update
-  const download = await CapacitorNativeUpdate.downloadUpdate({
+  const download = await NativeUpdate.downloadUpdate({
     url: downloadUrl
   });
   
   // Monitor download progress
-  CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+  NativeUpdate.addListener('downloadProgress', (progress) => {
     console.log(`Download progress: ${progress.percent}%`);
   });
   
   // Install the update
-  await CapacitorNativeUpdate.installUpdate({
+  await NativeUpdate.installUpdate({
     bundleId: download.bundleId
   });
   
   // Reload the app with new bundle
-  await CapacitorNativeUpdate.reloadApp();
+  await NativeUpdate.reloadApp();
 }
 ```
 
@@ -58,7 +58,7 @@ async function downloadAndInstall(downloadUrl: string) {
 ```typescript
 // Check if a native app update is available
 async function checkAppStoreUpdate() {
-  const result = await CapacitorNativeUpdate.checkAppUpdate();
+  const result = await NativeUpdate.checkAppUpdate();
   
   if (result.updateAvailable) {
     // Show update prompt to user
@@ -68,7 +68,7 @@ async function checkAppStoreUpdate() {
     
     if (shouldUpdate) {
       // Open app store for update
-      await CapacitorNativeUpdate.openAppStore();
+      await NativeUpdate.openAppStore();
     }
   }
 }
@@ -80,7 +80,7 @@ async function checkAppStoreUpdate() {
 // Request app review after positive user action
 async function requestReview() {
   try {
-    const result = await CapacitorNativeUpdate.requestReview();
+    const result = await NativeUpdate.requestReview();
     
     if (result.displayed) {
       console.log('Review dialog was shown');
@@ -107,7 +107,7 @@ async function onTaskCompleted() {
 
 ```typescript
 // Initialize with custom configuration
-CapacitorNativeUpdate.configure({
+NativeUpdate.configure({
   // Live update settings
   autoCheckOnStart: true,
   updateCheckInterval: 3600000, // 1 hour
@@ -129,7 +129,7 @@ CapacitorNativeUpdate.configure({
 // Comprehensive error handling
 async function safeUpdateCheck() {
   try {
-    const result = await CapacitorNativeUpdate.checkForUpdate({
+    const result = await NativeUpdate.checkForUpdate({
       updateUrl: 'https://your-update-server.com/api/check',
       currentVersion: '1.0.0'
     });
@@ -155,26 +155,26 @@ async function safeUpdateCheck() {
 // Set up event listeners
 function setupUpdateListeners() {
   // Download progress
-  CapacitorNativeUpdate.addListener('downloadProgress', (event) => {
+  NativeUpdate.addListener('downloadProgress', (event) => {
     updateProgressBar(event.percent);
   });
   
   // Update installed
-  CapacitorNativeUpdate.addListener('updateInstalled', (event) => {
+  NativeUpdate.addListener('updateInstalled', (event) => {
     console.log(`Update ${event.version} installed successfully`);
   });
   
   // Update failed
-  CapacitorNativeUpdate.addListener('updateFailed', (event) => {
+  NativeUpdate.addListener('updateFailed', (event) => {
     console.error(`Update failed: ${event.error}`);
     // Optionally rollback
-    CapacitorNativeUpdate.rollback();
+    NativeUpdate.rollback();
   });
 }
 
 // Clean up listeners when done
 function cleanup() {
-  CapacitorNativeUpdate.removeAllListeners();
+  NativeUpdate.removeAllListeners();
 }
 ```
 

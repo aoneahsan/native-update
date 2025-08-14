@@ -9,7 +9,7 @@ export default {
     {
       file: 'dist/plugin.js',
       format: 'iife',
-      name: 'CapacitorNativeUpdate',
+      name: 'NativeUpdate',
       globals: {
         '@capacitor/core': 'capacitorExports',
         '@capacitor/filesystem': 'capacitorFilesystem',
@@ -17,7 +17,7 @@ export default {
       },
       sourcemap: true,
       inlineDynamicImports: true,
-      banner: '/*! Capacitor Native Update Plugin v1.4.0 | MIT License */',
+      banner: '/*! Native Update Plugin v1.4.0 | MIT License */',
     },
     {
       file: 'dist/plugin.cjs.js',

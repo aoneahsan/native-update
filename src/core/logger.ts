@@ -14,7 +14,7 @@ export class Logger {
 
   constructor(context?: string) {
     this.configManager = ConfigManager.getInstance();
-    this.context = context || 'CapacitorNativeUpdate';
+    this.context = context || 'NativeUpdate';
   }
 
   static getInstance(): Logger {

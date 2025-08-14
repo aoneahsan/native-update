@@ -63,7 +63,7 @@ App reviews are crucial for app store visibility and user trust. This feature he
 
 ```typescript
 // Configure app reviews
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   appReview: {
     minimumDaysSinceInstall: 7,
     minimumDaysSinceLastPrompt: 60,
@@ -75,11 +75,11 @@ await CapacitorNativeUpdate.configure({
 async function requestReview() {
   try {
     // Check if we can request a review
-    const canRequest = await CapacitorNativeUpdate.AppReview.canRequestReview();
+    const canRequest = await NativeUpdate.AppReview.canRequestReview();
 
     if (canRequest.allowed) {
       // Request the review
-      const result = await CapacitorNativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.AppReview.requestReview();
 
       if (result.shown) {
         console.log('Review dialog was shown');
@@ -104,7 +104,7 @@ class AppReviewManager {
 
   async initialize() {
     // Configure with advanced settings
-    await CapacitorNativeUpdate.configure({
+    await NativeUpdate.configure({
       appReview: {
         minimumDaysSinceInstall: 14,
         minimumDaysSinceLastPrompt: 90,
@@ -182,7 +182,7 @@ class AppReviewManager {
 
   private async analyzeReviewReadiness() {
     // Check basic eligibility
-    const canRequest = await CapacitorNativeUpdate.AppReview.canRequestReview();
+    const canRequest = await NativeUpdate.AppReview.canRequestReview();
 
     if (!canRequest.allowed) {
       return {
@@ -243,7 +243,7 @@ class AppReviewManager {
 
   async requestReview() {
     try {
-      const result = await CapacitorNativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.AppReview.requestReview();
 
       // Track the request
       this.trackReviewRequest(result);
@@ -367,7 +367,7 @@ class ReviewFatigueManager {
   async canRequestReview(): Promise<boolean> {
     // Check platform limits
     const platformCheck =
-      await CapacitorNativeUpdate.AppReview.canRequestReview();
+      await NativeUpdate.AppReview.canRequestReview();
 
     if (!platformCheck.allowed) {
       return false;
@@ -596,7 +596,7 @@ class iOSReviewManager {
   async requestReview(): Promise<ReviewResult> {
     try {
       // Use StoreKit review controller
-      const result = await CapacitorNativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.AppReview.requestReview();
 
       // iOS handles everything natively
       return {
@@ -614,7 +614,7 @@ class iOSReviewManager {
 
   private async fallbackToAppStore() {
     // Open App Store page
-    await CapacitorNativeUpdate.AppUpdate.openAppStore();
+    await NativeUpdate.AppUpdate.openAppStore();
 
     return {
       shown: true,
@@ -633,7 +633,7 @@ class AndroidReviewManager {
   async requestReview(): Promise<ReviewResult> {
     try {
       // Use Play Core in-app review
-      const result = await CapacitorNativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.AppReview.requestReview();
 
       return {
         shown: result.shown,
@@ -650,7 +650,7 @@ class AndroidReviewManager {
 
   private async fallbackToPlayStore() {
     // Open Play Store page
-    await CapacitorNativeUpdate.AppUpdate.openAppStore();
+    await NativeUpdate.AppUpdate.openAppStore();
 
     return {
       shown: true,
@@ -921,10 +921,10 @@ const debugConfig = {
 // Test different scenarios
 async function testReviewScenarios() {
   // Test immediate request
-  await CapacitorNativeUpdate.AppReview.requestReview();
+  await NativeUpdate.AppReview.requestReview();
 
   // Test eligibility check
-  const canRequest = await CapacitorNativeUpdate.AppReview.canRequestReview();
+  const canRequest = await NativeUpdate.AppReview.canRequestReview();
   console.log('Can request review:', canRequest);
 
   // Test custom triggers

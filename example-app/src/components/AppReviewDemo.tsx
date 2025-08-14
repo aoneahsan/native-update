@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { useUpdateContext } from '../context/UpdateContext';
 
 export default function AppReviewDemo() {
@@ -10,7 +10,7 @@ export default function AppReviewDemo() {
 
   const checkReviewStatus = async () => {
     try {
-      const result = await CapacitorNativeUpdate.canRequestReview();
+      const result = await NativeUpdate.canRequestReview();
       setCanRequestReview(result.canRequest);
       
       if (result.lastRequestDate) {
@@ -34,7 +34,7 @@ export default function AppReviewDemo() {
     try {
       addLog('info', 'Requesting app review...');
       
-      const result = await CapacitorNativeUpdate.requestReview();
+      const result = await NativeUpdate.requestReview();
       
       if (result.displayed) {
         addLog('success', 'Review prompt was displayed');
@@ -56,7 +56,7 @@ export default function AppReviewDemo() {
     try {
       addLog('warning', 'Force requesting review (bypassing rate limits)...');
       
-      const result = await CapacitorNativeUpdate.requestReview({ 
+      const result = await NativeUpdate.requestReview({ 
         force: true 
       });
       
@@ -73,7 +73,7 @@ export default function AppReviewDemo() {
   const openStoreReview = async () => {
     try {
       addLog('info', 'Opening store review page...');
-      await CapacitorNativeUpdate.openStoreReview();
+      await NativeUpdate.openStoreReview();
       addLog('success', 'Store review page opened');
     } catch (error) {
       addLog('error', `Failed to open store review: ${error.message}`);
@@ -83,7 +83,7 @@ export default function AppReviewDemo() {
   const resetReviewPrompts = async () => {
     try {
       addLog('info', 'Resetting review prompts...');
-      await CapacitorNativeUpdate.resetReviewPrompts();
+      await NativeUpdate.resetReviewPrompts();
       addLog('success', 'Review prompts reset');
       await checkReviewStatus();
     } catch (error) {
@@ -102,7 +102,7 @@ export default function AppReviewDemo() {
 
   const getReviewUrl = async () => {
     try {
-      const result = await CapacitorNativeUpdate.getStoreReviewUrl();
+      const result = await NativeUpdate.getStoreReviewUrl();
       addLog('info', `Review URL: ${result.url}`);
       navigator.clipboard.writeText(result.url);
       addLog('success', 'Review URL copied to clipboard');

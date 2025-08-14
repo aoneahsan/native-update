@@ -4,7 +4,7 @@ import type {
   BundleInfo,
   LatestVersion,
   SyncResult,
-} from 'capacitor-native-update';
+} from 'native-update';
 
 interface LiveUpdatePanelProps {
   updateService: UpdateService;

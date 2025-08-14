@@ -57,7 +57,7 @@ Live Updates, also known as Over-The-Air (OTA) updates, allow you to deploy Java
 
 ```typescript
 // 1. Configure live updates
-await CapacitorNativeUpdate.configure({
+await NativeUpdate.configure({
   liveUpdate: {
     appId: 'com.myapp.example',
     serverUrl: 'https://updates.myserver.com',
@@ -66,7 +66,7 @@ await CapacitorNativeUpdate.configure({
 });
 
 // 2. Sync updates (automatic with autoUpdate: true)
-const result = await CapacitorNativeUpdate.LiveUpdate.sync();
+const result = await NativeUpdate.LiveUpdate.sync();
 
 // 3. Handle the result
 switch (result.status) {
@@ -87,7 +87,7 @@ class LiveUpdateManager {
 
   async initialize() {
     // Configure with advanced options
-    await CapacitorNativeUpdate.configure({
+    await NativeUpdate.configure({
       liveUpdate: {
         appId: 'com.myapp.example',
         serverUrl: 'https://updates.myserver.com',
@@ -108,7 +108,7 @@ class LiveUpdateManager {
 
   private setupUpdateListeners() {
     // Download progress
-    CapacitorNativeUpdate.LiveUpdate.addListener(
+    NativeUpdate.LiveUpdate.addListener(
       'downloadProgress',
       (progress) => {
         this.updateDownloadProgress(progress.percent);
@@ -116,7 +116,7 @@ class LiveUpdateManager {
     );
 
     // State changes
-    CapacitorNativeUpdate.LiveUpdate.addListener(
+    NativeUpdate.LiveUpdate.addListener(
       'updateStateChanged',
       (event) => {
         this.handleStateChange(event);
@@ -126,8 +126,8 @@ class LiveUpdateManager {
 
   async checkForUpdates() {
     try {
-      const latest = await CapacitorNativeUpdate.LiveUpdate.getLatest();
-      const current = await CapacitorNativeUpdate.LiveUpdate.current();
+      const latest = await NativeUpdate.LiveUpdate.getLatest();
+      const current = await NativeUpdate.LiveUpdate.current();
 
       if (this.isNewerVersion(latest.version, current.version)) {
         this.updateAvailable = true;
@@ -142,7 +142,7 @@ class LiveUpdateManager {
     if (!this.updateAvailable) return;
 
     try {
-      const bundle = await CapacitorNativeUpdate.LiveUpdate.download({
+      const bundle = await NativeUpdate.LiveUpdate.download({
         version: 'latest',
         onProgress: (progress) => {
           console.log(`Download: ${progress.percent}%`);
@@ -150,7 +150,7 @@ class LiveUpdateManager {
       });
 
       // Validate the bundle
-      const validation = await CapacitorNativeUpdate.LiveUpdate.validateUpdate({
+      const validation = await NativeUpdate.LiveUpdate.validateUpdate({
         bundleId: bundle.bundleId,
       });
 
@@ -166,10 +166,10 @@ class LiveUpdateManager {
 
   async installUpdate(bundle: BundleInfo) {
     // Set the bundle as active
-    await CapacitorNativeUpdate.LiveUpdate.set(bundle);
+    await NativeUpdate.LiveUpdate.set(bundle);
 
     // Notify app is ready (important for rollback mechanism)
-    await CapacitorNativeUpdate.LiveUpdate.notifyAppReady();
+    await NativeUpdate.LiveUpdate.notifyAppReady();
 
     // Schedule reload based on user preference
     this.scheduleReload();
@@ -177,12 +177,12 @@ class LiveUpdateManager {
 
   private scheduleReload() {
     // Option 1: Immediate reload
-    // await CapacitorNativeUpdate.LiveUpdate.reload();
+    // await NativeUpdate.LiveUpdate.reload();
 
     // Option 2: Reload on next app resume
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
-        CapacitorNativeUpdate.LiveUpdate.reload();
+        NativeUpdate.LiveUpdate.reload();
       }
     });
 
@@ -254,7 +254,7 @@ The plugin uses semantic versioning (MAJOR.MINOR.PATCH):
 
 ```typescript
 // Version comparison
-const current = await CapacitorNativeUpdate.LiveUpdate.current();
+const current = await NativeUpdate.LiveUpdate.current();
 console.log(current.version); // "1.2.3"
 
 // Check if update is major/minor/patch
@@ -273,7 +273,7 @@ function getUpdateType(oldVersion: string, newVersion: string) {
 
 ```typescript
 // List all downloaded bundles
-const bundles = await CapacitorNativeUpdate.LiveUpdate.list();
+const bundles = await NativeUpdate.LiveUpdate.list();
 
 bundles.forEach((bundle) => {
   console.log(`Version: ${bundle.version}`);
@@ -283,7 +283,7 @@ bundles.forEach((bundle) => {
 });
 
 // Clean up old bundles
-await CapacitorNativeUpdate.LiveUpdate.delete({
+await NativeUpdate.LiveUpdate.delete({
   keepNewest: 3, // Keep only 3 most recent bundles
 });
 ```
@@ -302,7 +302,7 @@ async function onAppReady() {
     await performHealthCheck();
 
     // Notify that app started successfully
-    await CapacitorNativeUpdate.LiveUpdate.notifyAppReady();
+    await NativeUpdate.LiveUpdate.notifyAppReady();
   } catch (error) {
     // Don't call notifyAppReady() - automatic rollback will occur
     console.error('App startup failed:', error);
@@ -314,14 +314,14 @@ async function onAppReady() {
 
 ```typescript
 // Reset to original bundle
-await CapacitorNativeUpdate.LiveUpdate.reset();
+await NativeUpdate.LiveUpdate.reset();
 
 // Or rollback to previous version
-const bundles = await CapacitorNativeUpdate.LiveUpdate.list();
+const bundles = await NativeUpdate.LiveUpdate.list();
 const previousBundle = bundles[bundles.length - 2];
 if (previousBundle) {
-  await CapacitorNativeUpdate.LiveUpdate.set(previousBundle);
-  await CapacitorNativeUpdate.LiveUpdate.reload();
+  await NativeUpdate.LiveUpdate.set(previousBundle);
+  await NativeUpdate.LiveUpdate.reload();
 }
 ```
 
@@ -334,7 +334,7 @@ Use channels to manage different release tracks.
 ```typescript
 // Set channel based on user preference
 const channel = getUserPreference('updateChannel') || 'production';
-await CapacitorNativeUpdate.LiveUpdate.setChannel(channel);
+await NativeUpdate.LiveUpdate.setChannel(channel);
 
 // Available channels examples:
 // - 'production': Stable releases
@@ -349,7 +349,7 @@ await CapacitorNativeUpdate.LiveUpdate.setChannel(channel);
 ```typescript
 // Enable features based on channel
 async function getFeatureFlags() {
-  const bundle = await CapacitorNativeUpdate.LiveUpdate.current();
+  const bundle = await NativeUpdate.LiveUpdate.current();
 
   switch (bundle.metadata?.channel) {
     case 'alpha':
@@ -379,7 +379,7 @@ async function getFeatureFlags() {
 2. **Implement delta updates** (coming soon):
    ```typescript
    // Future API
-   const delta = await CapacitorNativeUpdate.LiveUpdate.downloadDelta({
+   const delta = await NativeUpdate.LiveUpdate.downloadDelta({
      fromVersion: current.version,
      toVersion: latest.version,
    });
@@ -410,12 +410,12 @@ async function getFeatureFlags() {
 
 ```typescript
 // Monitor storage usage
-const storage = await CapacitorNativeUpdate.LiveUpdate.getStorageInfo();
+const storage = await NativeUpdate.LiveUpdate.getStorageInfo();
 console.log(`Used: ${storage.usedBytes} / ${storage.totalBytes}`);
 
 // Clean up when needed
 if (storage.usedBytes > storage.totalBytes * 0.8) {
-  await CapacitorNativeUpdate.LiveUpdate.delete({
+  await NativeUpdate.LiveUpdate.delete({
     olderThan: Date.now() - 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 }
@@ -427,7 +427,7 @@ if (storage.usedBytes > storage.totalBytes * 0.8) {
 
 ```typescript
 try {
-  await CapacitorNativeUpdate.LiveUpdate.sync();
+  await NativeUpdate.LiveUpdate.sync();
 } catch (error) {
   switch (error.code) {
     case 'NETWORK_ERROR':
@@ -442,7 +442,7 @@ try {
 
     case 'CHECKSUM_ERROR':
       // Bundle corrupted
-      await CapacitorNativeUpdate.LiveUpdate.delete({
+      await NativeUpdate.LiveUpdate.delete({
         bundleId: error.bundleId,
       });
       break;
@@ -474,7 +474,7 @@ class UpdateRetryManager {
 
   async syncWithRetry() {
     try {
-      await CapacitorNativeUpdate.LiveUpdate.sync();
+      await NativeUpdate.LiveUpdate.sync();
       this.retryCount = 0; // Reset on success
     } catch (error) {
       if (this.shouldRetry(error)) {
@@ -526,7 +526,7 @@ const devConfig = {
 };
 
 // Force update check
-await CapacitorNativeUpdate.LiveUpdate.sync({ forceCheck: true });
+await NativeUpdate.LiveUpdate.sync({ forceCheck: true });
 
 // Simulate different scenarios
 await testUpdateScenarios();
@@ -565,7 +565,7 @@ function shouldReceiveUpdate(userId: string, percentage: number): boolean {
 
 if (shouldReceiveUpdate(user.id, 10)) {
   // 10% rollout
-  await CapacitorNativeUpdate.LiveUpdate.setChannel('beta');
+  await NativeUpdate.LiveUpdate.setChannel('beta');
 }
 ```
 
@@ -573,7 +573,7 @@ if (shouldReceiveUpdate(user.id, 10)) {
 
 ```typescript
 // Notify users about updates
-CapacitorNativeUpdate.LiveUpdate.addListener('updateStateChanged', (event) => {
+NativeUpdate.LiveUpdate.addListener('updateStateChanged', (event) => {
   if (event.status === 'READY') {
     showNotification({
       title: 'Update Ready',

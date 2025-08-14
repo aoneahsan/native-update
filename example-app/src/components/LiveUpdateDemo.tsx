@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { NativeUpdate } from 'native-update';
 import { useUpdateContext } from '../context/UpdateContext';
 
 export default function LiveUpdateDemo() {
@@ -20,7 +20,7 @@ export default function LiveUpdateDemo() {
 
   const loadCurrentVersion = async () => {
     try {
-      const current = await CapacitorNativeUpdate.getCurrentBundle();
+      const current = await NativeUpdate.getCurrentBundle();
       setCurrentVersion(current.version || '1.0.0');
       addLog('info', `Current version: ${current.version}`);
     } catch (error) {
@@ -30,7 +30,7 @@ export default function LiveUpdateDemo() {
 
   const loadBundles = async () => {
     try {
-      const result = await CapacitorNativeUpdate.getBundles();
+      const result = await NativeUpdate.getBundles();
       setBundles(result.bundles || []);
     } catch (error) {
       addLog('error', `Failed to load bundles: ${error.message}`);
@@ -42,7 +42,7 @@ export default function LiveUpdateDemo() {
     addLog('info', 'Checking for updates...');
 
     try {
-      const result = await CapacitorNativeUpdate.checkForUpdate();
+      const result = await NativeUpdate.checkForUpdate();
       
       if (result.available) {
         setUpdateAvailable(true);
@@ -74,12 +74,12 @@ export default function LiveUpdateDemo() {
 
     try {
       // Set up progress listener
-      const progressListener = CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+      const progressListener = NativeUpdate.addListener('downloadProgress', (progress) => {
         setDownloadProgress(progress.percent);
         addLog('info', `Download progress: ${progress.percent}%`);
       });
 
-      const result = await CapacitorNativeUpdate.downloadUpdate({
+      const result = await NativeUpdate.downloadUpdate({
         onProgress: (progress) => {
           setDownloadProgress(progress.percent);
         }
@@ -101,10 +101,10 @@ export default function LiveUpdateDemo() {
       addLog('info', 'Applying update...');
       
       if (bundleId) {
-        await CapacitorNativeUpdate.setBundle(bundleId);
+        await NativeUpdate.setBundle(bundleId);
       }
       
-      await CapacitorNativeUpdate.applyUpdate();
+      await NativeUpdate.applyUpdate();
       addLog('success', 'Update applied! App will restart...');
     } catch (error) {
       addLog('error', `Failed to apply update: ${error.message}`);
@@ -118,7 +118,7 @@ export default function LiveUpdateDemo() {
 
   const deleteBundle = async (bundleId: string) => {
     try {
-      await CapacitorNativeUpdate.deleteBundle(bundleId);
+      await NativeUpdate.deleteBundle(bundleId);
       addLog('success', `Deleted bundle: ${bundleId}`);
       await loadBundles();
     } catch (error) {
@@ -128,7 +128,7 @@ export default function LiveUpdateDemo() {
 
   const resetToOriginal = async () => {
     try {
-      await CapacitorNativeUpdate.reset();
+      await NativeUpdate.reset();
       addLog('success', 'Reset to original bundle');
       await loadCurrentVersion();
       await loadBundles();
@@ -139,7 +139,7 @@ export default function LiveUpdateDemo() {
 
   const switchChannel = async (newChannel: string) => {
     try {
-      await CapacitorNativeUpdate.setChannel(newChannel);
+      await NativeUpdate.setChannel(newChannel);
       setChannel(newChannel);
       addLog('success', `Switched to ${newChannel} channel`);
     } catch (error) {
@@ -149,7 +149,7 @@ export default function LiveUpdateDemo() {
 
   const notifyAppReady = async () => {
     try {
-      await CapacitorNativeUpdate.notifyAppReady();
+      await NativeUpdate.notifyAppReady();
       addLog('success', 'App marked as ready');
     } catch (error) {
       addLog('error', `Failed to notify app ready: ${error.message}`);
@@ -159,7 +159,7 @@ export default function LiveUpdateDemo() {
   const syncUpdate = async () => {
     try {
       addLog('info', 'Starting sync...');
-      const result = await CapacitorNativeUpdate.sync();
+      const result = await NativeUpdate.sync();
       
       switch (result.status) {
         case 'UPDATE_AVAILABLE':

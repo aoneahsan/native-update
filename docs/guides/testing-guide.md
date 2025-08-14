@@ -45,7 +45,7 @@ src/__tests__/
 
 2. **Configure Plugin**
    ```typescript
-   await CapacitorNativeUpdate.configure({
+   await NativeUpdate.configure({
      serverUrl: 'http://localhost:3000',
      channel: 'development',
      autoCheck: true,
@@ -55,12 +55,12 @@ src/__tests__/
 3. **Test Update Flow**
    ```typescript
    // Check for updates
-   const update = await CapacitorNativeUpdate.checkForUpdate();
+   const update = await NativeUpdate.checkForUpdate();
    
    // Download if available
    if (update.available) {
-     await CapacitorNativeUpdate.downloadUpdate();
-     await CapacitorNativeUpdate.applyUpdate();
+     await NativeUpdate.downloadUpdate();
+     await NativeUpdate.applyUpdate();
    }
    ```
 
@@ -110,7 +110,7 @@ src/__tests__/
 ```typescript
 // Test HTTPS enforcement
 try {
-  await CapacitorNativeUpdate.configure({
+  await NativeUpdate.configure({
     serverUrl: 'http://insecure.com', // Should fail
   });
 } catch (error) {
@@ -124,7 +124,7 @@ try {
 node tools/bundle-signer.js sign test-bundle.zip private-key.pem
 
 # Verify in app
-const isValid = await CapacitorNativeUpdate.verifySignature(
+const isValid = await NativeUpdate.verifySignature(
   bundleData,
   signature
 );
@@ -135,7 +135,7 @@ const isValid = await CapacitorNativeUpdate.verifySignature(
 #### Download Performance
 ```typescript
 // Monitor download speed
-CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
+NativeUpdate.addListener('downloadProgress', (progress) => {
   console.log(`Speed: ${progress.speed} MB/s`);
   console.log(`Progress: ${progress.percent}%`);
 });
@@ -170,23 +170,23 @@ CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
    // Full update test
    async function testCompleteUpdate() {
      // Configure
-     await CapacitorNativeUpdate.configure({
+     await NativeUpdate.configure({
        serverUrl: 'https://your-server.com',
        publicKey: 'your-public-key',
      });
      
      // Check
-     const update = await CapacitorNativeUpdate.checkForUpdate();
+     const update = await NativeUpdate.checkForUpdate();
      if (!update.available) return;
      
      // Download with progress
-     await CapacitorNativeUpdate.downloadUpdate();
+     await NativeUpdate.downloadUpdate();
      
      // Apply
-     await CapacitorNativeUpdate.applyUpdate();
+     await NativeUpdate.applyUpdate();
      
      // Verify
-     const current = await CapacitorNativeUpdate.getCurrentVersion();
+     const current = await NativeUpdate.getCurrentVersion();
      console.log('Updated to:', current.version);
    }
    ```
@@ -196,7 +196,7 @@ CapacitorNativeUpdate.addListener('downloadProgress', (progress) => {
 #### Network Failures
 ```typescript
 // Test offline behavior
-await CapacitorNativeUpdate.checkForUpdate()
+await NativeUpdate.checkForUpdate()
   .catch(error => {
     expect(error.code).toBe('NETWORK_ERROR');
   });
@@ -206,7 +206,7 @@ await CapacitorNativeUpdate.checkForUpdate()
 ```typescript
 // Test checksum validation
 const corruptedBundle = await fetch('corrupted-bundle.zip');
-await CapacitorNativeUpdate.applyUpdate(corruptedBundle)
+await NativeUpdate.applyUpdate(corruptedBundle)
   .catch(error => {
     expect(error.code).toBe('CHECKSUM_ERROR');
   });
@@ -218,13 +218,13 @@ await CapacitorNativeUpdate.applyUpdate(corruptedBundle)
 // Test rollback mechanism
 async function testRollback() {
   // Apply bad update
-  await CapacitorNativeUpdate.applyUpdate(badUpdate);
+  await NativeUpdate.applyUpdate(badUpdate);
   
   // Simulate app crash
   await simulateCrash();
   
   // Verify rollback on restart
-  const version = await CapacitorNativeUpdate.getCurrentVersion();
+  const version = await NativeUpdate.getCurrentVersion();
   expect(version).toBe(previousVersion);
 }
 ```
@@ -334,7 +334,7 @@ artillery quick --count 100 --num 10 \
 
 ### Enable Debug Logging
 ```typescript
-CapacitorNativeUpdate.configure({
+NativeUpdate.configure({
   debug: true,
   logLevel: 'verbose',
 });
