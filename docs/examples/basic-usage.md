@@ -106,20 +106,38 @@ async function onTaskCompleted() {
 ## Configuration Options
 
 ```typescript
-// Initialize with custom configuration
-NativeUpdate.configure({
-  // Live update settings
-  autoCheckOnStart: true,
-  updateCheckInterval: 3600000, // 1 hour
-  updateChannel: 'production',
-  
-  // Security settings
-  enableSignatureVerification: true,
-  publicKey: 'your-public-key',
-  
-  // App review settings
-  minimumDaysSinceInstall: 3,
-  minimumDaysSinceLastPrompt: 30
+// Option 1: Direct configuration (auto-initializes if not already initialized)
+await NativeUpdate.configure({
+  config: {
+    // Live update settings
+    autoUpdate: true,
+    updateCheckInterval: 3600000, // 1 hour
+    updateChannel: 'production',
+    
+    // Security settings
+    enableSignatureVerification: true,
+    publicKey: 'your-public-key',
+    
+    // App review settings
+    minimumDaysSinceInstall: 3,
+    minimumDaysSinceLastPrompt: 30
+  }
+});
+
+// Option 2: Explicit initialization (if you need more control)
+await NativeUpdate.initialize({
+  config: {
+    autoUpdate: true,
+    updateChannel: 'production'
+  }
+});
+
+// Later, you can update configuration
+await NativeUpdate.configure({
+  config: {
+    updateChannel: 'staging',
+    autoUpdate: false
+  }
 });
 ```
 

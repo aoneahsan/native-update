@@ -62,14 +62,13 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   // NativeUpdatePlugin methods
   async configure(options: { config: PluginInitConfig }): Promise<void> {
     if (!this.initialized) {
-      throw new NativeUpdateError(
-        ErrorCode.NOT_CONFIGURED,
-        'Plugin not initialized. Call initialize() first.'
-      );
+      // Auto-initialize with the provided config
+      await this.initialize(options.config);
+    } else {
+      // Apply plugin configuration
+      const configManager = this.pluginManager.getConfigManager();
+      configManager.configure(options.config);
     }
-    // Apply plugin configuration
-    const configManager = this.pluginManager.getConfigManager();
-    configManager.configure(options.config);
   }
 
   async getSecurityInfo(): Promise<SecurityInfo> {

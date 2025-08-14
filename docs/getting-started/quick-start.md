@@ -24,21 +24,20 @@ import { NativeUpdate } from 'native-update';
 // Initialize the plugin with your configuration
 async function initializeUpdates() {
   await NativeUpdate.configure({
-    liveUpdate: {
-      appId: 'com.yourcompany.app',
-      serverUrl: 'https://updates.yourserver.com',
-      channel: 'production',
+    config: {
+      // Live update settings
       autoUpdate: true,
+      updateChannel: 'production',
       updateStrategy: 'IMMEDIATE',
-    },
-    appUpdate: {
-      checkOnAppStart: true,
-      minimumVersion: '1.0.0',
-    },
-    appReview: {
+      
+      // Security settings
+      enableSignatureVerification: true,
+      publicKey: 'your-public-key',
+      
+      // App review settings
       minimumDaysSinceInstall: 7,
       minimumLaunchCount: 3,
-    },
+    }
   });
 }
 
