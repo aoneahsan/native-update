@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 import LiveUpdateDemo from './components/LiveUpdateDemo';
 import AppUpdateDemo from './components/AppUpdateDemo';
 import AppReviewDemo from './components/AppReviewDemo';

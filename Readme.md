@@ -84,7 +84,7 @@ Increase user engagement with intelligent review prompts:
 ## Installation
 
 ```bash
-npm install capacitor-native-update
+npm install native-update
 npx cap sync
 ```
 
@@ -93,7 +93,7 @@ npx cap sync
 ### 1. Basic Setup
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 
 // Initialize on app start
 async function initializeApp() {
@@ -171,7 +171,7 @@ async function requestAppReview() {
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 import { AlertController } from '@ionic/angular';
 
 @Component({
@@ -411,7 +411,7 @@ This package is **open-source** and created by **Ahsan Mahmood** for the develop
 
 ### Community Resources
 
-- **[GitHub Repository](https://github.com/aoneahsan/capacitor-native-update)** - Source code and issues
+- **[GitHub Repository](https://github.com/aoneahsan/native-update)** - Source code and issues
 - **[Documentation](./docs/README.md)** - Comprehensive documentation
 - **[Examples](./docs/examples/)** - Real-world usage examples
 - **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute
@@ -439,7 +439,7 @@ MIT License - see [LICENSE](./LICENSE) for details.
 - 📧 Email: aoneahsan@gmail.com
 - 🌐 Website: [Ahsan Mahmood](https://aoneahsan.com)
 - 💼 LinkedIn: [Ahsan Mahmood](https://linkedin.com/in/aoneahsan)
-- 🐛 Issues: [GitHub Issues](https://github.com/aoneahsan/capacitor-native-update/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/aoneahsan/native-update/issues)
 
 ## Author
 

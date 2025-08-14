@@ -1,7 +1,7 @@
 {
-  "name": "capacitor-native-update-example",
+  "name": "native-update-example",
   "version": "1.0.0",
-  "description": "Example app demonstrating all features of capacitor-native-update plugin",
+  "description": "Example app demonstrating all features of native-update plugin",
   "main": "index.js",
   "scripts": {
     "start": "vite",
@@ -16,7 +16,7 @@
     "@capacitor/android": "^5.0.0",
     "@capacitor/core": "^5.0.0",
     "@capacitor/ios": "^5.0.0",
-    "capacitor-native-update": "file:..",
+    "native-update": "file:..",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

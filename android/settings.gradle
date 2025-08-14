@@ -1,2 +1,2 @@
-include ':capacitor-native-update'
-project(':capacitor-native-update').projectDir = new File('../.')
+include ':native-update'
+project(':native-update').projectDir = new File('../.')

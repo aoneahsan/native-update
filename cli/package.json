@@ -1,7 +1,7 @@
 {
-  "name": "capacitor-native-update-cli",
+  "name": "native-update-cli",
   "version": "1.0.0",
-  "description": "CLI for Capacitor Native Update",
+  "description": "CLI for Native Update",
   "type": "module",
   "bin": {
     "cap-update": "./cap-update.js"

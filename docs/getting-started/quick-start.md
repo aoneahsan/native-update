@@ -19,7 +19,7 @@ Get up and running with Capacitor Native Update in just a few minutes! This guid
 ### 1. Import and Configure
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 
 // Initialize the plugin with your configuration
 async function initializeUpdates() {
@@ -214,7 +214,7 @@ requestReviewIfAppropriate();
 ```typescript
 // In your main app component
 import { App } from '@capacitor/app';
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 
 App.addListener('appStateChange', async ({ isActive }) => {
   if (isActive) {

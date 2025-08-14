@@ -1,7 +1,7 @@
 {
-  "name": "capacitor-native-update-server",
+  "name": "native-update-server",
   "version": "1.0.0",
-  "description": "Example update server for Capacitor Native Update plugin",
+  "description": "Example update server for Native Update plugin",
   "type": "module",
   "main": "server.js",
   "scripts": {

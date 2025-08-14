@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.aoneahsan.nativeupdate',
-  appName: 'capacitor-native-update',
+  appName: 'native-update',
   webDir: 'dist',
 };
 

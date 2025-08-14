@@ -32,13 +32,13 @@ Before installing the plugin, ensure you have:
 Using npm:
 
 ```bash
-npm install capacitor-native-update
+npm install native-update
 ```
 
 Using yarn:
 
 ```bash
-yarn add capacitor-native-update
+yarn add native-update
 ```
 
 ### 2. Sync Native Projects
@@ -110,7 +110,7 @@ No additional setup is required for web platform. The plugin provides fallback i
 In your app's initialization code (e.g., `main.ts`, `app.component.ts`, or `App.jsx`):
 
 ```typescript
-import { CapacitorNativeUpdate } from 'capacitor-native-update';
+import { CapacitorNativeUpdate } from 'native-update';
 
 // Basic initialization
 await CapacitorNativeUpdate.configure({
@@ -160,7 +160,7 @@ import type {
   UpdateConfig,
   BundleInfo,
   SyncResult,
-} from 'capacitor-native-update';
+} from 'native-update';
 ```
 
 ## Troubleshooting Installation
@@ -201,7 +201,7 @@ After successful installation:
 If you encounter any issues during installation:
 
 - Check our [Troubleshooting Guide](../guides/troubleshooting.md)
-- Search existing [GitHub Issues](https://github.com/aoneahsan/capacitor-native-update/issues)
+- Search existing [GitHub Issues](https://github.com/aoneahsan/native-update/issues)
 - Create a new issue with detailed information about your setup
 
 ---

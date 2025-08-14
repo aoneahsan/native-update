@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Capacitor plugin project called "capacitor-native-update" that provides a comprehensive update solution combining:
+This is a Capacitor plugin project called "native-update" that provides a comprehensive update solution combining:
 
 1. **Live/OTA Updates** - Deploy JavaScript/HTML/CSS updates instantly without app store approval
 2. **Native App Updates** - Check and prompt for app store updates

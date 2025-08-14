@@ -381,7 +381,7 @@ export class NativeUpdateWeb
     // Update last request time
     this.lastReviewRequest = Date.now();
     localStorage.setItem(
-      'capacitor-native-update-last-review',
+      'native-update-last-review',
       this.lastReviewRequest.toString()
     );
 
@@ -721,14 +721,14 @@ export class NativeUpdateWeb
 
   private loadStoredData(): void {
     // Load configuration
-    const storedConfig = localStorage.getItem('capacitor-native-update-config');
+    const storedConfig = localStorage.getItem('native-update-config');
     if (storedConfig) {
       this.config = JSON.parse(storedConfig);
     }
 
     // Load bundles
     const storedBundles = localStorage.getItem(
-      'capacitor-native-update-bundles'
+      'native-update-bundles'
     );
     if (storedBundles) {
       const bundlesArray: BundleInfo[] = JSON.parse(storedBundles);
@@ -739,7 +739,7 @@ export class NativeUpdateWeb
 
     // Load current bundle
     const storedCurrent = localStorage.getItem(
-      'capacitor-native-update-current'
+      'native-update-current'
     );
     if (storedCurrent) {
       this.currentBundle = JSON.parse(storedCurrent);
@@ -755,7 +755,7 @@ export class NativeUpdateWeb
 
     // Load launch count
     const storedLaunchCount = localStorage.getItem(
-      'capacitor-native-update-launch-count'
+      'native-update-launch-count'
     );
     if (storedLaunchCount) {
       this.launchCount = parseInt(storedLaunchCount, 10);
@@ -764,13 +764,13 @@ export class NativeUpdateWeb
 
   private saveStoredData(): void {
     localStorage.setItem(
-      'capacitor-native-update-bundles',
+      'native-update-bundles',
       JSON.stringify(Array.from(this.bundles.values()))
     );
 
     if (this.currentBundle) {
       localStorage.setItem(
-        'capacitor-native-update-current',
+        'native-update-current',
         JSON.stringify(this.currentBundle)
       );
     }
@@ -778,20 +778,20 @@ export class NativeUpdateWeb
 
   private saveConfiguration(): void {
     localStorage.setItem(
-      'capacitor-native-update-config',
+      'native-update-config',
       JSON.stringify(this.config)
     );
   }
 
   private getInstallDate(): number {
-    const stored = localStorage.getItem('capacitor-native-update-install-date');
+    const stored = localStorage.getItem('native-update-install-date');
     if (stored) {
       return parseInt(stored, 10);
     }
 
     const now = Date.now();
     localStorage.setItem(
-      'capacitor-native-update-install-date',
+      'native-update-install-date',
       now.toString()
     );
     return now;
@@ -800,7 +800,7 @@ export class NativeUpdateWeb
   private incrementLaunchCount(): void {
     this.launchCount++;
     localStorage.setItem(
-      'capacitor-native-update-launch-count',
+      'native-update-launch-count',
       this.launchCount.toString()
     );
   }

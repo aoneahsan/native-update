@@ -1,4 +1,4 @@
-# Contributing to Capacitor Native Update
+# Contributing to Native Update
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
@@ -24,8 +24,8 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/aoneahsan/capacitor-native-update.git
-cd capacitor-native-update
+git clone https://github.com/aoneahsan/native-update.git
+cd native-update
 ```
 
 2. Install dependencies:

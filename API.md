@@ -1,6 +1,6 @@
-# Capacitor Native Update - API Reference
+# Native Update - API Reference
 
-This document provides a complete API reference for the Capacitor Native Update plugin.
+This document provides a complete API reference for the Native Update plugin.
 
 ## Table of Contents
 
