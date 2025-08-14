@@ -4,12 +4,12 @@ Complete API documentation for native app store update functionality.
 
 ## Methods
 
-### checkAppUpdate()
+### getAppUpdateInfo()
 
-Check if a native app update is available in the app store.
+Get information about available app updates in the app store.
 
 ```typescript
-const result = await NativeUpdate.checkAppUpdate();
+const result = await NativeUpdate.getAppUpdateInfo();
 // Returns:
 {
   updateAvailable: boolean;
@@ -29,13 +29,13 @@ const result = await NativeUpdate.checkAppUpdate();
 }
 ```
 
-### startImmediateUpdate()
+### performImmediateUpdate()
 
-Start an immediate (blocking) update. Android only - shows full-screen update UI.
+Perform an immediate (blocking) update. Android only - shows full-screen update UI.
 
 ```typescript
 try {
-  await NativeUpdate.startImmediateUpdate();
+  await NativeUpdate.performImmediateUpdate();
   // App will restart after update
 } catch (error) {
   // User cancelled or update failed
@@ -60,72 +60,15 @@ await NativeUpdate.completeFlexibleUpdate();
 // App will restart
 ```
 
-### getVersionInfo()
-
-Get detailed version information.
-
-```typescript
-const info = await NativeUpdate.getVersionInfo();
-// Returns:
-{
-  currentVersion: string;      // e.g., "1.2.3"
-  buildNumber: string;         // e.g., "123"
-  packageName: string;         // e.g., "com.example.app"
-  platform: 'ios' | 'android' | 'web';
-  availableVersion?: string;   // From app store
-  minimumVersion?: string;     // Minimum required version
-}
-```
-
-### isMinimumVersionMet()
-
-Check if the app meets minimum version requirements.
-
-```typescript
-const result = await NativeUpdate.isMinimumVersionMet();
-// Returns:
-{
-  isMet: boolean;
-  currentVersion: string;
-  minimumVersion: string;
-  updateRequired: boolean;
-}
-```
-
 ### openAppStore()
 
 Open the app store page for updates.
 
 ```typescript
-await NativeUpdate.openAppStore();
-```
-
-### getAppStoreUrl()
-
-Get the app store URL without opening it.
-
-```typescript
-const result = await NativeUpdate.getAppStoreUrl();
-// Returns:
-{
-  url: string;  // e.g., "https://apps.apple.com/app/id123456789"
-  platform: 'ios' | 'android' | 'web';
-}
-```
-
-### getUpdateInstallState()
-
-Get the current install state of a flexible update. Android only.
-
-```typescript
-const state = await NativeUpdate.getUpdateInstallState();
-// Returns:
-{
-  installStatus: number;    // Android InstallStatus code
-  bytesDownloaded: number;
-  totalBytesToDownload: number;
-  percentComplete: number;
-}
+await NativeUpdate.openAppStore({
+  // Optional: specify app ID for iOS or package name for Android
+  appId: 'your-app-id'
+});
 ```
 
 ## Events
@@ -200,9 +143,9 @@ NativeUpdate.addListener('appUpdateProgress', (progress) => {
 1. **Check for updates on app start**
    ```typescript
    async function checkOnStart() {
-     const result = await NativeUpdate.checkAppUpdate();
+     const result = await NativeUpdate.getAppUpdateInfo();
      if (result.updateAvailable && result.updatePriority === 'IMMEDIATE') {
-       await NativeUpdate.startImmediateUpdate();
+       await NativeUpdate.performImmediateUpdate();
      }
    }
    ```
@@ -228,7 +171,7 @@ NativeUpdate.addListener('appUpdateProgress', (progress) => {
 3. **Fallback for iOS**
    ```typescript
    if (platform === 'ios') {
-     const result = await NativeUpdate.checkAppUpdate();
+     const result = await NativeUpdate.getAppUpdateInfo();
      if (result.updateAvailable) {
        showUpdateDialog(() => {
          NativeUpdate.openAppStore();

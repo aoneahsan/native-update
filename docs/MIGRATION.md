@@ -188,5 +188,5 @@ await NativeUpdate.configure(config);
 ### Getting Help
 
 - Check our [example app](../example) for implementation patterns
-- Review the [API documentation](../API.md)
+- Review the [API documentation](./api/live-update-api.md)
 - File issues on GitHub for migration problems

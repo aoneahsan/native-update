@@ -70,26 +70,19 @@ import { NativeUpdate } from 'native-update';
 export class LiveUpdateService {
   async checkAndApplyUpdates() {
     try {
-      // 1. Check for updates
-      const { available, version } =
-        await NativeUpdate.checkForUpdate();
+      // 1. Sync with the update server
+      const result = await NativeUpdate.sync();
 
-      if (!available) {
+      if (result.status === 'UP_TO_DATE') {
         console.log('No updates available');
         return;
       }
 
-      console.log(`Update ${version} available!`);
-
-      // 2. Download the update
-      await NativeUpdate.downloadUpdate({
-        onProgress: (progress) => {
-          console.log(`Download: ${progress.percent}%`);
-        },
-      });
-
-      // 3. Apply the update (app will restart)
-      await NativeUpdate.applyUpdate();
+      if (result.status === 'UPDATE_INSTALLED') {
+        console.log(`Update ${result.bundle?.version} installed!`);
+        // Reload to apply the update
+        await NativeUpdate.reload();
+      }
     } catch (error) {
       console.error('Update failed:', error);
     }
@@ -107,42 +100,41 @@ export class UpdateUIService {
   ) {}
 
   async checkForUpdatesWithUI() {
-    const { available, version, notes } =
-      await NativeUpdate.checkForUpdate();
+    const result = await NativeUpdate.sync();
 
-    if (!available) return;
+    if (result.status === 'UP_TO_DATE') return;
 
-    // Show update dialog
-    const alert = await this.alertController.create({
-      header: 'Update Available',
-      message: `Version ${version} is ready!\n\n${notes || 'Bug fixes and improvements'}`,
-      buttons: [
-        { text: 'Later', role: 'cancel' },
-        {
-          text: 'Update Now',
-          handler: () => this.downloadAndInstall(),
-        },
-      ],
-    });
+    if (result.status === 'UPDATE_AVAILABLE') {
+      // Show update dialog
+      const alert = await this.alertController.create({
+        header: 'Update Available',
+        message: `Version ${result.bundle?.version} is ready!\n\nBug fixes and improvements`,
+        buttons: [
+          { text: 'Later', role: 'cancel' },
+          {
+            text: 'Update Now',
+            handler: () => this.applyUpdate(),
+          },
+        ],
+      });
 
-    await alert.present();
+      await alert.present();
+    } else if (result.status === 'UPDATE_INSTALLED') {
+      // Update already installed, just need to reload
+      await NativeUpdate.reload();
+    }
   }
 
-  private async downloadAndInstall() {
+  private async applyUpdate() {
     const loading = await this.loadingController.create({
-      message: 'Downloading update...',
+      message: 'Applying update...',
     });
     await loading.present();
 
     try {
-      await NativeUpdate.downloadUpdate({
-        onProgress: (progress) => {
-          loading.message = `Downloading: ${Math.round(progress.percent)}%`;
-        },
-      });
-
-      loading.message = 'Installing...';
-      await NativeUpdate.applyUpdate();
+      // The sync method already downloaded the update
+      // We just need to reload the app
+      await NativeUpdate.reload();
     } catch (error) {
       await loading.dismiss();
       // Show error
@@ -179,7 +171,7 @@ Check for app store updates and install them!
 export class NativeUpdateService {
   async checkForAppStoreUpdates() {
     try {
-      const result = await NativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.getAppUpdateInfo();
 
       if (!result.updateAvailable) {
         console.log('App is up to date');
@@ -200,7 +192,7 @@ export class NativeUpdateService {
   private async handleAndroidUpdate(result: any) {
     if (result.immediateUpdateAllowed) {
       // Critical update - must install
-      await NativeUpdate.startImmediateUpdate();
+      await NativeUpdate.performImmediateUpdate();
     } else {
       // Optional update - download in background
       await NativeUpdate.startFlexibleUpdate();
@@ -422,12 +414,9 @@ export class AppComponent implements OnInit {
   // Live Updates
   private async checkLiveUpdates() {
     try {
-      const { available } = await NativeUpdate.checkForUpdate();
+      const result = await NativeUpdate.sync();
 
-      if (available) {
-        // Auto-download in background
-        await NativeUpdate.downloadUpdate();
-
+      if (result.status === 'UPDATE_INSTALLED') {
         // Notify user
         const toast = await this.toastCtrl.create({
           message: 'Update ready! Restart to apply.',
@@ -435,7 +424,7 @@ export class AppComponent implements OnInit {
           buttons: [
             {
               text: 'Restart',
-              handler: () => NativeUpdate.applyUpdate(),
+              handler: () => NativeUpdate.reload(),
             },
           ],
         });
@@ -462,7 +451,7 @@ export class AppComponent implements OnInit {
 
   private async checkNativeUpdates() {
     try {
-      const result = await NativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.getAppUpdateInfo();
 
       if (result.updateAvailable && result.flexibleUpdateAllowed) {
         // Start background download for Android
@@ -569,8 +558,8 @@ Now that you have the basics working:
    - [Live Updates Guide](./LIVE_UPDATES_GUIDE.md) - Complete OTA implementation
    - [Native Updates Guide](./NATIVE_UPDATES_GUIDE.md) - Platform-specific details
    - [App Review Guide](./APP_REVIEW_GUIDE.md) - Maximize review rates
-   - [Security Guide](./SECURITY.md) - Best practices
-   - [API Reference](../API.md) - All methods and options
+   - [Security Guide](./guides/security-best-practices.md) - Best practices
+   - [API Reference](./api/live-update-api.md) - All methods and options
 
 ## Troubleshooting
 

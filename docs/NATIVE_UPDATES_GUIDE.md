@@ -113,7 +113,7 @@ export class NativeUpdateService {
       const platform = Capacitor.getPlatform();
 
       // Check for native app updates
-      const result = await NativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.getAppUpdateInfo();
 
       if (result.updateAvailable) {
         console.log(`Update available: ${result.availableVersion}`);
@@ -144,7 +144,7 @@ export class AndroidImmediateUpdate {
   async performImmediateUpdate() {
     try {
       // Start immediate update
-      const { started } = await NativeUpdate.startImmediateUpdate();
+      const { started } = await NativeUpdate.performImmediateUpdate();
 
       if (started) {
         // The app will be restarted automatically after update
@@ -261,7 +261,7 @@ export class AndroidFlexibleUpdate {
 export class iOSAppStoreUpdate {
   async checkAndPromptUpdate() {
     try {
-      const result = await NativeUpdate.checkAppUpdate();
+      const result = await NativeUpdate.getAppUpdateInfo();
 
       if (result.updateAvailable) {
         await this.showiOSUpdateDialog(result);
@@ -314,7 +314,7 @@ export class UnifiedUpdateService {
 
   async checkAndUpdateApp() {
     try {
-      const updateInfo = await NativeUpdate.checkAppUpdate();
+      const updateInfo = await NativeUpdate.getAppUpdateInfo();
 
       if (!updateInfo.updateAvailable) {
         console.log('App is up to date');
@@ -534,7 +534,7 @@ export class UpdateUIService {
 ```typescript
 export class SmartUpdateScheduler {
   async scheduleUpdate() {
-    const updateInfo = await NativeUpdate.checkAppUpdate();
+    const updateInfo = await NativeUpdate.getAppUpdateInfo();
 
     if (!updateInfo.updateAvailable) return;
 
@@ -643,7 +643,7 @@ const state = await NativeUpdate.getUpdateState();
 if (state.status === 'FAILED') {
   // Clear update data and retry
   await NativeUpdate.clearUpdateData();
-  await NativeUpdate.checkAppUpdate();
+  await NativeUpdate.getAppUpdateInfo();
 }
 ```
 
@@ -690,5 +690,5 @@ if (!config.appStoreId) {
 
 - Learn about [Live Updates (OTA)](./LIVE_UPDATES_GUIDE.md)
 - Implement [App Review Features](./APP_REVIEW_GUIDE.md)
-- Review [Security Guidelines](./SECURITY.md)
-- Check [API Reference](../API.md)
+- Review [Security Guidelines](./guides/security-best-practices.md)
+- Check [API Reference](./api/app-update-api.md)

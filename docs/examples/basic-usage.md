@@ -17,39 +17,36 @@ import { NativeUpdate } from 'native-update';
 // Check for updates on app startup
 async function checkForUpdates() {
   try {
-    const result = await NativeUpdate.checkForUpdate({
-      updateUrl: 'https://your-update-server.com/api/check',
-      currentVersion: '1.0.0'
+    const result = await NativeUpdate.sync({
+      updateUrl: 'https://your-update-server.com/api/check'
     });
     
-    if (result.updateAvailable) {
-      console.log(`Update available: ${result.version}`);
-      // Download and install the update
-      await downloadAndInstall(result.downloadUrl);
+    if (result.status === 'UPDATE_AVAILABLE') {
+      console.log(`Update available: ${result.bundle?.version}`);
+      // Update will be downloaded and installed automatically
+    } else if (result.status === 'UPDATE_INSTALLED') {
+      // Reload the app to apply the update
+      await NativeUpdate.reload();
     }
   } catch (error) {
     console.error('Update check failed:', error);
   }
 }
 
-async function downloadAndInstall(downloadUrl: string) {
-  // Download the update
-  const download = await NativeUpdate.downloadUpdate({
-    url: downloadUrl
+async function downloadAndInstall(version: string) {
+  // Download a specific version
+  const download = await NativeUpdate.download({
+    version: version
   });
   
-  // Monitor download progress
-  NativeUpdate.addListener('downloadProgress', (progress) => {
-    console.log(`Download progress: ${progress.percent}%`);
-  });
-  
-  // Install the update
-  await NativeUpdate.installUpdate({
-    bundleId: download.bundleId
+  // Set the downloaded bundle as active
+  await NativeUpdate.set({
+    version: download.version,
+    checksum: download.checksum
   });
   
   // Reload the app with new bundle
-  await NativeUpdate.reloadApp();
+  await NativeUpdate.reload();
 }
 ```
 
@@ -58,7 +55,7 @@ async function downloadAndInstall(downloadUrl: string) {
 ```typescript
 // Check if a native app update is available
 async function checkAppStoreUpdate() {
-  const result = await NativeUpdate.checkAppUpdate();
+  const result = await NativeUpdate.getAppUpdateInfo();
   
   if (result.updateAvailable) {
     // Show update prompt to user
@@ -147,12 +144,11 @@ await NativeUpdate.configure({
 // Comprehensive error handling
 async function safeUpdateCheck() {
   try {
-    const result = await NativeUpdate.checkForUpdate({
-      updateUrl: 'https://your-update-server.com/api/check',
-      currentVersion: '1.0.0'
+    const result = await NativeUpdate.sync({
+      updateUrl: 'https://your-update-server.com/api/check'
     });
     
-    if (result.updateAvailable) {
+    if (result.status === 'UPDATE_AVAILABLE' || result.status === 'UPDATE_INSTALLED') {
       await handleUpdate(result);
     }
   } catch (error) {
@@ -172,21 +168,26 @@ async function safeUpdateCheck() {
 ```typescript
 // Set up event listeners
 function setupUpdateListeners() {
+  // Update state changes
+  NativeUpdate.addListener('updateStateChanged', (event) => {
+    console.log('Update state:', event.status);
+    if (event.status === 'READY') {
+      // Update has been applied successfully
+      console.log('Update ready to use');
+    }
+  });
+  
   // Download progress
-  NativeUpdate.addListener('downloadProgress', (event) => {
-    updateProgressBar(event.percent);
+  NativeUpdate.addListener('downloadProgress', (progress) => {
+    console.log(`Download progress: ${progress.percent}%`);
+    console.log(`Speed: ${progress.bytesPerSecond} bytes/s`);
   });
   
-  // Update installed
-  NativeUpdate.addListener('updateInstalled', (event) => {
-    console.log(`Update ${event.version} installed successfully`);
-  });
-  
-  // Update failed
-  NativeUpdate.addListener('updateFailed', (event) => {
-    console.error(`Update failed: ${event.error}`);
-    // Optionally rollback
-    NativeUpdate.rollback();
+  // Background update notifications
+  NativeUpdate.addListener('backgroundUpdateNotification', (event) => {
+    if (event.updateAvailable) {
+      console.log(`Background update available: ${event.version}`);
+    }
   });
 }
 
@@ -199,5 +200,6 @@ function cleanup() {
 ## Next Steps
 
 - See [Advanced Scenarios](./advanced-scenarios.md) for more complex use cases
-- Check [Integration Examples](./integration-examples.md) for framework-specific implementations
-- Read the [API Reference](../api/README.md) for complete method documentation
+- Read the [Live Update API Reference](../api/live-update-api.md) for complete live update methods
+- Read the [App Update API Reference](../api/app-update-api.md) for native update methods
+- Read the [App Review API Reference](../api/app-review-api.md) for review request methods

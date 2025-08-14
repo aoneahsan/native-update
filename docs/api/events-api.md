@@ -64,388 +64,137 @@ NativeUpdate.addListener('downloadProgress', (progress) => {
 }
 ```
 
-### updateInstalled
-
-Fired when an update has been successfully installed.
-
-```typescript
-NativeUpdate.addListener('updateInstalled', (update) => {
-  console.log('Update installed:', update.version);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  bundleId: string;
-  version: string;
-  previousVersion: string;
-  installTime: number;
-  willRestartApp: boolean;
-}
-```
-
-### updateFailed
-
-Fired when an update fails to download or install.
-
-```typescript
-NativeUpdate.addListener('updateFailed', (error) => {
-  console.error('Update failed:', error);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  bundleId?: string;
-  version?: string;
-  error: {
-    code: string;
-    message: string;
-    details?: any;
-  };
-  canRetry: boolean;
-  timestamp: number;
-}
-```
-
-### rollbackOccurred
-
-Fired when the app rolls back to a previous version.
-
-```typescript
-NativeUpdate.addListener('rollbackOccurred', (rollback) => {
-  console.log('Rolled back from:', rollback.failedVersion);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  failedVersion: string;
-  failedBundleId: string;
-  rolledBackTo: string;
-  reason: string;
-  timestamp: number;
-}
-```
-
-## App Update Events
-
-### appUpdateStateChanged
-
-Fired when native app update state changes. Android only.
-
-```typescript
-NativeUpdate.addListener('appUpdateStateChanged', (state) => {
-  console.log('App update state:', state);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  installStatus: number;     // Android InstallStatus
-  installErrorCode?: number;
-  packageName: string;
-  availableVersion: string;
-}
-```
-
-**Install Status Codes:**
-- `0` - Unknown
-- `1` - Pending
-- `2` - Downloading
-- `3` - Installing
-- `4` - Installed
-- `5` - Failed
-- `6` - Canceled
-- `11` - Downloaded
-
-### appUpdateProgress
-
-Fired during flexible app update download. Android only.
-
-```typescript
-NativeUpdate.addListener('appUpdateProgress', (progress) => {
-  console.log('App update progress:', progress.percentComplete);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  bytesDownloaded: number;
-  totalBytesToDownload: number;
-  percentComplete: number;
-  downloadSpeed: number;     // Bytes per second
-  estimatedTime: number;     // Seconds remaining
-}
-```
-
-### appUpdateAvailable
-
-Fired when an app update becomes available.
-
-```typescript
-NativeUpdate.addListener('appUpdateAvailable', (update) => {
-  console.log('App update available:', update.version);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  currentVersion: string;
-  availableVersion: string;
-  updatePriority: 'LOW' | 'MEDIUM' | 'HIGH' | 'IMMEDIATE';
-  updateSize?: number;
-  releaseNotes?: string;
-  storeUrl: string;
-}
-```
-
-## App Review Events
-
-### reviewPromptDisplayed
-
-Fired when a review prompt is shown to the user.
-
-```typescript
-NativeUpdate.addListener('reviewPromptDisplayed', (event) => {
-  analytics.track('review_prompt_shown');
-});
-```
-
-**Event Data:**
-```typescript
-{
-  platform: 'ios' | 'android' | 'web';
-  method: 'in-app' | 'store-redirect';
-  timestamp: number;
-  sessionTime: number;       // Time in app before prompt
-}
-```
-
-### reviewPromptDismissed
-
-Fired when the review prompt is dismissed.
-
-```typescript
-NativeUpdate.addListener('reviewPromptDismissed', (event) => {
-  console.log('Review prompt dismissed');
-});
-```
-
-**Event Data:**
-```typescript
-{
-  platform: 'ios' | 'android' | 'web';
-  userAction?: 'reviewed' | 'dismissed' | 'later';
-  timestamp: number;
-}
-```
-
 ## Background Update Events
 
-### backgroundCheckStarted
+### backgroundUpdateProgress
 
-Fired when a background update check begins.
+Fired during background update operations.
 
 ```typescript
-NativeUpdate.addListener('backgroundCheckStarted', (event) => {
-  console.log('Background check started');
+NativeUpdate.addListener('backgroundUpdateProgress', (event) => {
+  console.log('Background update status:', event.status);
 });
 ```
 
 **Event Data:**
 ```typescript
 {
-  checkId: string;
-  trigger: 'scheduled' | 'app-resume' | 'manual';
-  timestamp: number;
+  type: BackgroundUpdateType;
+  status: 'checking' | 'downloading' | 'installing' | 'completed' | 'failed';
+  progress?: number;
+  error?: string;
 }
 ```
 
-### backgroundCheckCompleted
+### backgroundUpdateNotification
 
-Fired when a background update check completes.
+Fired when background update has a notification to show.
 
 ```typescript
-NativeUpdate.addListener('backgroundCheckCompleted', (result) => {
-  console.log('Background check result:', result);
+NativeUpdate.addListener('backgroundUpdateNotification', (event) => {
+  console.log('Update available:', event.updateAvailable);
 });
 ```
 
 **Event Data:**
 ```typescript
 {
-  checkId: string;
+  type: BackgroundUpdateType;
   updateAvailable: boolean;
   version?: string;
-  downloadStarted: boolean;
-  duration: number;          // Check duration in ms
-  timestamp: number;
+  description?: string;
 }
 ```
 
-### backgroundDownloadCompleted
+## Event Best Practices
 
-Fired when a background download completes.
-
-```typescript
-NativeUpdate.addListener('backgroundDownloadCompleted', (result) => {
-  console.log('Background download completed');
-});
-```
-
-**Event Data:**
-```typescript
-{
-  bundleId: string;
-  version: string;
-  success: boolean;
-  error?: string;
-  downloadTime: number;      // Total download time
-  willInstallOnResume: boolean;
-}
-```
-
-## Error Events
-
-### error
-
-Generic error event for any plugin errors.
+### 1. Always Remove Listeners
 
 ```typescript
-NativeUpdate.addListener('error', (error) => {
-  console.error('Plugin error:', error);
-  errorReporting.log(error);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  code: string;              // Error code
-  message: string;           // Human-readable message
-  module: 'live-update' | 'app-update' | 'app-review';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  details?: any;             // Additional error context
-  timestamp: number;
-  stackTrace?: string;
-}
-```
-
-## Analytics Events
-
-### analyticsEvent
-
-Fired for analytics tracking.
-
-```typescript
-NativeUpdate.addListener('analyticsEvent', (event) => {
-  // Forward to your analytics provider
-  analytics.track(event.name, event.properties);
-});
-```
-
-**Event Data:**
-```typescript
-{
-  name: string;              // Event name
-  properties: Record<string, any>;
-  category: 'update' | 'review' | 'error' | 'performance';
-  timestamp: number;
-}
-```
-
-## Best Practices
-
-### 1. Centralized Event Handling
-
-```typescript
-class UpdateEventManager {
+class UpdateManager {
   private listeners: PluginListenerHandle[] = [];
-  
-  init() {
-    // Register all listeners
+
+  setupListeners() {
+    // Store listener references
     this.listeners.push(
-      NativeUpdate.addListener('updateStateChanged', this.handleStateChange),
-      NativeUpdate.addListener('downloadProgress', this.handleProgress),
-      NativeUpdate.addListener('error', this.handleError)
+      NativeUpdate.addListener('updateStateChanged', (state) => {
+        this.handleStateChange(state);
+      })
+    );
+
+    this.listeners.push(
+      NativeUpdate.addListener('downloadProgress', (progress) => {
+        this.updateProgressBar(progress.percent);
+      })
     );
   }
-  
+
   cleanup() {
     // Remove all listeners
     this.listeners.forEach(listener => listener.remove());
+    this.listeners = [];
   }
-  
-  private handleStateChange = (state) => {
-    // Centralized state handling
-    updateUI(state);
-    logEvent('update_state', state);
-  };
-  
-  private handleProgress = (progress) => {
-    // Update progress UI
-    progressBar.setValue(progress.percent);
-  };
-  
-  private handleError = (error) => {
-    // Centralized error handling
-    if (error.severity === 'critical') {
-      showErrorDialog(error);
+}
+```
+
+### 2. Handle All States
+
+```typescript
+function handleStateChange(state: UpdateStateChangedEvent) {
+  switch (state.status) {
+    case 'CHECKING':
+      showLoader('Checking for updates...');
+      break;
+    case 'DOWNLOADING':
+      showLoader('Downloading update...');
+      break;
+    case 'READY':
+      hideLoader();
+      promptUserToRestart();
+      break;
+    case 'FAILED':
+      hideLoader();
+      showError('Update failed. Please try again.');
+      break;
+    case 'INSTALLING':
+      showLoader('Installing update...');
+      break;
+  }
+}
+```
+
+### 3. Progress Updates
+
+```typescript
+function setupProgressTracking() {
+  let lastUpdate = 0;
+
+  NativeUpdate.addListener('downloadProgress', (progress) => {
+    // Update UI at most once per second
+    const now = Date.now();
+    if (now - lastUpdate > 1000) {
+      updateUI({
+        percent: progress.percent,
+        speed: formatBytes(progress.bytesPerSecond) + '/s',
+        remaining: formatTime(progress.estimatedTime)
+      });
+      lastUpdate = now;
     }
-    errorReporter.log(error);
-  };
+  });
 }
 ```
 
-### 2. Event-Driven UI Updates
+## Platform-Specific Notes
 
-```typescript
-// React example
-function useUpdateState() {
-  const [state, setState] = useState<UpdateState>('idle');
-  const [progress, setProgress] = useState(0);
-  
-  useEffect(() => {
-    const listeners = [
-      NativeUpdate.addListener('updateStateChanged', (event) => {
-        setState(event.status);
-      }),
-      NativeUpdate.addListener('downloadProgress', (event) => {
-        setProgress(event.percent);
-      })
-    ];
-    
-    return () => {
-      listeners.forEach(l => l.remove());
-    };
-  }, []);
-  
-  return { state, progress };
-}
-```
+### iOS
+- All events are supported
+- Review events may not fire if StoreKit decides not to show the prompt
 
-### 3. Analytics Integration
+### Android
+- All events are supported
+- App update events only fire when using Google Play
 
-```typescript
-// Set up analytics forwarding
-NativeUpdate.addListener('analyticsEvent', (event) => {
-  switch (analyticsProvider) {
-    case 'firebase':
-      firebase.analytics().logEvent(event.name, event.properties);
-      break;
-    case 'mixpanel':
-      mixpanel.track(event.name, event.properties);
-      break;
-    case 'custom':
-      customAnalytics.track(event);
-      break;
-  }
-});
-```
+### Web
+- Limited event support
+- No native app update events
+- Review events will not fire

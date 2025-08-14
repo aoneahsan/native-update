@@ -7,7 +7,6 @@
 > - Bundle storage and CDN
 > - Signing and security services
 > 
-> See [ROADMAP.md](../ROADMAP.md) for complete requirements.
 
 Welcome to the comprehensive documentation for **Capacitor Native Update**, a foundation plugin that provides architecture for a complete update lifecycle management solution for Capacitor applications.
 
@@ -34,8 +33,9 @@ Created by **Ahsan Mahmood** and open-sourced for the developer community, this 
 ### Guides
 
 - [**Security Best Practices**](./guides/security-best-practices.md) - Implement secure updates
-- [**Migration Guide**](./guides/migration-guide.md) - Migrate from other update solutions
-- [**Troubleshooting**](./guides/troubleshooting.md) - Common issues and solutions
+- [**Migration from CodePush**](./guides/migration-from-codepush.md) - Migrate from CodePush
+- [**Testing Guide**](./guides/testing-guide.md) - Testing your update implementation
+- [**Deployment Guide**](./guides/deployment-guide.md) - Deploy to production
 
 ### API Reference
 
@@ -47,8 +47,7 @@ Created by **Ahsan Mahmood** and open-sourced for the developer community, this 
 ### Examples
 
 - [**Basic Usage**](./examples/basic-usage.md) - Simple implementation examples
-- [**Advanced Scenarios**](./examples/advanced-scenarios.md) - Complex use cases
-- [**Integration Examples**](./examples/integration-examples.md) - Framework-specific integrations
+- [**Advanced Scenarios**](./examples/advanced-scenarios.md) - Complex use cases and framework integrations
 
 ### Production
 
