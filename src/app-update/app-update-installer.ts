@@ -3,17 +3,17 @@ import { Logger } from '../core/logger';
 import { AppUpdateProgress, AppUpdateState, AppUpdateInstallStatus } from './types';
 
 export class AppUpdateInstaller {
-  private config: PluginConfig;
+  // private config: PluginConfig;
   private logger: Logger;
   private progressCallback?: (progress: AppUpdateProgress) => void;
   private currentState: AppUpdateState;
 
   constructor(config: PluginConfig) {
-    this.config = config;
+    // config parameter is kept for compatibility but not used
     this.logger = new Logger('AppUpdateInstaller');
     this.currentState = {
       installStatus: AppUpdateInstallStatus.UNKNOWN,
-      packageName: config.packageName || '',
+      packageName: '',
       availableVersion: ''
     };
   }

@@ -3,19 +3,26 @@ import { Logger } from '../core/logger';
 import { AppUpdateInfo, AppUpdateOptions, VersionInfo, AppStoreInfo } from './types';
 import { Capacitor } from '@capacitor/core';
 
+interface PlatformConfig extends PluginConfig {
+  webUpdateUrl?: string;
+  appStoreId?: string;
+  packageName?: string;
+}
+
 export class PlatformAppUpdate {
-  private config: PluginConfig;
+  private config: PlatformConfig;
   private logger: Logger;
   private platform: string;
 
   constructor(config: PluginConfig) {
-    this.config = config;
+    this.config = config as PlatformConfig;
     this.logger = new Logger('PlatformAppUpdate');
     this.platform = Capacitor.getPlatform();
   }
 
   async checkForUpdate(options?: AppUpdateOptions): Promise<AppUpdateInfo> {
-    this.logger.log('Checking for platform update', { platform: this.platform });
+    // options parameter is kept for future use
+    this.logger.log('Checking for platform update: ' + this.platform);
     
     const versionInfo = await this.getVersionInfo();
     
@@ -58,7 +65,8 @@ export class PlatformAppUpdate {
   }
 
   async getVersionInfo(): Promise<VersionInfo> {
-    const appInfo = await Capacitor.getAppInfo?.() || {
+    // getAppInfo is not available in standard Capacitor, using default values
+    const appInfo = {
       version: '1.0.0',
       build: '1',
       id: 'com.example.app'

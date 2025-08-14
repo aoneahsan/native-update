@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ConfigManager } from '../core/config';
-import type { PluginConfig } from '../definitions';
+import type { PluginConfig } from '../core/config';
 
 describe('ConfigManager', () => {
   let configManager: ConfigManager;
@@ -14,53 +14,51 @@ describe('ConfigManager', () => {
   describe('configure', () => {
     it('should store and retrieve configuration', () => {
       const config: PluginConfig = {
-        serverUrl: 'https://updates.example.com',
-        channel: 'production',
-        autoCheck: true,
-        checkInterval: 3600,
+        baseUrl: 'https://updates.example.com',
         publicKey: 'test-public-key',
+        enableLogging: true,
       };
 
       configManager.configure(config);
       
-      expect(configManager.get('serverUrl')).toBe('https://updates.example.com');
-      expect(configManager.get('channel')).toBe('production');
-      expect(configManager.get('autoCheck')).toBe(true);
+      expect(configManager.get('baseUrl')).toBe('https://updates.example.com');
+      expect(configManager.get('publicKey')).toBe('test-public-key');
+      expect(configManager.get('enableLogging')).toBe(true);
     });
 
     it('should merge partial configurations', () => {
       const initialConfig: PluginConfig = {
-        serverUrl: 'https://updates.example.com',
-        channel: 'production',
+        baseUrl: 'https://updates.example.com',
+        retryAttempts: 3,
       };
 
       const updateConfig: Partial<PluginConfig> = {
-        channel: 'staging',
-        autoCheck: false,
+        retryAttempts: 5,
+        enableLogging: false,
       };
 
       configManager.configure(initialConfig);
       configManager.configure(updateConfig);
 
-      expect(configManager.get('serverUrl')).toBe('https://updates.example.com');
-      expect(configManager.get('channel')).toBe('staging');
-      expect(configManager.get('autoCheck')).toBe(false);
+      expect(configManager.get('baseUrl')).toBe('https://updates.example.com');
+      expect(configManager.get('retryAttempts')).toBe(5);
+      expect(configManager.get('enableLogging')).toBe(false);
     });
   });
 
   describe('validation', () => {
-    it('should validate server URL is HTTPS', () => {
+    it('should validate base URL is HTTPS', () => {
       const config: PluginConfig = {
-        serverUrl: 'http://updates.example.com', // HTTP should fail
+        baseUrl: 'http://updates.example.com', // HTTP should fail
       };
 
       expect(() => configManager.configure(config)).toThrow();
     });
 
-    it('should validate check interval', () => {
+    it('should validate retry attempts', () => {
       const config: PluginConfig = {
-        serverUrl: 'https://updates.example.com',
-        checkInterval: -1, // Negative should fail
+        baseUrl: 'https://updates.example.com',
+        retryAttempts: -1, // Negative should fail
       };
 
       expect(() => configManager.configure(config)).toThrow();
@@ -70,18 +68,18 @@ describe('ConfigManager', () => {
   describe('getAll', () => {
     it('should return all configuration values', () => {
       const config: PluginConfig = {
-        serverUrl: 'https://updates.example.com',
-        channel: 'production',
-        autoCheck: true,
+        baseUrl: 'https://updates.example.com',
+        retryAttempts: 3,
+        enableLogging: true,
       };
 
       configManager.configure(config);
       const allConfig = configManager.getAll();
 
       expect(allConfig).toMatchObject(config);
-      expect(allConfig).toHaveProperty('serverUrl', 'https://updates.example.com');
-      expect(allConfig).toHaveProperty('channel', 'production');
-      expect(allConfig).toHaveProperty('autoCheck', true);
+      expect(allConfig).toHaveProperty('baseUrl', 'https://updates.example.com');
+      expect(allConfig).toHaveProperty('retryAttempts', 3);
+      expect(allConfig).toHaveProperty('enableLogging', true);
     });
   });
 });

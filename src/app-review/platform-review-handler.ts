@@ -1,6 +1,7 @@
 import { PluginConfig } from '../core/config';
 import { Logger } from '../core/logger';
-import { ReviewRequestResult, StoreReviewUrl, ReviewRequestOptions } from './types';
+import { StoreReviewUrl, ReviewRequestOptions } from './types';
+import { ReviewResult } from '../definitions';
 import { Capacitor } from '@capacitor/core';
 
 export class PlatformReviewHandler {
@@ -14,7 +15,7 @@ export class PlatformReviewHandler {
     this.platform = Capacitor.getPlatform();
   }
 
-  async requestReview(options?: ReviewRequestOptions): Promise<ReviewRequestResult> {
+  async requestReview(options?: ReviewRequestOptions): Promise<ReviewResult> {
     this.logger.log('Requesting review on platform', this.platform);
     
     // Check if custom UI is requested
@@ -84,7 +85,7 @@ export class PlatformReviewHandler {
     return this.platform;
   }
 
-  private async requestIOSReview(): Promise<ReviewRequestResult> {
+  private async requestIOSReview(): Promise<ReviewResult> {
     // This would be handled by native iOS implementation using StoreKit
     // For web simulation:
     if (this.platform === 'web') {
@@ -94,11 +95,10 @@ export class PlatformReviewHandler {
     // Native implementation would call SKStoreReviewController.requestReview()
     return {
       displayed: true,
-      platform: 'ios'
     };
   }
 
-  private async requestAndroidReview(): Promise<ReviewRequestResult> {
+  private async requestAndroidReview(): Promise<ReviewResult> {
     // This would be handled by native Android implementation using Play Core
     // For web simulation:
     if (this.platform === 'web') {
@@ -108,16 +108,15 @@ export class PlatformReviewHandler {
     // Native implementation would use ReviewManager from Play Core
     return {
       displayed: true,
-      platform: 'android'
     };
   }
 
-  private async requestWebReview(options?: ReviewRequestOptions): Promise<ReviewRequestResult> {
+  private async requestWebReview(options?: ReviewRequestOptions): Promise<ReviewResult> {
     // For web, show a custom prompt
     return this.showCustomReviewPrompt(options);
   }
 
-  private async showCustomReviewPrompt(options?: ReviewRequestOptions): Promise<ReviewRequestResult> {
+  private async showCustomReviewPrompt(options?: ReviewRequestOptions): Promise<ReviewResult> {
     const message = options?.customMessage || 'Would you like to rate our app?';
     
     // Create a simple modal for web
@@ -132,25 +131,22 @@ export class PlatformReviewHandler {
       
       return {
         displayed: true,
-        platform: this.platform
       };
     }
     
     return {
       displayed: false,
       reason: 'Custom UI not available',
-      platform: this.platform
     };
   }
 
-  private simulateReviewRequest(platform: string): ReviewRequestResult {
+  private simulateReviewRequest(platform: string): ReviewResult {
     // Simulate native behavior for testing
     this.logger.log(`Simulating ${platform} review request`);
     
     // Simulate that the prompt was shown
     return {
       displayed: true,
-      platform: platform
     };
   }
 

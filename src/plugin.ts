@@ -19,7 +19,6 @@ import type {
   CanRequestReviewResult,
   // Security
   SecurityInfo,
-  UpdateConfig,
   // Background Update
   BackgroundUpdateConfig,
   BackgroundUpdateStatus,
@@ -61,21 +60,16 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   }
 
   // NativeUpdatePlugin methods
-  async configure(options: UpdateConfig): Promise<void> {
+  async configure(options: { config: PluginConfig }): Promise<void> {
     if (!this.initialized) {
       throw new CapacitorNativeUpdateError(
         ErrorCode.NOT_CONFIGURED,
         'Plugin not initialized. Call initialize() first.'
       );
     }
-    // Apply update configuration
+    // Apply plugin configuration
     const configManager = this.pluginManager.getConfigManager();
-    if (options.liveUpdate?.allowedHosts) {
-      configManager.configure({ allowedHosts: options.liveUpdate.allowedHosts });
-    }
-    if (options.liveUpdate?.maxBundleSize) {
-      configManager.configure({ maxBundleSize: options.liveUpdate.maxBundleSize });
-    }
+    configManager.configure(options.config);
   }
 
   async getSecurityInfo(): Promise<SecurityInfo> {
@@ -83,7 +77,7 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
       enforceHttps: true,
       certificatePinning: {
         enabled: false,
-        certificates: [],
+        pins: [],
       },
       validateInputs: true,
       secureStorage: true,

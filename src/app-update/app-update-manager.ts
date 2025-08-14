@@ -1,4 +1,11 @@
 import { PluginConfig } from '../core/config';
+
+interface ExtendedConfig extends PluginConfig {
+  updateUrl?: string;
+  packageName?: string;
+  minimumVersion?: string;
+  enforceMinVersion?: boolean;
+}
 import { Logger } from '../core/logger';
 import { AppUpdateChecker } from './app-update-checker';
 import { AppUpdateInstaller } from './app-update-installer';
@@ -16,20 +23,18 @@ import { AppUpdatePlugin } from '../definitions';
 import { PluginListenerHandle } from '@capacitor/core';
 
 export class AppUpdateManager implements AppUpdatePlugin {
-  private config: PluginConfig;
+  private config: ExtendedConfig;
   private logger: Logger;
   private checker: AppUpdateChecker;
   private installer: AppUpdateInstaller;
-  private notifier: AppUpdateNotifier;
   private platformUpdate: PlatformAppUpdate;
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
 
   constructor(config: PluginConfig) {
-    this.config = config;
+    this.config = config as ExtendedConfig;
     this.logger = new Logger('AppUpdateManager');
     this.checker = new AppUpdateChecker(config);
     this.installer = new AppUpdateInstaller(config);
-    this.notifier = new AppUpdateNotifier(config);
     this.platformUpdate = new PlatformAppUpdate(config);
   }
 
@@ -158,7 +163,8 @@ export class AppUpdateManager implements AppUpdatePlugin {
     }
   }
 
-  async openAppStore(): Promise<void> {
+  async openAppStore(options?: import('../definitions').OpenAppStoreOptions): Promise<void> {
+    // options parameter is intentionally unused
     try {
       this.logger.log('Opening app store');
       const storeInfo = await this.getAppStoreUrl();
@@ -169,7 +175,7 @@ export class AppUpdateManager implements AppUpdatePlugin {
     }
   }
 
-  async getAppStoreUrl(): Promise<AppStoreInfo> {
+  private async getAppStoreUrl(): Promise<AppStoreInfo> {
     try {
       this.logger.log('Getting app store URL');
       return await this.platformUpdate.getAppStoreUrl();
@@ -200,7 +206,7 @@ export class AppUpdateManager implements AppUpdatePlugin {
     this.listeners.get(eventName)!.add(listenerFunc);
     
     return {
-      remove: () => {
+      remove: async () => {
         const listeners = this.listeners.get(eventName);
         if (listeners) {
           listeners.delete(listenerFunc);
@@ -209,7 +215,7 @@ export class AppUpdateManager implements AppUpdatePlugin {
     };
   }
 
-  removeAllListeners(eventName?: string): void {
+  async removeAllListeners(eventName?: string): Promise<void> {
     if (eventName) {
       this.listeners.delete(eventName);
     } else {

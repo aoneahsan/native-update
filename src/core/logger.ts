@@ -10,9 +10,11 @@ export enum LogLevel {
 export class Logger {
   private static instance: Logger;
   private configManager: ConfigManager;
+  private context: string;
 
-  private constructor() {
+  constructor(context?: string) {
     this.configManager = ConfigManager.getInstance();
+    this.context = context || 'CapacitorNativeUpdate';
   }
 
   static getInstance(): Logger {
@@ -58,7 +60,11 @@ export class Logger {
     return data;
   }
 
-  private log(level: LogLevel, message: string, data?: unknown): void {
+  log(message: string, data?: unknown): void {
+    this.logWithLevel(LogLevel.INFO, message, data);
+  }
+
+  private logWithLevel(level: LogLevel, message: string, data?: unknown): void {
     if (!this.shouldLog()) return;
 
     const timestamp = new Date().toISOString();
@@ -66,6 +72,7 @@ export class Logger {
     const logEntry: Record<string, unknown> = {
       timestamp,
       level: LogLevel[level],
+      context: this.context,
       message,
     };
     if (sanitizedData !== undefined) {
@@ -74,30 +81,30 @@ export class Logger {
 
     switch (level) {
       case LogLevel.DEBUG:
-        console.debug('[CapacitorNativeUpdate]', logEntry);
+        console.debug(`[${this.context}]`, logEntry);
         break;
       case LogLevel.INFO:
-        console.info('[CapacitorNativeUpdate]', logEntry);
+        console.info(`[${this.context}]`, logEntry);
         break;
       case LogLevel.WARN:
-        console.warn('[CapacitorNativeUpdate]', logEntry);
+        console.warn(`[${this.context}]`, logEntry);
         break;
       case LogLevel.ERROR:
-        console.error('[CapacitorNativeUpdate]', logEntry);
+        console.error(`[${this.context}]`, logEntry);
         break;
     }
   }
 
   debug(message: string, data?: unknown): void {
-    this.log(LogLevel.DEBUG, message, data);
+    this.logWithLevel(LogLevel.DEBUG, message, data);
   }
 
   info(message: string, data?: unknown): void {
-    this.log(LogLevel.INFO, message, data);
+    this.logWithLevel(LogLevel.INFO, message, data);
   }
 
   warn(message: string, data?: unknown): void {
-    this.log(LogLevel.WARN, message, data);
+    this.logWithLevel(LogLevel.WARN, message, data);
   }
 
   error(message: string, error?: Error | unknown): void {
@@ -106,6 +113,6 @@ export class Logger {
       message: error.message,
       stack: error.stack,
     } : error;
-    this.log(LogLevel.ERROR, message, errorData);
+    this.logWithLevel(LogLevel.ERROR, message, errorData);
   }
 }

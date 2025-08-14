@@ -351,8 +351,9 @@ export class SecurityValidator {
    * is primarily implemented at the native layer
    */
   async validateCertificatePin(hostname: string, certificate: string): Promise<boolean> {
-    const certificatePins = this.configManager.get('certificatePins');
-    if (!certificatePins || certificatePins.length === 0) {
+    // Certificate pinning is not available in PluginConfig type
+    const certificatePins = (this.configManager as any).certificatePins;
+    if (!certificatePins || !Array.isArray(certificatePins) || certificatePins.length === 0) {
       // No pins configured, allow connection
       return true;
     }

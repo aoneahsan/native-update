@@ -1,6 +1,7 @@
 import { PluginConfig } from '../core/config';
 import { Logger } from '../core/logger';
-import { ReviewConditions, ReviewAvailability } from './types';
+import { ReviewConditions } from './types';
+import { CanRequestReviewResult } from '../definitions';
 
 interface StoredConditionsData {
   installDate: number;
@@ -29,7 +30,7 @@ export class ReviewConditionsChecker {
     this.initialize();
   }
 
-  async checkConditions(): Promise<ReviewAvailability> {
+  async checkConditions(): Promise<CanRequestReviewResult> {
     const data = await this.getStoredData();
     const conditions = data.conditions;
     

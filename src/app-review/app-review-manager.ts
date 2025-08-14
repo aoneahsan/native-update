@@ -4,13 +4,11 @@ import { ReviewConditionsChecker } from './review-conditions-checker';
 import { ReviewRateLimiter } from './review-rate-limiter';
 import { PlatformReviewHandler } from './platform-review-handler';
 import {
-  ReviewRequestResult,
-  ReviewAvailability,
   ReviewConditions,
   StoreReviewUrl,
   ReviewRequestOptions
 } from './types';
-import { AppReviewPlugin } from '../definitions';
+import { AppReviewPlugin, ReviewResult, CanRequestReviewResult } from '../definitions';
 import { PluginListenerHandle } from '@capacitor/core';
 
 export class AppReviewManager implements AppReviewPlugin {
@@ -29,7 +27,7 @@ export class AppReviewManager implements AppReviewPlugin {
     this.platformHandler = new PlatformReviewHandler(config);
   }
 
-  async requestReview(options?: ReviewRequestOptions): Promise<ReviewRequestResult> {
+  async requestReview(options?: ReviewRequestOptions): Promise<ReviewResult> {
     try {
       this.logger.log('Requesting app review', options);
       
@@ -39,10 +37,7 @@ export class AppReviewManager implements AppReviewPlugin {
         if (!availability.canRequest) {
           return {
             displayed: false,
-            reason: availability.reason,
-            platform: this.platformHandler.getPlatform(),
-            lastRequestDate: availability.lastRequestDate,
-            requestCount: availability.requestCount
+            reason: availability.reason || 'Rate limiting active',
           };
         }
       }
@@ -56,7 +51,7 @@ export class AppReviewManager implements AppReviewPlugin {
         
         // Emit event
         this.emit('reviewPromptDisplayed', {
-          platform: result.platform,
+          platform: this.platformHandler.getPlatform(),
           method: options?.useCustomUI ? 'custom' : 'in-app',
           timestamp: Date.now()
         });
@@ -69,7 +64,7 @@ export class AppReviewManager implements AppReviewPlugin {
     }
   }
 
-  async canRequestReview(): Promise<ReviewAvailability> {
+  async canRequestReview(): Promise<CanRequestReviewResult> {
     try {
       this.logger.log('Checking review availability');
       
@@ -96,8 +91,6 @@ export class AppReviewManager implements AppReviewPlugin {
       
       return {
         canRequest: true,
-        lastRequestDate: rateLimitCheck.lastRequestDate,
-        requestCount: rateLimitCheck.requestCount
       };
     } catch (error) {
       this.logger.error('Failed to check review availability', error);
@@ -126,7 +119,7 @@ export class AppReviewManager implements AppReviewPlugin {
     }
   }
 
-  async getStoreReviewUrl(): Promise<StoreReviewUrl> {
+  private async getStoreReviewUrl(): Promise<StoreReviewUrl> {
     try {
       this.logger.log('Getting store review URL');
       return await this.platformHandler.getStoreReviewUrl();

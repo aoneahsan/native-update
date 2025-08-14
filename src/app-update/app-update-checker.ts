@@ -2,12 +2,17 @@ import { PluginConfig } from '../core/config';
 import { Logger } from '../core/logger';
 import { AppUpdateInfo, AppUpdateOptions } from './types';
 
+interface UpdateConfig extends PluginConfig {
+  updateUrl?: string;
+  channel?: string;
+}
+
 export class AppUpdateChecker {
-  private config: PluginConfig;
+  private config: UpdateConfig;
   private logger: Logger;
 
   constructor(config: PluginConfig) {
-    this.config = config;
+    this.config = config as UpdateConfig;
     this.logger = new Logger('AppUpdateChecker');
   }
 
@@ -91,7 +96,7 @@ export class AppUpdateChecker {
     stalenessDays?: number
   ): 'LOW' | 'MEDIUM' | 'HIGH' | 'IMMEDIATE' {
     // Parse version difference
-    const [major, minor, patch] = versionDiff.split('.').map(Number);
+    const [major, minor] = versionDiff.split('.').map(Number);
     
     // Major version change = IMMEDIATE
     if (major > 0) {

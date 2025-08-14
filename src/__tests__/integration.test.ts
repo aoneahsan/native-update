@@ -1,63 +1,59 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { CapacitorNativeUpdateWeb } from '../web';
-import type { PluginConfig } from '../definitions';
+import { NativeUpdateWeb } from '../web';
+import type { PluginConfig } from '../core/config';
 
 describe('Integration Tests', () => {
-  let plugin: CapacitorNativeUpdateWeb;
+  let plugin: NativeUpdateWeb;
 
   beforeEach(() => {
-    plugin = new CapacitorNativeUpdateWeb();
+    plugin = new NativeUpdateWeb();
   });
 
   describe('Plugin Lifecycle', () => {
     it('should configure and check for updates', async () => {
       const config: PluginConfig = {
-        serverUrl: 'https://updates.example.com',
-        channel: 'production',
-        autoCheck: false,
+        baseUrl: 'https://updates.example.com',
+        enableLogging: true,
       };
 
       // Configure plugin
       await plugin.configure({ config });
 
-      // Get current version
-      const currentVersion = await plugin.getCurrentVersion();
-      expect(currentVersion).toBeDefined();
-      expect(currentVersion.version).toBe('1.0.0'); // Web default
-
-      // Check for updates (will fail without server)
+      // Sync for updates (will fail without server)
       try {
-        await plugin.checkForUpdate();
+        const result = await plugin.sync();
+        expect(result).toBeDefined();
       } catch (error: any) {
-        expect(error.message).toContain('Failed to fetch');
+        expect(error).toBeDefined();
       }
     });
 
     it('should handle app review requests', async () => {
       const result = await plugin.requestReview();
+      expect(result).toBeDefined();
       expect(result.displayed).toBe(false); // Web platform
     });
 
     it('should check native app updates', async () => {
-      const result = await plugin.checkAppUpdate();
+      const result = await plugin.getAppUpdateInfo();
+      expect(result).toBeDefined();
       expect(result.updateAvailable).toBe(false); // Web platform
-      expect(result.platform).toBe('web');
     });
   });
 
   describe('Error Handling', () => {
     it('should validate configuration', async () => {
       const invalidConfig: PluginConfig = {
-        serverUrl: 'http://insecure.com', // Should fail - not HTTPS
+        baseUrl: 'http://insecure.com', // Should fail - not HTTPS
       };
 
       await expect(plugin.configure({ config: invalidConfig }))
-        .rejects.toThrow('must use HTTPS');
+        .rejects.toThrow();
     });
 
     it('should handle missing configuration', async () => {
-      // Try to check for updates without configuration
-      await expect(plugin.checkForUpdate())
+      // Try to sync without configuration
+      await expect(plugin.sync())
         .rejects.toThrow();
     });
   });

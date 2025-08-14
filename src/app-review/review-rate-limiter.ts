@@ -1,6 +1,7 @@
 import { PluginConfig } from '../core/config';
 import { Logger } from '../core/logger';
-import { ReviewAvailability, ReviewMetrics } from './types';
+import { ReviewMetrics } from './types';
+import { CanRequestReviewResult } from '../definitions';
 
 interface RateLimitData {
   totalRequests: number;
@@ -25,7 +26,7 @@ export class ReviewRateLimiter {
     this.logger = new Logger('ReviewRateLimiter');
   }
 
-  async canRequestReview(): Promise<ReviewAvailability> {
+  async canRequestReview(): Promise<CanRequestReviewResult> {
     const data = await this.getRateLimitData();
     const platform = this.getPlatform();
     
@@ -38,9 +39,6 @@ export class ReviewRateLimiter {
         return {
           canRequest: false,
           reason: `Only ${daysSinceLastRequest} days since last prompt, need ${minDays}`,
-          lastRequestDate: data.lastRequestDate,
-          requestCount: data.totalRequests,
-          daysUntilNext: minDays - daysSinceLastRequest
         };
       }
     }
@@ -54,8 +52,6 @@ export class ReviewRateLimiter {
         return {
           canRequest: false,
           reason: `iOS limit reached: ${requestsThisYear}/${this.IOS_MAX_PROMPTS_PER_YEAR} prompts this year`,
-          lastRequestDate: data.lastRequestDate,
-          requestCount: data.totalRequests
         };
       }
     }
@@ -69,15 +65,11 @@ export class ReviewRateLimiter {
       return {
         canRequest: false,
         reason: `Version limit reached: ${requestsThisVersion}/${maxPerVersion} prompts for v${currentVersion}`,
-        lastRequestDate: data.lastRequestDate,
-        requestCount: data.totalRequests
       };
     }
     
     return {
       canRequest: true,
-      lastRequestDate: data.lastRequestDate,
-      requestCount: data.totalRequests
     };
   }
 

@@ -2,12 +2,16 @@ import { PluginConfig } from '../core/config';
 import { Logger } from '../core/logger';
 import { AppUpdateInfo } from './types';
 
+interface NotifierConfig extends PluginConfig {
+  showUpdateNotification?: boolean;
+}
+
 export class AppUpdateNotifier {
-  private config: PluginConfig;
+  private config: NotifierConfig;
   private logger: Logger;
 
   constructor(config: PluginConfig) {
-    this.config = config;
+    this.config = config as NotifierConfig;
     this.logger = new Logger('AppUpdateNotifier');
   }
 
@@ -94,15 +98,18 @@ export class AppUpdateNotifier {
       return;
     }
     
-    const notification = new Notification('Update Ready', {
+    const notificationOptions: NotificationOptions = {
       body: 'App update has been downloaded and is ready to install.',
       icon: '/icon.png',
       tag: 'app-update-ready',
-      actions: [
-        { action: 'install', title: 'Install Now' },
-        { action: 'later', title: 'Later' }
-      ]
-    });
+    };
+    // Actions are not supported in standard NotificationOptions
+    (notificationOptions as any).actions = [
+      { action: 'install', title: 'Install Now' },
+      { action: 'later', title: 'Later' }
+    ];
+    
+    const notification = new Notification('Update Ready', notificationOptions);
     
     notification.onclick = (event: any) => {
       if (event.action === 'install') {

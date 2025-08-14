@@ -72,6 +72,14 @@ export class ConfigManager {
     return this.config[key];
   }
 
+  set<K extends keyof Required<PluginConfig>>(key: K, value: Required<PluginConfig>[K]): void {
+    this.config[key] = value;
+  }
+
+  getAll(): Required<PluginConfig> {
+    return { ...this.config };
+  }
+
   isConfigured(): boolean {
     return !!(this.config.filesystem && this.config.preferences);
   }
