@@ -10,6 +10,7 @@ export default [
       'android/**',
       'ios/**',
       'example/**',
+      'example-app/**',
       '*.config.js',
       '*.config.ts',
     ],
