@@ -34,21 +34,26 @@ export class Logger {
       // Remove potential file paths
       sanitized = sanitized.replace(/\/[^\s]+\/([\w.-]+)$/g, '/<path>/$1');
       // Remove potential URLs with credentials
-      sanitized = sanitized.replace(/https?:\/\/[^:]+:[^@]+@/g, 'https://***:***@');
+      sanitized = sanitized.replace(
+        /https?:\/\/[^:]+:[^@]+@/g,
+        'https://***:***@'
+      );
       // Remove potential API keys
       sanitized = sanitized.replace(/[a-zA-Z0-9]{32,}/g, '<redacted>');
       return sanitized;
     } else if (typeof data === 'object' && data !== null) {
       if (Array.isArray(data)) {
-        return data.map(item => this.sanitize(item));
+        return data.map((item) => this.sanitize(item));
       } else {
         const sanitized: Record<string, unknown> = {};
         const dataObj = data as Record<string, unknown>;
         for (const key in dataObj) {
-          if (key.toLowerCase().includes('key') || 
-              key.toLowerCase().includes('secret') || 
-              key.toLowerCase().includes('password') ||
-              key.toLowerCase().includes('token')) {
+          if (
+            key.toLowerCase().includes('key') ||
+            key.toLowerCase().includes('secret') ||
+            key.toLowerCase().includes('password') ||
+            key.toLowerCase().includes('token')
+          ) {
             sanitized[key] = '<redacted>';
           } else {
             sanitized[key] = this.sanitize(dataObj[key]);
@@ -108,11 +113,14 @@ export class Logger {
   }
 
   error(message: string, error?: Error | unknown): void {
-    const errorData = error instanceof Error ? {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-    } : error;
+    const errorData =
+      error instanceof Error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : error;
     this.logWithLevel(LogLevel.ERROR, message, errorData);
   }
 }

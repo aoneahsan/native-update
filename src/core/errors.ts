@@ -63,7 +63,12 @@ export class ConfigurationError extends CapacitorNativeUpdateError {
 }
 
 export class DownloadError extends CapacitorNativeUpdateError {
-  constructor(code: ErrorCode, message: string, details?: unknown, originalError?: Error) {
+  constructor(
+    code: ErrorCode,
+    message: string,
+    details?: unknown,
+    originalError?: Error
+  ) {
     super(code, message, details, originalError);
     this.name = 'DownloadError';
   }
@@ -77,14 +82,24 @@ export class ValidationError extends CapacitorNativeUpdateError {
 }
 
 export class StorageError extends CapacitorNativeUpdateError {
-  constructor(code: ErrorCode, message: string, details?: unknown, originalError?: Error) {
+  constructor(
+    code: ErrorCode,
+    message: string,
+    details?: unknown,
+    originalError?: Error
+  ) {
     super(code, message, details, originalError);
     this.name = 'StorageError';
   }
 }
 
 export class UpdateError extends CapacitorNativeUpdateError {
-  constructor(code: ErrorCode, message: string, details?: unknown, originalError?: Error) {
+  constructor(
+    code: ErrorCode,
+    message: string,
+    details?: unknown,
+    originalError?: Error
+  ) {
     super(code, message, details, originalError);
     this.name = 'UpdateError';
   }

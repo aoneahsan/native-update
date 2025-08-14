@@ -229,7 +229,7 @@ class SecurityManager {
 // MARK: - Keychain Wrapper
 
 private class KeychainWrapper {
-    private let serviceName = "com.capacitor.nativeupdate"
+    private let serviceName = "com.aoneahsan.nativeupdate"
     
     func set(_ value: String, forKey key: String) {
         guard let data = value.data(using: .utf8) else { return }

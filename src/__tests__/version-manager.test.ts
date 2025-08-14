@@ -44,7 +44,9 @@ describe('VersionManager', () => {
 
     it('should respect minimum app version', () => {
       expect(VersionManager.shouldUpdate('1.0.0', '1.0.1', '1.0.0')).toBe(true);
-      expect(VersionManager.shouldUpdate('1.0.0', '1.0.1', '2.0.0')).toBe(false);
+      expect(VersionManager.shouldUpdate('1.0.0', '1.0.1', '2.0.0')).toBe(
+        false
+      );
     });
   });
 });

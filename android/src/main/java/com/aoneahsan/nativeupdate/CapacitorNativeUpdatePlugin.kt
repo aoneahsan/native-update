@@ -1,4 +1,4 @@
-package com.capacitor.nativeupdate
+package com.aoneahsan.nativeupdate
 
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall

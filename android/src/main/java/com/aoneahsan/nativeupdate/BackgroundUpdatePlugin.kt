@@ -1,4 +1,4 @@
-package com.capacitor.nativeupdate
+package com.aoneahsan.nativeupdate
 
 import android.content.Context
 import android.content.pm.PackageManager

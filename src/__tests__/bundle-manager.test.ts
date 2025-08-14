@@ -36,7 +36,7 @@ describe('BundleManager', () => {
       clear: vi.fn().mockResolvedValue(undefined),
       keys: vi.fn().mockResolvedValue({ keys: [] }),
     };
-    
+
     // Initialize bundle manager with mocked preferences
     const { ConfigManager } = await import('../core/config');
     ConfigManager.getInstance().set('preferences', mockPreferences as any);
@@ -77,15 +77,27 @@ describe('BundleManager', () => {
   describe('cleanupOldBundles', () => {
     it('should keep only specified number of bundles', async () => {
       const mockBundles = [
-        { path: 'bundle-1.0.0', modificationTime: new Date('2024-01-01').getTime() },
-        { path: 'bundle-1.0.1', modificationTime: new Date('2024-01-02').getTime() },
-        { path: 'bundle-1.0.2', modificationTime: new Date('2024-01-03').getTime() },
-        { path: 'bundle-1.0.3', modificationTime: new Date('2024-01-04').getTime() },
+        {
+          path: 'bundle-1.0.0',
+          modificationTime: new Date('2024-01-01').getTime(),
+        },
+        {
+          path: 'bundle-1.0.1',
+          modificationTime: new Date('2024-01-02').getTime(),
+        },
+        {
+          path: 'bundle-1.0.2',
+          modificationTime: new Date('2024-01-03').getTime(),
+        },
+        {
+          path: 'bundle-1.0.3',
+          modificationTime: new Date('2024-01-04').getTime(),
+        },
       ];
 
       const { Filesystem } = await import('@capacitor/filesystem');
       vi.mocked(Filesystem.readdir).mockResolvedValue({
-        files: mockBundles.map(b => ({
+        files: mockBundles.map((b) => ({
           name: b.path,
           type: 'directory',
           size: 1024,
@@ -115,7 +127,7 @@ describe('BundleManager', () => {
         signature: 'sig',
         verified: true,
       };
-      
+
       await bundleManager.saveBundleInfo(bundle);
       const retrieved = await bundleManager.getBundle('bundle-1.2.3');
       expect(retrieved).toBeDefined();

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.capacitor.nativeupdate">
+    package="com.aoneahsan.nativeupdate">
     
     <!-- Required permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,12 +22,12 @@
     
     <!-- Broadcast receiver for notification actions -->
     <receiver
-        android:name="com.capacitor.nativeupdate.NotificationActionReceiver"
+        android:name="com.aoneahsan.nativeupdate.NotificationActionReceiver"
         android:exported="false">
         <intent-filter>
-            <action android:name="com.capacitor.nativeupdate.UPDATE_NOW" />
-            <action android:name="com.capacitor.nativeupdate.UPDATE_LATER" />
-            <action android:name="com.capacitor.nativeupdate.DISMISS" />
+            <action android:name="com.aoneahsan.nativeupdate.UPDATE_NOW" />
+            <action android:name="com.aoneahsan.nativeupdate.UPDATE_LATER" />
+            <action android:name="com.aoneahsan.nativeupdate.DISMISS" />
         </intent-filter>
     </receiver>
     

@@ -118,12 +118,12 @@ export class UpdateManager {
       this.currentState = null;
     } catch (error) {
       logger.error('Bundle update failed', error);
-      
+
       // Attempt rollback
       if (this.currentState) {
         await this.rollback();
       }
-      
+
       throw error;
     } finally {
       this.updateInProgress = false;
@@ -143,7 +143,12 @@ export class UpdateManager {
 
     // Check if downgrade
     if (currentBundle && !options?.allowDowngrade) {
-      if (versionManager.shouldBlockDowngrade(currentBundle.version, newBundle.version)) {
+      if (
+        versionManager.shouldBlockDowngrade(
+          currentBundle.version,
+          newBundle.version
+        )
+      ) {
         throw new ValidationError(
           ErrorCode.VERSION_DOWNGRADE,
           `Cannot downgrade from ${currentBundle.version} to ${newBundle.version}`
@@ -153,12 +158,14 @@ export class UpdateManager {
 
     // Verify bundle integrity
     if (!newBundle.verified) {
-      logger.warn('Bundle not verified, verifying now', { bundleId: newBundle.bundleId });
-      
+      logger.warn('Bundle not verified, verifying now', {
+        bundleId: newBundle.bundleId,
+      });
+
       // Load bundle data
       const downloadManager = this.pluginManager.getDownloadManager();
       const blob = await downloadManager.loadBlob(newBundle.bundleId);
-      
+
       if (!blob) {
         throw new UpdateError(
           ErrorCode.FILE_NOT_FOUND,
@@ -196,7 +203,9 @@ export class UpdateManager {
       }
 
       // Mark as verified
-      await this.pluginManager.getBundleManager().markBundleAsVerified(newBundle.bundleId);
+      await this.pluginManager
+        .getBundleManager()
+        .markBundleAsVerified(newBundle.bundleId);
     }
 
     logger.debug('Bundle validation passed', { bundleId: newBundle.bundleId });
@@ -246,7 +255,7 @@ export class UpdateManager {
     try {
       // Extract bundle to target location
       const targetPath = `active/${bundle.bundleId}`;
-      
+
       // Create target directory
       await this.filesystem!.mkdir({
         path: targetPath,
@@ -264,7 +273,10 @@ export class UpdateManager {
       // Update bundle path
       bundle.path = targetPath;
 
-      logger.debug('Bundle files installed', { bundleId: bundle.bundleId, targetPath });
+      logger.debug('Bundle files installed', {
+        bundleId: bundle.bundleId,
+        targetPath,
+      });
     } catch (error) {
       throw new UpdateError(
         ErrorCode.UPDATE_FAILED,
@@ -321,7 +333,7 @@ export class UpdateManager {
       // Restore from backup if available
       if (this.currentState.backupPath && this.currentState.currentBundle) {
         const restoredPath = `active/${this.currentState.currentBundle.bundleId}`;
-        
+
         await this.filesystem!.copy({
           from: this.currentState.backupPath,
           to: restoredPath,
@@ -335,7 +347,9 @@ export class UpdateManager {
 
       // Restore active bundle
       if (this.currentState.currentBundle) {
-        await bundleManager.setActiveBundle(this.currentState.currentBundle.bundleId);
+        await bundleManager.setActiveBundle(
+          this.currentState.currentBundle.bundleId
+        );
       } else {
         // No previous bundle, clear active
         await bundleManager.clearActiveBundle();
@@ -390,11 +404,13 @@ export class UpdateManager {
     }
 
     const logger = this.pluginManager.getLogger();
-    logger.warn('Cancelling update', { bundleId: this.currentState.newBundle.bundleId });
+    logger.warn('Cancelling update', {
+      bundleId: this.currentState.newBundle.bundleId,
+    });
 
     // Attempt rollback
     await this.rollback();
-    
+
     this.updateInProgress = false;
     this.currentState = null;
   }

@@ -1,7 +1,7 @@
 import { registerPlugin } from '@capacitor/core';
 import type {
   CapacitorNativeUpdatePlugin,
-  PluginConfig,
+  PluginInitConfig,
   // Live Update
   SyncOptions,
   SyncResult,
@@ -42,7 +42,7 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   }
 
   // Main plugin methods
-  async initialize(config: PluginConfig): Promise<void> {
+  async initialize(config: PluginInitConfig): Promise<void> {
     await this.pluginManager.initialize(config);
     this.initialized = true;
   }
@@ -60,7 +60,7 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   }
 
   // NativeUpdatePlugin methods
-  async configure(options: { config: PluginConfig }): Promise<void> {
+  async configure(options: { config: PluginInitConfig }): Promise<void> {
     if (!this.initialized) {
       throw new CapacitorNativeUpdateError(
         ErrorCode.NOT_CONFIGURED,
@@ -87,12 +87,12 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   // LiveUpdatePlugin methods
   async sync(_options?: SyncOptions): Promise<SyncResult> {
     const bundleManager = this.pluginManager.getBundleManager();
-    
+
     try {
       // Check for updates
       const currentBundle = await bundleManager.getActiveBundle();
       const currentVersion = currentBundle?.version || '1.0.0';
-      
+
       // For now, return up-to-date status
       return {
         status: SyncStatus.UP_TO_DATE,
@@ -112,14 +112,14 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   async download(options: DownloadOptions): Promise<BundleInfo> {
     const downloadManager = this.pluginManager.getDownloadManager();
     const bundleManager = this.pluginManager.getBundleManager();
-    
+
     const blob = await downloadManager.downloadWithRetry(
       options.url,
       options.version
     );
-    
+
     const path = await downloadManager.saveBlob(options.version, blob);
-    
+
     const bundleInfo: BundleInfo = {
       bundleId: options.version,
       version: options.version,
@@ -131,9 +131,9 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
       signature: options.signature,
       verified: false,
     };
-    
+
     await bundleManager.saveBundleInfo(bundleInfo);
-    
+
     return bundleInfo;
   }
 
@@ -168,14 +168,16 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
 
   async delete(options: DeleteOptions): Promise<void> {
     const bundleManager = this.pluginManager.getBundleManager();
-    
+
     if (options.bundleId) {
       await bundleManager.deleteBundle(options.bundleId);
     } else if (options.keepVersions !== undefined) {
       // Delete old versions keeping the specified number
       const bundles = await bundleManager.getAllBundles();
-      const sortedBundles = bundles.sort((a, b) => b.downloadTime - a.downloadTime);
-      
+      const sortedBundles = bundles.sort(
+        (a, b) => b.downloadTime - a.downloadTime
+      );
+
       for (let i = options.keepVersions; i < sortedBundles.length; i++) {
         await bundleManager.deleteBundle(sortedBundles[i].bundleId);
       }
@@ -201,7 +203,9 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
 
   async setChannel(channel: string): Promise<void> {
     // Store the channel preference
-    const preferences = this.pluginManager.getConfigManager().get('preferences');
+    const preferences = this.pluginManager
+      .getConfigManager()
+      .get('preferences');
     if (preferences) {
       await preferences.set({
         key: 'update_channel',
@@ -217,14 +221,14 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
 
   async validateUpdate(options: ValidateOptions): Promise<ValidationResult> {
     const securityValidator = this.pluginManager.getSecurityValidator();
-    
+
     try {
       // Validate checksum
       const isValid = await securityValidator.validateChecksum(
         new ArrayBuffer(0), // Placeholder for bundle data
         options.checksum
       );
-      
+
       return {
         isValid,
         details: {
@@ -282,14 +286,14 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   // AppReviewPlugin methods
   async requestReview(): Promise<ReviewResult> {
     return {
-      shown: false,
+      displayed: false,
       error: 'Reviews are not supported on web',
     };
   }
 
   async canRequestReview(): Promise<CanRequestReviewResult> {
     return {
-      allowed: false,
+      canRequest: false,
       reason: 'Reviews are not supported on web',
     };
   }
@@ -297,7 +301,9 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   // BackgroundUpdatePlugin methods
   async enableBackgroundUpdates(config: BackgroundUpdateConfig): Promise<void> {
     // Store the configuration
-    const preferences = this.pluginManager.getConfigManager().get('preferences');
+    const preferences = this.pluginManager
+      .getConfigManager()
+      .get('preferences');
     if (preferences) {
       await preferences.set({
         key: 'background_update_config',
@@ -307,7 +313,9 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
   }
 
   async disableBackgroundUpdates(): Promise<void> {
-    const preferences = this.pluginManager.getConfigManager().get('preferences');
+    const preferences = this.pluginManager
+      .getConfigManager()
+      .get('preferences');
     if (preferences) {
       await preferences.remove({ key: 'background_update_config' });
     }
@@ -342,7 +350,9 @@ class CapacitorNativeUpdatePluginWeb implements CapacitorNativeUpdatePlugin {
     };
   }
 
-  async setNotificationPreferences(preferences: NotificationPreferences): Promise<void> {
+  async setNotificationPreferences(
+    preferences: NotificationPreferences
+  ): Promise<void> {
     // Store preferences but notifications aren't supported on web
     const prefs = this.pluginManager.getConfigManager().get('preferences');
     if (prefs) {

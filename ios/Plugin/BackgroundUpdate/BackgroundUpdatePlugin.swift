@@ -6,7 +6,7 @@ import UserNotifications
 @objc(BackgroundUpdatePlugin)
 public class BackgroundUpdatePlugin: CAPPlugin {
     
-    private let backgroundTaskIdentifier = "com.capacitor.native.update.background"
+    private let backgroundTaskIdentifier = "com.aoneahsan.nativeupdate.background"
     private var backgroundUpdateConfig: BackgroundUpdateConfig?
     private var backgroundUpdateStatus: BackgroundUpdateStatus
     private var notificationManager: BackgroundNotificationManager?

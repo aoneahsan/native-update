@@ -1,10 +1,11 @@
-import { ConfigManager, PluginConfig } from './config';
+import { ConfigManager } from './config';
 import { Logger } from './logger';
 import { SecurityValidator } from './security';
 import { BundleManager } from '../live-update/bundle-manager';
 import { DownloadManager } from '../live-update/download-manager';
 import { VersionManager } from '../live-update/version-manager';
 import { CapacitorNativeUpdateError, ErrorCode } from './errors';
+import { PluginInitConfig } from '../definitions';
 
 /**
  * Central manager for all plugin components
@@ -36,7 +37,7 @@ export class PluginManager {
   /**
    * Initialize the plugin with configuration
    */
-  async initialize(config: PluginConfig): Promise<void> {
+  async initialize(config: PluginInitConfig): Promise<void> {
     if (this.initialized) {
       this.logger.warn('Plugin already initialized');
       return;

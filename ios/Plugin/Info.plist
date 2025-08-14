@@ -36,8 +36,8 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.capacitor.native.update.background</string>
-		<string>com.capacitor.native.update.processing</string>
+		<string>com.aoneahsan.nativeupdate.background</string>
+		<string>com.aoneahsan.nativeupdate.processing</string>
 	</array>
 </dict>
 </plist>

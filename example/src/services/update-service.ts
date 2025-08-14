@@ -193,7 +193,7 @@ export class UpdateService {
     }
   }
 
-  async canRequestReview(): Promise<{ allowed: boolean; reason?: string }> {
+  async canRequestReview(): Promise<{ canRequest: boolean; reason?: string }> {
     return await CapacitorNativeUpdate.canRequestReview();
   }
 

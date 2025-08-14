@@ -203,7 +203,7 @@ Add to your `Info.plist`:
 </array>
 <key>BGTaskSchedulerPermittedIdentifiers</key>
 <array>
-  <string>com.capacitor.native.update.background</string>
+  <string>com.aoneahsan.nativeupdate.background</string>
 </array>
 ```
 

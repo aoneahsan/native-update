@@ -16,7 +16,9 @@ export class AppUpdateChecker {
     this.logger = new Logger('AppUpdateChecker');
   }
 
-  async checkServerVersion(options?: AppUpdateOptions): Promise<Partial<AppUpdateInfo>> {
+  async checkServerVersion(
+    _?: AppUpdateOptions
+  ): Promise<Partial<AppUpdateInfo>> {
     if (!this.config.updateUrl) {
       return {};
     }
@@ -25,7 +27,7 @@ export class AppUpdateChecker {
       const url = new URL(`${this.config.updateUrl}/app-version`);
       url.searchParams.append('platform', this.getPlatform());
       url.searchParams.append('current', await this.getCurrentVersion());
-      
+
       if (this.config.channel) {
         url.searchParams.append('channel', this.config.channel);
       }
@@ -33,10 +35,10 @@ export class AppUpdateChecker {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'X-App-Version': await this.getCurrentVersion(),
-          'X-App-Platform': this.getPlatform()
-        }
+          'X-App-Platform': this.getPlatform(),
+        },
       });
 
       if (!response.ok) {
@@ -44,13 +46,13 @@ export class AppUpdateChecker {
       }
 
       const data = await response.json();
-      
+
       return {
         availableVersion: data.version,
         updatePriority: data.priority,
         releaseNotes: data.releaseNotes,
         updateSize: data.size,
-        updateURL: data.downloadUrl
+        updateURL: data.downloadUrl,
       };
     } catch (error) {
       this.logger.error('Failed to check server version', error);
@@ -61,15 +63,15 @@ export class AppUpdateChecker {
   compareVersions(version1: string, version2: string): number {
     const v1Parts = version1.split('.').map(Number);
     const v2Parts = version2.split('.').map(Number);
-    
+
     for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
       const v1Part = v1Parts[i] || 0;
       const v2Part = v2Parts[i] || 0;
-      
+
       if (v1Part > v2Part) return 1;
       if (v1Part < v2Part) return -1;
     }
-    
+
     return 0;
   }
 
@@ -82,39 +84,42 @@ export class AppUpdateChecker {
     if (this.compareVersions(currentVersion, availableVersion) < 0) {
       return true;
     }
-    
+
     // Check if current version meets minimum requirement
-    if (minimumVersion && this.compareVersions(currentVersion, minimumVersion) < 0) {
+    if (
+      minimumVersion &&
+      this.compareVersions(currentVersion, minimumVersion) < 0
+    ) {
       return true;
     }
-    
+
     return false;
   }
 
   determineUpdatePriority(
     versionDiff: string,
     stalenessDays?: number
-  ): 'LOW' | 'MEDIUM' | 'HIGH' | 'IMMEDIATE' {
+  ): number {
     // Parse version difference
     const [major, minor] = versionDiff.split('.').map(Number);
-    
-    // Major version change = IMMEDIATE
+
+    // Major version change = IMMEDIATE (priority 5)
     if (major > 0) {
-      return 'IMMEDIATE';
+      return 5;
     }
-    
-    // Minor version with high staleness = HIGH
+
+    // Minor version with high staleness = HIGH (priority 4)
     if (minor > 0 && stalenessDays && stalenessDays > 30) {
-      return 'HIGH';
+      return 4;
     }
-    
-    // Minor version = MEDIUM
+
+    // Minor version = MEDIUM (priority 3)
     if (minor > 0) {
-      return 'MEDIUM';
+      return 3;
     }
-    
-    // Patch version = LOW
-    return 'LOW';
+
+    // Patch version = LOW (priority 1)
+    return 1;
   }
 
   private async getCurrentVersion(): Promise<string> {

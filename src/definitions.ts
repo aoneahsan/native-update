@@ -2,7 +2,7 @@ export interface NativeUpdatePlugin {
   /**
    * Configure the plugin with initial settings
    */
-  configure(options: { config: PluginConfig }): Promise<void>;
+  configure(options: { config: PluginInitConfig }): Promise<void>;
 
   /**
    * Get current security configuration
@@ -376,12 +376,13 @@ export interface OpenAppStoreOptions {
  * App Review Types
  */
 export interface ReviewResult {
-  shown: boolean;
+  displayed: boolean;
   error?: string;
+  reason?: string;
 }
 
 export interface CanRequestReviewResult {
-  allowed: boolean;
+  canRequest: boolean;
   reason?: string;
 }
 
@@ -637,89 +638,135 @@ export interface NativeUpdateListeners {
 }
 
 /**
- * Plugin configuration options
+ * Plugin initialization configuration options
  */
-export interface PluginConfig {
+export interface PluginInitConfig {
   /**
    * Capacitor Filesystem instance (required)
    */
   filesystem?: typeof import('@capacitor/filesystem').Filesystem;
-  
+
   /**
    * Capacitor Preferences instance (required)
    */
   preferences?: typeof import('@capacitor/preferences').Preferences;
-  
+
   /**
    * Base URL for update server
    */
   baseUrl?: string;
-  
+
   /**
    * List of allowed hosts for security
    */
   allowedHosts?: string[];
-  
+
   /**
    * Maximum bundle size in bytes (default: 100MB)
    */
   maxBundleSize?: number;
-  
+
   /**
    * Download timeout in milliseconds (default: 30000)
    */
   downloadTimeout?: number;
-  
+
   /**
    * Number of retry attempts for failed downloads (default: 3)
    */
   retryAttempts?: number;
-  
+
   /**
    * Delay between retry attempts in milliseconds (default: 1000)
    */
   retryDelay?: number;
-  
+
   /**
    * Enable bundle signature validation (default: true)
    */
   enableSignatureValidation?: boolean;
-  
+
   /**
    * Public key for signature validation
    */
   publicKey?: string;
-  
+
   /**
    * Cache expiration time in milliseconds (default: 24 hours)
    */
   cacheExpiration?: number;
-  
+
   /**
    * Enable debug logging (default: false)
    */
   enableLogging?: boolean;
+
+  /**
+   * Server URL for update checks
+   */
+  serverUrl?: string;
+
+  /**
+   * Update channel
+   */
+  channel?: string;
+
+  /**
+   * Enable automatic update checking
+   */
+  autoCheck?: boolean;
+
+  /**
+   * Enable automatic updates
+   */
+  autoUpdate?: boolean;
+
+  /**
+   * Update strategy
+   */
+  updateStrategy?: UpdateStrategy;
+
+  /**
+   * Require bundle signatures
+   */
+  requireSignature?: boolean;
+
+  /**
+   * Checksum algorithm to use
+   */
+  checksumAlgorithm?: ChecksumAlgorithm;
+
+  /**
+   * Update check interval in milliseconds
+   */
+  checkInterval?: number;
+
+  /**
+   * Security configuration
+   */
+  security?: SecurityConfig;
 }
 
 /**
  * Main plugin interface with initialization
  */
-export interface CapacitorNativeUpdatePlugin extends NativeUpdateCombinedPlugin {
+export interface CapacitorNativeUpdatePlugin
+  extends NativeUpdateCombinedPlugin {
   /**
    * Initialize the plugin with configuration
    */
-  initialize(config: PluginConfig): Promise<void>;
-  
+  initialize(config: PluginInitConfig): Promise<void>;
+
   /**
    * Check if plugin is initialized
    */
   isInitialized(): boolean;
-  
+
   /**
    * Reset plugin state
    */
   reset(): Promise<void>;
-  
+
   /**
    * Clean up resources
    */

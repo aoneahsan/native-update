@@ -21,7 +21,7 @@ export class ReviewConditionsChecker {
     minimumAppLaunches: 5,
     minimumSignificantEvents: 3,
     requirePositiveEvents: true,
-    maxPromptsPerVersion: 1
+    maxPromptsPerVersion: 1,
   };
 
   constructor(config: PluginConfig) {
@@ -33,45 +33,47 @@ export class ReviewConditionsChecker {
   async checkConditions(): Promise<CanRequestReviewResult> {
     const data = await this.getStoredData();
     const conditions = data.conditions;
-    
+
     // Check days since install
     const daysSinceInstall = this.getDaysSince(data.installDate);
     if (daysSinceInstall < (conditions.minimumDaysSinceInstall || 0)) {
       return {
         canRequest: false,
-        reason: `Only ${daysSinceInstall} days since install, need ${conditions.minimumDaysSinceInstall}`
+        reason: `Only ${daysSinceInstall} days since install, need ${conditions.minimumDaysSinceInstall}`,
       };
     }
-    
+
     // Check app launches
     if (data.appLaunches < (conditions.minimumAppLaunches || 0)) {
       return {
         canRequest: false,
-        reason: `Only ${data.appLaunches} app launches, need ${conditions.minimumAppLaunches}`
+        reason: `Only ${data.appLaunches} app launches, need ${conditions.minimumAppLaunches}`,
       };
     }
-    
+
     // Check significant events
-    if (conditions.requirePositiveEvents && 
-        data.significantEvents.length < (conditions.minimumSignificantEvents || 0)) {
+    if (
+      conditions.requirePositiveEvents &&
+      data.significantEvents.length < (conditions.minimumSignificantEvents || 0)
+    ) {
       return {
         canRequest: false,
-        reason: `Only ${data.significantEvents.length} significant events, need ${conditions.minimumSignificantEvents}`
+        reason: `Only ${data.significantEvents.length} significant events, need ${conditions.minimumSignificantEvents}`,
       };
     }
-    
+
     // Check custom conditions
     if (conditions.customConditions) {
       for (const [key, value] of Object.entries(conditions.customConditions)) {
         if (!this.evaluateCustomCondition(key, value)) {
           return {
             canRequest: false,
-            reason: `Custom condition '${key}' not met`
+            reason: `Custom condition '${key}' not met`,
           };
         }
       }
     }
-    
+
     return { canRequest: true };
   }
 
@@ -83,7 +85,7 @@ export class ReviewConditionsChecker {
 
   async trackEvent(eventName: string): Promise<void> {
     const data = await this.getStoredData();
-    
+
     // Add to significant events if not already tracked
     if (!data.significantEvents.includes(eventName)) {
       data.significantEvents.push(eventName);
@@ -114,13 +116,13 @@ export class ReviewConditionsChecker {
       appLaunches: data.appLaunches,
       significantEvents: data.significantEvents,
       currentVersion: await this.getCurrentVersion(),
-      conditions: data.conditions
+      conditions: data.conditions,
     };
   }
 
   private async initialize(): Promise<void> {
     const data = await this.getStoredData();
-    
+
     // Check if app version changed
     const currentVersion = await this.getCurrentVersion();
     if (data.lastVersion !== currentVersion) {
@@ -128,7 +130,7 @@ export class ReviewConditionsChecker {
       // Optionally reset some counters on version change
       await this.saveStoredData(data);
     }
-    
+
     // Track app launch
     await this.trackAppLaunch();
   }
@@ -142,14 +144,14 @@ export class ReviewConditionsChecker {
     } catch (error) {
       this.logger.error('Failed to read stored conditions', error);
     }
-    
+
     // Return default data
     return {
       installDate: Date.now(),
       appLaunches: 0,
       significantEvents: [],
       lastVersion: await this.getCurrentVersion(),
-      conditions: this.defaultConditions
+      conditions: this.defaultConditions,
     };
   }
 

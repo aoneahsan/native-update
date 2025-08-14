@@ -60,13 +60,16 @@ export class SecurityValidator {
   async calculateChecksum(data: ArrayBuffer): Promise<string> {
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   /**
    * Verify checksum matches expected value
    */
-  async verifyChecksum(data: ArrayBuffer, expectedChecksum: string): Promise<boolean> {
+  async verifyChecksum(
+    data: ArrayBuffer,
+    expectedChecksum: string
+  ): Promise<boolean> {
     if (!expectedChecksum) {
       this.logger.warn('No checksum provided for verification');
       return true; // Allow if no checksum provided
@@ -74,11 +77,11 @@ export class SecurityValidator {
 
     const actualChecksum = await this.calculateChecksum(data);
     const isValid = actualChecksum === expectedChecksum.toLowerCase();
-    
+
     if (!isValid) {
       this.logger.error('Checksum verification failed', {
         expected: expectedChecksum,
-        actual: actualChecksum
+        actual: actualChecksum,
       });
     }
 
@@ -88,14 +91,20 @@ export class SecurityValidator {
   /**
    * Alias for verifyChecksum for backward compatibility
    */
-  async validateChecksum(data: ArrayBuffer, expectedChecksum: string): Promise<boolean> {
+  async validateChecksum(
+    data: ArrayBuffer,
+    expectedChecksum: string
+  ): Promise<boolean> {
     return this.verifyChecksum(data, expectedChecksum);
   }
 
   /**
    * Verify digital signature using Web Crypto API
    */
-  async verifySignature(data: ArrayBuffer, signature: string): Promise<boolean> {
+  async verifySignature(
+    data: ArrayBuffer,
+    signature: string
+  ): Promise<boolean> {
     if (!this.configManager.get('enableSignatureValidation')) {
       return true;
     }
@@ -173,7 +182,7 @@ export class SecurityValidator {
     // Remove any parent directory references
     const sanitized = path
       .split('/')
-      .filter(part => part !== '..' && part !== '.')
+      .filter((part) => part !== '..' && part !== '.')
       .join('/');
 
     // Ensure path doesn't start with /
@@ -220,8 +229,9 @@ export class SecurityValidator {
     }
 
     // Basic semantic versioning pattern
-    const semverPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
-    
+    const semverPattern =
+      /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+
     if (!semverPattern.test(version)) {
       throw new ValidationError(
         ErrorCode.INVALID_BUNDLE_FORMAT,
@@ -249,7 +259,11 @@ export class SecurityValidator {
   /**
    * Parse semantic version
    */
-  private parseVersion(version: string): { major: number; minor: number; patch: number } {
+  private parseVersion(version: string): {
+    major: number;
+    minor: number;
+    patch: number;
+  } {
     const parts = version.split('-')[0].split('.'); // Ignore pre-release
     return {
       major: parseInt(parts[0], 10) || 0,
@@ -273,10 +287,7 @@ export class SecurityValidator {
     try {
       parsedUrl = new URL(url);
     } catch {
-      throw new ValidationError(
-        ErrorCode.INVALID_URL,
-        'Invalid URL format'
-      );
+      throw new ValidationError(ErrorCode.INVALID_URL, 'Invalid URL format');
     }
 
     // Enforce HTTPS
@@ -308,7 +319,7 @@ export class SecurityValidator {
       /^fe80:/i,
     ];
 
-    if (privatePatterns.some(pattern => pattern.test(parsedUrl.hostname))) {
+    if (privatePatterns.some((pattern) => pattern.test(parsedUrl.hostname))) {
       throw new ValidationError(
         ErrorCode.UNAUTHORIZED_HOST,
         'Private/local addresses are not allowed'
@@ -342,7 +353,9 @@ export class SecurityValidator {
   generateSecureId(): string {
     const array = new Uint8Array(16);
     crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+      ''
+    );
   }
 
   /**
@@ -350,15 +363,24 @@ export class SecurityValidator {
    * Note: This is a placeholder for web implementation as certificate pinning
    * is primarily implemented at the native layer
    */
-  async validateCertificatePin(hostname: string, certificate: string): Promise<boolean> {
+  async validateCertificatePin(
+    hostname: string,
+    certificate: string
+  ): Promise<boolean> {
     // Certificate pinning is not available in PluginConfig type
     const certificatePins = (this.configManager as any).certificatePins;
-    if (!certificatePins || !Array.isArray(certificatePins) || certificatePins.length === 0) {
+    if (
+      !certificatePins ||
+      !Array.isArray(certificatePins) ||
+      certificatePins.length === 0
+    ) {
       // No pins configured, allow connection
       return true;
     }
 
-    const hostPins = certificatePins.filter((pin: any) => pin.hostname === hostname);
+    const hostPins = certificatePins.filter(
+      (pin: any) => pin.hostname === hostname
+    );
     if (hostPins.length === 0) {
       // No pins for this host, allow connection
       return true;
@@ -372,7 +394,7 @@ export class SecurityValidator {
       this.logger.error('Certificate pinning validation failed', {
         hostname,
         expectedPins: hostPins.map((p: any) => p.sha256),
-        actualHash: certificateHash
+        actualHash: certificateHash,
       });
     }
 
@@ -403,7 +425,8 @@ export class SecurityValidator {
 
     // Limit metadata size to prevent abuse
     const metadataStr = JSON.stringify(metadata || {});
-    if (metadataStr.length > 10240) { // 10KB limit
+    if (metadataStr.length > 10240) {
+      // 10KB limit
       throw new ValidationError(
         ErrorCode.INVALID_BUNDLE_FORMAT,
         'Metadata is too large (max 10KB)'

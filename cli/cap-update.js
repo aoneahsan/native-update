@@ -5,7 +5,9 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 const program = new Command();
-const packageJson = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'));
+const packageJson = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'package.json'), 'utf8')
+);
 
 program
   .name('cap-update')

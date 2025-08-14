@@ -2,7 +2,6 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
-import { resolve, join } from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -27,30 +26,32 @@ async function createBundle(distPath, outputPath) {
 
   try {
     console.log(`Creating bundle from: ${distPath}`);
-    
+
     // Create zip
     const zipName = outputPath || `bundle-${Date.now()}.zip`;
     await execAsync(`cd "${distPath}" && zip -r "../${zipName}" .`);
-    
+
     // Calculate checksum
     const bundleData = readFileSync(zipName);
     const checksum = createHash('sha256').update(bundleData).digest('hex');
-    
+
     // Create manifest
     const manifest = {
       version: new Date().toISOString(),
       checksum,
       size: bundleData.length,
-      created: new Date().toISOString()
+      created: new Date().toISOString(),
     };
-    
-    writeFileSync(`${zipName}.manifest.json`, JSON.stringify(manifest, null, 2));
-    
+
+    writeFileSync(
+      `${zipName}.manifest.json`,
+      JSON.stringify(manifest, null, 2)
+    );
+
     console.log(`\nBundle created successfully!`);
     console.log(`Bundle: ${zipName}`);
     console.log(`Checksum: ${checksum}`);
     console.log(`Size: ${bundleData.length} bytes`);
-    
   } catch (error) {
     console.error('Error creating bundle:', error.message);
     process.exit(1);
@@ -60,7 +61,9 @@ async function createBundle(distPath, outputPath) {
 function showHelp() {
   console.log('Usage: bundle-creator <command> [options]\n');
   console.log('Commands:');
-  console.log('  create <dist-path> [output-name]  Create bundle from dist directory');
+  console.log(
+    '  create <dist-path> [output-name]  Create bundle from dist directory'
+  );
   console.log('  help                              Show this help message');
   console.log('\nExample:');
   console.log('  bundle-creator create ./dist my-app-v1.0.0.zip');
@@ -78,11 +81,11 @@ switch (command) {
     }
     createBundle(distPath, outputPath);
     break;
-  
+
   case 'help':
     showHelp();
     break;
-    
+
   default:
     console.error(`Unknown command: ${command}`);
     showHelp();

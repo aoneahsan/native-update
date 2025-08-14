@@ -39,7 +39,7 @@ export class Analytics {
    */
   addProvider(provider: AnalyticsProvider): void {
     this.providers.push(provider);
-    
+
     // Set existing user ID and properties
     if (this.userId) {
       provider.setUserId(this.userId);
@@ -54,13 +54,13 @@ export class Analytics {
    */
   async trackEvent(event: UpdateEvent): Promise<void> {
     this.logger.debug('Analytics event', event);
-    
-    const promises = this.providers.map(provider => 
-      provider.trackEvent(event).catch(error => 
-        this.logger.error('Analytics provider error', error)
-      )
+
+    const promises = this.providers.map((provider) =>
+      provider
+        .trackEvent(event)
+        .catch((error) => this.logger.error('Analytics provider error', error))
     );
-    
+
     await Promise.all(promises);
   }
 
@@ -69,13 +69,13 @@ export class Analytics {
    */
   async trackError(error: Error, context?: Record<string, any>): Promise<void> {
     this.logger.error('Analytics error', { error, context });
-    
-    const promises = this.providers.map(provider => 
-      provider.trackError(error, context).catch(err => 
-        this.logger.error('Analytics provider error', err)
-      )
+
+    const promises = this.providers.map((provider) =>
+      provider
+        .trackError(error, context)
+        .catch((err) => this.logger.error('Analytics provider error', err))
     );
-    
+
     await Promise.all(promises);
   }
 
@@ -84,7 +84,7 @@ export class Analytics {
    */
   setUserId(userId: string): void {
     this.userId = userId;
-    this.providers.forEach(provider => provider.setUserId(userId));
+    this.providers.forEach((provider) => provider.setUserId(userId));
   }
 
   /**
@@ -92,7 +92,9 @@ export class Analytics {
    */
   setProperties(properties: Record<string, any>): void {
     this.properties = { ...this.properties, ...properties };
-    this.providers.forEach(provider => provider.setProperties(this.properties));
+    this.providers.forEach((provider) =>
+      provider.setProperties(this.properties)
+    );
   }
 
   /**
@@ -100,7 +102,7 @@ export class Analytics {
    */
   async trackUpdateCheck(available: boolean, version?: string): Promise<void> {
     const startTime = Date.now();
-    
+
     await this.trackEvent({
       type: 'check',
       version,
@@ -113,7 +115,11 @@ export class Analytics {
   /**
    * Track download progress
    */
-  async trackDownload(version: string, success: boolean, error?: string): Promise<void> {
+  async trackDownload(
+    version: string,
+    success: boolean,
+    error?: string
+  ): Promise<void> {
     await this.trackEvent({
       type: 'download',
       version,
@@ -125,7 +131,11 @@ export class Analytics {
   /**
    * Track installation
    */
-  async trackInstall(version: string, success: boolean, error?: string): Promise<void> {
+  async trackInstall(
+    version: string,
+    success: boolean,
+    error?: string
+  ): Promise<void> {
     await this.trackEvent({
       type: 'install',
       version,
@@ -137,7 +147,11 @@ export class Analytics {
   /**
    * Track rollback
    */
-  async trackRollback(fromVersion: string, toVersion: string, reason: string): Promise<void> {
+  async trackRollback(
+    fromVersion: string,
+    toVersion: string,
+    reason: string
+  ): Promise<void> {
     await this.trackEvent({
       type: 'rollback',
       success: true,

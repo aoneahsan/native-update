@@ -53,7 +53,8 @@ export class CacheManager {
    * Set cache entry with expiration
    */
   async set<T>(key: string, data: T, ttlMs?: number): Promise<void> {
-    const expiry = Date.now() + (ttlMs || this.configManager.get('cacheExpiration'));
+    const expiry =
+      Date.now() + (ttlMs || this.configManager.get('cacheExpiration'));
     const entry: CacheEntry<T> = {
       data,
       timestamp: Date.now(),
@@ -124,7 +125,7 @@ export class CacheManager {
    */
   async clear(): Promise<void> {
     this.memoryCache.clear();
-    
+
     // Remove cache directory
     try {
       await this.filesystem!.rmdir({
@@ -132,7 +133,7 @@ export class CacheManager {
         directory: Directory.Data,
         recursive: true,
       });
-      
+
       // Recreate empty cache directory
       await this.filesystem!.mkdir({
         path: this.CACHE_DIR,
@@ -171,7 +172,7 @@ export class CacheManager {
       for (const file of files.files) {
         const key = file.name.replace('.json', '');
         const entry = await this.loadFromFile(key);
-        
+
         if (!entry || now >= entry.expiry) {
           await this.removeFile(key);
           cleanedCount++;
@@ -182,7 +183,9 @@ export class CacheManager {
     }
 
     if (cleanedCount > 0) {
-      this.logger.info('Cleaned expired cache entries', { count: cleanedCount });
+      this.logger.info('Cleaned expired cache entries', {
+        count: cleanedCount,
+      });
     }
   }
 
@@ -252,13 +255,16 @@ export class CacheManager {
   /**
    * Persist cache entry to file
    */
-  private async persistToFile<T>(key: string, entry: CacheEntry<T>): Promise<void> {
+  private async persistToFile<T>(
+    key: string,
+    entry: CacheEntry<T>
+  ): Promise<void> {
     if (!this.filesystem) return;
 
     try {
       const path = `${this.CACHE_DIR}/${key}.json`;
       const data = JSON.stringify(entry);
-      
+
       await this.filesystem.writeFile({
         path,
         data,

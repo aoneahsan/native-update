@@ -5,8 +5,12 @@ describe('SecurityValidator', () => {
   describe('validateUrl', () => {
     it('should accept HTTPS URLs', () => {
       expect(SecurityValidator.validateUrl('https://example.com')).toBe(true);
-      expect(SecurityValidator.validateUrl('https://sub.example.com/path')).toBe(true);
-      expect(SecurityValidator.validateUrl('https://example.com:8443')).toBe(true);
+      expect(
+        SecurityValidator.validateUrl('https://sub.example.com/path')
+      ).toBe(true);
+      expect(SecurityValidator.validateUrl('https://example.com:8443')).toBe(
+        true
+      );
     });
 
     it('should reject HTTP URLs', () => {
@@ -36,9 +40,15 @@ describe('SecurityValidator', () => {
 
   describe('sanitizeInput', () => {
     it('should sanitize dangerous input', () => {
-      expect(SecurityValidator.sanitizeInput('<script>alert(1)</script>')).toBe('alert1');
-      expect(SecurityValidator.sanitizeInput('normal text')).toBe('normal text');
-      expect(SecurityValidator.sanitizeInput('path/to/file')).toBe('path/to/file');
+      expect(SecurityValidator.sanitizeInput('<script>alert(1)</script>')).toBe(
+        'alert1'
+      );
+      expect(SecurityValidator.sanitizeInput('normal text')).toBe(
+        'normal text'
+      );
+      expect(SecurityValidator.sanitizeInput('path/to/file')).toBe(
+        'path/to/file'
+      );
     });
 
     it('should handle null and undefined', () => {
@@ -54,7 +64,9 @@ describe('SecurityValidator', () => {
     });
 
     it('should reject excessive sizes', () => {
-      expect(SecurityValidator.validateBundleSize(200 * 1024 * 1024)).toBe(false); // 200MB
+      expect(SecurityValidator.validateBundleSize(200 * 1024 * 1024)).toBe(
+        false
+      ); // 200MB
       expect(SecurityValidator.validateBundleSize(-1)).toBe(false);
       expect(SecurityValidator.validateBundleSize(0)).toBe(false);
     });

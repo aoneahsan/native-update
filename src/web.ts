@@ -24,7 +24,7 @@ import type {
   NotificationPermissionStatus,
   LiveUpdateConfig,
 } from './definitions';
-import type { PluginConfig } from './core/config';
+import type { PluginInitConfig } from './definitions';
 
 import { SyncStatus, BundleStatus, UpdateErrorCode } from './definitions';
 
@@ -54,7 +54,7 @@ export class NativeUpdateWeb
   /**
    * Configuration and Core Methods
    */
-  async configure(options: { config: PluginConfig }): Promise<void> {
+  async configure(options: { config: PluginInitConfig }): Promise<void> {
     // Store the plugin config
     // In a real implementation, this would configure the plugin properly
     if (options.config) {
@@ -369,9 +369,9 @@ export class NativeUpdateWeb
   async requestReview(): Promise<ReviewResult> {
     const canRequest = await this.canRequestReview();
 
-    if (!canRequest.allowed) {
+    if (!canRequest.canRequest) {
       return {
-        shown: false,
+        displayed: false,
         error: canRequest.reason,
       };
     }
@@ -396,7 +396,7 @@ export class NativeUpdateWeb
     }
 
     return {
-      shown: true,
+      displayed: true,
     };
   }
 
@@ -412,7 +412,7 @@ export class NativeUpdateWeb
       daysSinceInstall < config.minimumDaysSinceInstall
     ) {
       return {
-        allowed: false,
+        canRequest: false,
         reason: 'Not enough days since install',
       };
     }
@@ -423,7 +423,7 @@ export class NativeUpdateWeb
         (now - this.lastReviewRequest) / (1000 * 60 * 60 * 24);
       if (daysSinceLastPrompt < config.minimumDaysSinceLastPrompt) {
         return {
-          allowed: false,
+          canRequest: false,
           reason: 'Too soon since last review request',
         };
       }
@@ -435,13 +435,13 @@ export class NativeUpdateWeb
       this.launchCount < config.minimumLaunchCount
     ) {
       return {
-        allowed: false,
+        canRequest: false,
         reason: 'Not enough app launches',
       };
     }
 
     return {
-      allowed: true,
+      canRequest: true,
     };
   }
 

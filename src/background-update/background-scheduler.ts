@@ -119,16 +119,19 @@ export class BackgroundScheduler {
       // Simulate app update check
       const currentVersion = '1.0.0';
       const availableVersion = '1.1.0';
-      
+
       // In real implementation, this would check with app store or server
-      const updateAvailable = this.compareVersions(currentVersion, availableVersion) < 0;
-      
+      const updateAvailable =
+        this.compareVersions(currentVersion, availableVersion) < 0;
+
       return {
         updateAvailable,
         currentVersion,
         availableVersion,
-        updatePriority: updateAvailable ? 'MEDIUM' : undefined,
-        releaseNotes: updateAvailable ? 'Bug fixes and performance improvements' : undefined
+        updatePriority: updateAvailable ? 3 : undefined, // 3 = MEDIUM priority
+        // releaseNotes: updateAvailable
+        //   ? 'Bug fixes and performance improvements'
+        //   : undefined,
       };
     } catch (error) {
       console.error('Failed to check app update:', error);
@@ -142,9 +145,10 @@ export class BackgroundScheduler {
       // In real implementation, this would call the update server
       const currentVersion = '1.0.0';
       const latestVersion = '1.0.1';
-      
-      const updateAvailable = this.compareVersions(currentVersion, latestVersion) < 0;
-      
+
+      const updateAvailable =
+        this.compareVersions(currentVersion, latestVersion) < 0;
+
       const result: LatestVersion = {
         available: updateAvailable,
         version: latestVersion,
@@ -172,10 +176,10 @@ export class BackgroundScheduler {
       if (!notificationEnabled) {
         return false;
       }
-      
+
       let title = 'Update Available';
       let body = '';
-      
+
       if (appUpdate?.updateAvailable) {
         title = 'App Update Available';
         body = `Version ${appUpdate.availableVersion} is ready to install.`;
@@ -183,10 +187,10 @@ export class BackgroundScheduler {
         title = 'New Update Available';
         body = `Version ${liveUpdate.version} is ready to download. ${liveUpdate.notes || ''}`;
       }
-      
+
       // In real implementation, this would use native notification APIs
       console.log('Sending notification:', { title, body });
-      
+
       // Simulate notification sent
       return true;
     } catch (error) {
@@ -212,19 +216,19 @@ export class BackgroundScheduler {
   protected isBatteryLevelSufficient(): boolean {
     return true;
   }
-  
+
   private compareVersions(version1: string, version2: string): number {
     const v1Parts = version1.split('.').map(Number);
     const v2Parts = version2.split('.').map(Number);
-    
+
     for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
       const v1Part = v1Parts[i] || 0;
       const v2Part = v2Parts[i] || 0;
-      
+
       if (v1Part > v2Part) return 1;
       if (v1Part < v2Part) return -1;
     }
-    
+
     return 0;
   }
 }

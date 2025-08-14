@@ -1,4 +1,4 @@
-package com.capacitor.nativeupdate
+package com.aoneahsan.nativeupdate
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -22,9 +22,9 @@ class BackgroundNotificationManager(
         private const val CHANNEL_ID = "capacitor_native_update"
         private const val CHANNEL_NAME = "App Updates"
         private const val NOTIFICATION_ID = 1001
-        private const val ACTION_UPDATE_NOW = "com.capacitor.nativeupdate.UPDATE_NOW"
-        private const val ACTION_UPDATE_LATER = "com.capacitor.nativeupdate.UPDATE_LATER"
-        private const val ACTION_DISMISS = "com.capacitor.nativeupdate.DISMISS"
+        private const val ACTION_UPDATE_NOW = "com.aoneahsan.nativeupdate.UPDATE_NOW"
+        private const val ACTION_UPDATE_LATER = "com.aoneahsan.nativeupdate.UPDATE_LATER"
+        private const val ACTION_DISMISS = "com.aoneahsan.nativeupdate.DISMISS"
     }
     
     private var preferences: NotificationPreferences = NotificationPreferences.default()

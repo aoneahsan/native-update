@@ -6,9 +6,13 @@ import { PlatformReviewHandler } from './platform-review-handler';
 import {
   ReviewConditions,
   StoreReviewUrl,
-  ReviewRequestOptions
+  ReviewRequestOptions,
 } from './types';
-import { AppReviewPlugin, ReviewResult, CanRequestReviewResult } from '../definitions';
+import {
+  AppReviewPlugin,
+  ReviewResult,
+  CanRequestReviewResult,
+} from '../definitions';
 import { PluginListenerHandle } from '@capacitor/core';
 
 export class AppReviewManager implements AppReviewPlugin {
@@ -30,7 +34,7 @@ export class AppReviewManager implements AppReviewPlugin {
   async requestReview(options?: ReviewRequestOptions): Promise<ReviewResult> {
     try {
       this.logger.log('Requesting app review', options);
-      
+
       // Check if we can request review (unless forced)
       if (!options?.force) {
         const availability = await this.canRequestReview();
@@ -41,22 +45,22 @@ export class AppReviewManager implements AppReviewPlugin {
           };
         }
       }
-      
+
       // Request review based on platform
       const result = await this.platformHandler.requestReview(options);
-      
+
       // Update rate limiting data
       if (result.displayed) {
         await this.rateLimiter.recordRequest();
-        
+
         // Emit event
         this.emit('reviewPromptDisplayed', {
           platform: this.platformHandler.getPlatform(),
           method: options?.useCustomUI ? 'custom' : 'in-app',
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       }
-      
+
       return result;
     } catch (error) {
       this.logger.error('Failed to request review', error);
@@ -67,28 +71,28 @@ export class AppReviewManager implements AppReviewPlugin {
   async canRequestReview(): Promise<CanRequestReviewResult> {
     try {
       this.logger.log('Checking review availability');
-      
+
       // Check rate limits
       const rateLimitCheck = await this.rateLimiter.canRequestReview();
       if (!rateLimitCheck.canRequest) {
         return rateLimitCheck;
       }
-      
+
       // Check conditions
       const conditionsCheck = await this.conditionsChecker.checkConditions();
       if (!conditionsCheck.canRequest) {
         return conditionsCheck;
       }
-      
+
       // Check platform availability
       const platformCheck = await this.platformHandler.isReviewAvailable();
       if (!platformCheck) {
         return {
           canRequest: false,
-          reason: 'Review not available on this platform'
+          reason: 'Review not available on this platform',
         };
       }
-      
+
       return {
         canRequest: true,
       };
@@ -96,7 +100,7 @@ export class AppReviewManager implements AppReviewPlugin {
       this.logger.error('Failed to check review availability', error);
       return {
         canRequest: false,
-        reason: 'Error checking availability'
+        reason: 'Error checking availability',
       };
     }
   }
@@ -106,12 +110,12 @@ export class AppReviewManager implements AppReviewPlugin {
       this.logger.log('Opening store review page');
       const storeUrl = await this.getStoreReviewUrl();
       await this.platformHandler.openUrl(storeUrl.url);
-      
+
       // Emit event
       this.emit('reviewPromptDisplayed', {
         platform: storeUrl.platform,
         method: 'store-redirect',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     } catch (error) {
       this.logger.error('Failed to open store review', error);
@@ -154,7 +158,7 @@ export class AppReviewManager implements AppReviewPlugin {
     try {
       this.logger.log('Tracking significant event', eventName);
       await this.conditionsChecker.trackEvent(eventName);
-      
+
       // Check if we should prompt for review after this event
       if (this.config.promptAfterPositiveEvents) {
         const canRequest = await this.canRequestReview();
@@ -176,10 +180,10 @@ export class AppReviewManager implements AppReviewPlugin {
       this.logger.log('Getting review metrics');
       const metrics = await this.rateLimiter.getMetrics();
       const conditions = await this.conditionsChecker.getStatus();
-      
+
       return {
         ...metrics,
-        ...conditions
+        ...conditions,
       };
     } catch (error) {
       this.logger.error('Failed to get review metrics', error);
@@ -194,16 +198,16 @@ export class AppReviewManager implements AppReviewPlugin {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, new Set());
     }
-    
+
     this.listeners.get(eventName)!.add(listenerFunc);
-    
+
     return {
-      remove: () => {
+      remove: async () => {
         const listeners = this.listeners.get(eventName);
         if (listeners) {
           listeners.delete(listenerFunc);
         }
-      }
+      },
     };
   }
 
@@ -218,7 +222,7 @@ export class AppReviewManager implements AppReviewPlugin {
   private emit(eventName: string, data: any): void {
     const listeners = this.listeners.get(eventName);
     if (listeners) {
-      listeners.forEach(listener => {
+      listeners.forEach((listener) => {
         try {
           listener(data);
         } catch (error) {

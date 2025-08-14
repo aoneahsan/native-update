@@ -1,4 +1,4 @@
-package com.capacitor.nativeupdate
+package com.aoneahsan.nativeupdate
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,9 +15,9 @@ import androidx.work.workDataOf
 class NotificationActionReceiver : BroadcastReceiver() {
     
     companion object {
-        const val ACTION_INSTALL_NOW = "com.capacitor.nativeupdate.ACTION_INSTALL_NOW"
-        const val ACTION_INSTALL_LATER = "com.capacitor.nativeupdate.ACTION_INSTALL_LATER"
-        const val ACTION_DISMISS = "com.capacitor.nativeupdate.ACTION_DISMISS"
+        const val ACTION_INSTALL_NOW = "com.aoneahsan.nativeupdate.ACTION_INSTALL_NOW"
+        const val ACTION_INSTALL_LATER = "com.aoneahsan.nativeupdate.ACTION_INSTALL_LATER"
+        const val ACTION_DISMISS = "com.aoneahsan.nativeupdate.ACTION_DISMISS"
         
         const val EXTRA_UPDATE_TYPE = "update_type"
         const val EXTRA_BUNDLE_ID = "bundle_id"

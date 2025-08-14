@@ -15,7 +15,8 @@ interface CachedVersionInfo {
  * Manages version checking and comparison
  */
 export class VersionManager {
-  private readonly VERSION_CHECK_CACHE_KEY = 'capacitor_native_update_version_cache';
+  private readonly VERSION_CHECK_CACHE_KEY =
+    'capacitor_native_update_version_cache';
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   private readonly logger: Logger;
   private readonly configManager: ConfigManager;
@@ -37,26 +38,26 @@ export class VersionManager {
       // Split version and pre-release
       const [v1Base, v1Pre] = version1.split('-');
       const [v2Base, v2Pre] = version2.split('-');
-      
+
       const v1Parts = v1Base.split('.').map(Number);
       const v2Parts = v2Base.split('.').map(Number);
-      
+
       // Compare major.minor.patch
       for (let i = 0; i < 3; i++) {
         const v1Part = v1Parts[i] || 0;
         const v2Part = v2Parts[i] || 0;
-        
+
         if (v1Part > v2Part) return 1;
         if (v1Part < v2Part) return -1;
       }
-      
+
       // If base versions are equal, compare pre-release
       if (v1Pre && !v2Pre) return -1; // 1.0.0-alpha < 1.0.0
-      if (!v1Pre && v2Pre) return 1;  // 1.0.0 > 1.0.0-alpha
+      if (!v1Pre && v2Pre) return 1; // 1.0.0 > 1.0.0-alpha
       if (v1Pre && v2Pre) {
         return v1Pre.localeCompare(v2Pre);
       }
-      
+
       return 0;
     } catch {
       if (version1 === version2) return 0;
@@ -74,8 +75,15 @@ export class VersionManager {
   /**
    * Check if update should be performed
    */
-  static shouldUpdate(currentVersion: string, newVersion: string, minAppVersion?: string): boolean {
-    if (minAppVersion && VersionManager.compareVersions(currentVersion, minAppVersion) < 0) {
+  static shouldUpdate(
+    currentVersion: string,
+    newVersion: string,
+    minAppVersion?: string
+  ): boolean {
+    if (
+      minAppVersion &&
+      VersionManager.compareVersions(currentVersion, minAppVersion) < 0
+    ) {
       return false;
     }
     return VersionManager.compareVersions(currentVersion, newVersion) < 0;
@@ -121,7 +129,10 @@ export class VersionManager {
       cached.channel === channel &&
       Date.now() - cached.timestamp < this.CACHE_DURATION
     ) {
-      this.logger.debug('Returning cached version info', { channel, version: cached.data.version });
+      this.logger.debug('Returning cached version info', {
+        channel,
+        version: cached.data.version,
+      });
       return cached.data;
     }
 
@@ -197,14 +208,18 @@ export class VersionManager {
 
       // If main versions are equal, check pre-release
       if (v1.prerelease && !v2.prerelease) return false; // v1 is pre-release, v2 is not
-      if (!v1.prerelease && v2.prerelease) return true;  // v1 is not pre-release, v2 is
+      if (!v1.prerelease && v2.prerelease) return true; // v1 is not pre-release, v2 is
       if (v1.prerelease && v2.prerelease) {
         return v1.prerelease > v2.prerelease;
       }
 
       return false; // Versions are equal
     } catch (error) {
-      this.logger.error('Failed to compare versions', { version1, version2, error });
+      this.logger.error('Failed to compare versions', {
+        version1,
+        version2,
+        error,
+      });
       return false;
     }
   }
@@ -212,16 +227,16 @@ export class VersionManager {
   /**
    * Check if update is mandatory based on minimum version
    */
-  isUpdateMandatory(
-    currentVersion: string,
-    minimumVersion?: string
-  ): boolean {
+  isUpdateMandatory(currentVersion: string, minimumVersion?: string): boolean {
     if (!minimumVersion) return false;
 
     try {
       this.securityValidator.validateVersion(currentVersion);
       this.securityValidator.validateVersion(minimumVersion);
-      return !this.isNewerVersion(currentVersion, minimumVersion) && currentVersion !== minimumVersion;
+      return (
+        !this.isNewerVersion(currentVersion, minimumVersion) &&
+        currentVersion !== minimumVersion
+      );
     } catch (error) {
       this.logger.error('Failed to check mandatory update', error);
       return false;
@@ -309,7 +324,9 @@ export class VersionManager {
   /**
    * Get version from cache
    */
-  private async getCachedVersionInfo(cacheKey: string): Promise<CachedVersionInfo | null> {
+  private async getCachedVersionInfo(
+    cacheKey: string
+  ): Promise<CachedVersionInfo | null> {
     // Check memory cache first
     const memCached = this.memoryCache.get(cacheKey);
     if (memCached && Date.now() - memCached.timestamp < this.CACHE_DURATION) {
@@ -318,12 +335,14 @@ export class VersionManager {
 
     // Check persistent cache
     try {
-      const { value } = await this.preferences!.get({ key: this.VERSION_CHECK_CACHE_KEY });
+      const { value } = await this.preferences!.get({
+        key: this.VERSION_CHECK_CACHE_KEY,
+      });
       if (!value) return null;
 
       const allCached: Record<string, CachedVersionInfo> = JSON.parse(value);
       const cached = allCached[cacheKey];
-      
+
       if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
         // Update memory cache
         this.memoryCache.set(cacheKey, cached);
@@ -355,9 +374,13 @@ export class VersionManager {
 
     // Update persistent cache
     try {
-      const { value } = await this.preferences!.get({ key: this.VERSION_CHECK_CACHE_KEY });
-      const allCached: Record<string, CachedVersionInfo> = value ? JSON.parse(value) : {};
-      
+      const { value } = await this.preferences!.get({
+        key: this.VERSION_CHECK_CACHE_KEY,
+      });
+      const allCached: Record<string, CachedVersionInfo> = value
+        ? JSON.parse(value)
+        : {};
+
       // Clean old entries
       const now = Date.now();
       for (const key in allCached) {
@@ -370,7 +393,7 @@ export class VersionManager {
 
       await this.preferences!.set({
         key: this.VERSION_CHECK_CACHE_KEY,
-        value: JSON.stringify(allCached)
+        value: JSON.stringify(allCached),
       });
     } catch (error) {
       this.logger.warn('Failed to cache version info', error);
@@ -394,7 +417,10 @@ export class VersionManager {
    */
   shouldBlockDowngrade(currentVersion: string, newVersion: string): boolean {
     try {
-      return this.securityValidator.isVersionDowngrade(currentVersion, newVersion);
+      return this.securityValidator.isVersionDowngrade(
+        currentVersion,
+        newVersion
+      );
     } catch (error) {
       this.logger.error('Failed to check downgrade', error);
       // Default to safe behavior - block if we can't determine

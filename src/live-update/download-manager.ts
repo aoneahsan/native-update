@@ -44,7 +44,7 @@ export class DownloadManager {
   private validateUrl(url: string): void {
     try {
       const parsedUrl = new URL(url);
-      
+
       // Ensure HTTPS
       if (parsedUrl.protocol !== 'https:') {
         throw new ValidationError(
@@ -55,7 +55,10 @@ export class DownloadManager {
 
       // Check against allowed hosts if configured
       const allowedHosts = this.configManager.get('allowedHosts');
-      if (allowedHosts.length > 0 && !allowedHosts.includes(parsedUrl.hostname)) {
+      if (
+        allowedHosts.length > 0 &&
+        !allowedHosts.includes(parsedUrl.hostname)
+      ) {
         throw new ValidationError(
           ErrorCode.UNAUTHORIZED_HOST,
           `Host ${parsedUrl.hostname} is not in the allowed hosts list`
@@ -63,10 +66,7 @@ export class DownloadManager {
       }
     } catch (error) {
       if (error instanceof ValidationError) throw error;
-      throw new ValidationError(
-        ErrorCode.INVALID_URL,
-        'Invalid URL format'
-      );
+      throw new ValidationError(ErrorCode.INVALID_URL, 'Invalid URL format');
     }
   }
 
@@ -81,7 +81,10 @@ export class DownloadManager {
     // Validate inputs
     this.validateUrl(url);
     if (!bundleId) {
-      throw new ValidationError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Bundle ID is required');
+      throw new ValidationError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Bundle ID is required'
+      );
     }
 
     // Check if already downloading
@@ -108,7 +111,7 @@ export class DownloadManager {
         signal: abortController.signal,
         headers: {
           'Cache-Control': 'no-cache',
-          'Accept': 'application/octet-stream, application/zip',
+          Accept: 'application/octet-stream, application/zip',
         },
       });
 
@@ -186,17 +189,19 @@ export class DownloadManager {
       // Combine chunks into a single blob
       const blob = new Blob(chunks as BlobPart[]);
       this.validateBlobSize(blob);
-      
-      this.logger.info('Download completed', { 
-        bundleId, 
+
+      this.logger.info('Download completed', {
+        bundleId,
         size: blob.size,
-        duration: Date.now() - downloadState.startTime
+        duration: Date.now() - downloadState.startTime,
       });
 
       return blob;
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        const isTimeout = Date.now() - downloadState.startTime >= this.configManager.get('downloadTimeout');
+        const isTimeout =
+          Date.now() - downloadState.startTime >=
+          this.configManager.get('downloadTimeout');
         throw new DownloadError(
           isTimeout ? ErrorCode.DOWNLOAD_TIMEOUT : ErrorCode.DOWNLOAD_FAILED,
           isTimeout ? 'Download timed out' : 'Download cancelled',
@@ -221,7 +226,7 @@ export class DownloadManager {
       'application/x-zip-compressed',
       'application/x-zip',
     ];
-    return validTypes.some(type => contentType.includes(type));
+    return validTypes.some((type) => contentType.includes(type));
   }
 
   /**
@@ -308,12 +313,17 @@ export class DownloadManager {
         lastError = error as Error;
 
         // Don't retry if cancelled or validation error
-        if (error instanceof ValidationError || 
-            (error instanceof Error && error.name === 'AbortError')) {
+        if (
+          error instanceof ValidationError ||
+          (error instanceof Error && error.name === 'AbortError')
+        ) {
           throw error;
         }
 
-        this.logger.warn(`Download attempt ${attempt + 1} failed`, { bundleId, error });
+        this.logger.warn(`Download attempt ${attempt + 1} failed`, {
+          bundleId,
+          error,
+        });
       }
     }
 
@@ -345,7 +355,7 @@ export class DownloadManager {
 
     const arrayBuffer = await this.blobToArrayBuffer(blob);
     const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-    
+
     const path = `bundles/${bundleId}/bundle.zip`;
     await this.filesystem.writeFile({
       path,
@@ -354,7 +364,11 @@ export class DownloadManager {
       recursive: true,
     });
 
-    this.logger.debug('Bundle saved to filesystem', { bundleId, path, size: blob.size });
+    this.logger.debug('Bundle saved to filesystem', {
+      bundleId,
+      path,
+      size: blob.size,
+    });
     return path;
   }
 
@@ -384,7 +398,10 @@ export class DownloadManager {
 
       return new Blob([bytes], { type: 'application/zip' });
     } catch (error) {
-      this.logger.debug('Failed to load bundle from filesystem', { bundleId, error });
+      this.logger.debug('Failed to load bundle from filesystem', {
+        bundleId,
+        error,
+      });
       return null;
     }
   }
@@ -409,7 +426,10 @@ export class DownloadManager {
       });
       this.logger.debug('Bundle deleted from filesystem', { bundleId });
     } catch (error) {
-      this.logger.warn('Failed to delete bundle from filesystem', { bundleId, error });
+      this.logger.warn('Failed to delete bundle from filesystem', {
+        bundleId,
+        error,
+      });
     }
   }
 }

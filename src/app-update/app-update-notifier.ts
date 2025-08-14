@@ -17,7 +17,7 @@ export class AppUpdateNotifier {
 
   async notifyUpdateAvailable(updateInfo: AppUpdateInfo): Promise<void> {
     this.logger.log('Notifying update available', updateInfo);
-    
+
     // Emit event for update availability
     this.emitUpdateEvent('appUpdateAvailable', {
       currentVersion: updateInfo.currentVersion,
@@ -25,9 +25,9 @@ export class AppUpdateNotifier {
       updatePriority: updateInfo.updatePriority,
       updateSize: updateInfo.updateSize,
       releaseNotes: updateInfo.releaseNotes,
-      storeUrl: updateInfo.updateURL
+      storeUrl: updateInfo.updateURL,
     });
-    
+
     // Show notification if configured
     if (this.config.showUpdateNotification !== false) {
       await this.showNotification(updateInfo);
@@ -36,21 +36,21 @@ export class AppUpdateNotifier {
 
   async notifyUpdateDownloading(progress: number): Promise<void> {
     this.logger.log('Update download progress', progress);
-    
+
     // Emit progress event
     this.emitUpdateEvent('appUpdateProgress', {
-      percentComplete: progress
+      percentComplete: progress,
     });
   }
 
   async notifyUpdateReady(): Promise<void> {
     this.logger.log('Update ready for installation');
-    
+
     // Emit ready event
     this.emitUpdateEvent('appUpdateReady', {
-      message: 'Update downloaded and ready to install'
+      message: 'Update downloaded and ready to install',
     });
-    
+
     // Show notification
     if (this.config.showUpdateNotification !== false) {
       await this.showReadyNotification();
@@ -59,11 +59,11 @@ export class AppUpdateNotifier {
 
   async notifyUpdateFailed(error: Error): Promise<void> {
     this.logger.error('Update failed', error);
-    
+
     // Emit error event
     this.emitUpdateEvent('appUpdateFailed', {
       error: error.message,
-      code: (error as any).code || 'UNKNOWN_ERROR'
+      code: (error as any).code || 'UNKNOWN_ERROR',
     });
   }
 
@@ -71,20 +71,20 @@ export class AppUpdateNotifier {
     if (!('Notification' in window)) {
       return;
     }
-    
+
     // Request permission if needed
     if (Notification.permission === 'default') {
       await Notification.requestPermission();
     }
-    
+
     if (Notification.permission === 'granted') {
       const notification = new Notification('App Update Available', {
         body: `Version ${updateInfo.availableVersion} is available. ${updateInfo.releaseNotes || ''}`,
         icon: '/icon.png',
         tag: 'app-update',
-        requireInteraction: updateInfo.updatePriority === 'IMMEDIATE'
+        requireInteraction: updateInfo.updatePriority === 5, // Priority 5 = IMMEDIATE
       });
-      
+
       notification.onclick = () => {
         // Trigger update action
         this.emitUpdateEvent('appUpdateNotificationClicked', {});
@@ -97,7 +97,7 @@ export class AppUpdateNotifier {
     if (!('Notification' in window) || Notification.permission !== 'granted') {
       return;
     }
-    
+
     const notificationOptions: NotificationOptions = {
       body: 'App update has been downloaded and is ready to install.',
       icon: '/icon.png',
@@ -106,11 +106,11 @@ export class AppUpdateNotifier {
     // Actions are not supported in standard NotificationOptions
     (notificationOptions as any).actions = [
       { action: 'install', title: 'Install Now' },
-      { action: 'later', title: 'Later' }
+      { action: 'later', title: 'Later' },
     ];
-    
+
     const notification = new Notification('Update Ready', notificationOptions);
-    
+
     notification.onclick = (event: any) => {
       if (event.action === 'install') {
         this.emitUpdateEvent('appUpdateInstallClicked', {});

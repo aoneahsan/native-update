@@ -14,7 +14,7 @@
 #-renamesourcefileattribute SourceFile
 
 # Capacitor Native Update Plugin
--keep class com.capacitor.nativeupdate.** { *; }
+-keep class com.aoneahsan.nativeupdate.** { *; }
 
 # OkHttp
 -dontwarn okhttp3.**

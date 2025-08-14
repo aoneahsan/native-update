@@ -1,5 +1,10 @@
 import type { Filesystem } from '@capacitor/filesystem';
 import type { Preferences } from '@capacitor/preferences';
+import type {
+  UpdateStrategy,
+  ChecksumAlgorithm,
+  SecurityConfig,
+} from '../definitions';
 
 export interface PluginConfig {
   filesystem?: typeof Filesystem;
@@ -14,6 +19,26 @@ export interface PluginConfig {
   publicKey?: string;
   cacheExpiration?: number;
   enableLogging?: boolean;
+  serverUrl?: string;
+  channel?: string;
+  autoCheck?: boolean;
+  autoUpdate?: boolean;
+  updateStrategy?: UpdateStrategy;
+  requireSignature?: boolean;
+  checksumAlgorithm?: ChecksumAlgorithm;
+  checkInterval?: number;
+  security?: SecurityConfig;
+  // App review config
+  promptAfterPositiveEvents?: boolean;
+  maxPromptsPerVersion?: number;
+  minimumDaysSinceLastPrompt?: number;
+  isPremiumUser?: boolean;
+  // Platform-specific config
+  appStoreId?: string;
+  iosAppId?: string;
+  packageName?: string;
+  webReviewUrl?: string;
+  minimumVersion?: string;
 }
 
 export class ConfigManager {
@@ -45,6 +70,31 @@ export class ConfigManager {
       publicKey: '',
       cacheExpiration: 24 * 60 * 60 * 1000, // 24 hours
       enableLogging: false,
+      serverUrl: '',
+      channel: 'production',
+      autoCheck: true,
+      autoUpdate: false,
+      updateStrategy: 'background' as UpdateStrategy,
+      requireSignature: true,
+      checksumAlgorithm: 'SHA-256' as ChecksumAlgorithm,
+      checkInterval: 24 * 60 * 60 * 1000, // 24 hours
+      security: {
+        enforceHttps: true,
+        validateInputs: true,
+        secureStorage: true,
+        logSecurityEvents: false,
+      },
+      // App review config
+      promptAfterPositiveEvents: false,
+      maxPromptsPerVersion: 1,
+      minimumDaysSinceLastPrompt: 7,
+      isPremiumUser: false,
+      // Platform-specific config
+      appStoreId: '',
+      iosAppId: '',
+      packageName: '',
+      webReviewUrl: '',
+      minimumVersion: '1.0.0',
     };
   }
 
@@ -68,11 +118,16 @@ export class ConfigManager {
     }
   }
 
-  get<K extends keyof Required<PluginConfig>>(key: K): Required<PluginConfig>[K] {
+  get<K extends keyof Required<PluginConfig>>(
+    key: K
+  ): Required<PluginConfig>[K] {
     return this.config[key];
   }
 
-  set<K extends keyof Required<PluginConfig>>(key: K, value: Required<PluginConfig>[K]): void {
+  set<K extends keyof Required<PluginConfig>>(
+    key: K,
+    value: Required<PluginConfig>[K]
+  ): void {
     this.config[key] = value;
   }
 

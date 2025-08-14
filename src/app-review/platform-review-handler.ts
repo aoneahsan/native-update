@@ -17,12 +17,12 @@ export class PlatformReviewHandler {
 
   async requestReview(options?: ReviewRequestOptions): Promise<ReviewResult> {
     this.logger.log('Requesting review on platform', this.platform);
-    
+
     // Check if custom UI is requested
     if (options?.useCustomUI) {
       return this.showCustomReviewPrompt(options);
     }
-    
+
     // Platform-specific in-app review
     if (this.platform === 'ios') {
       return this.requestIOSReview();
@@ -50,7 +50,7 @@ export class PlatformReviewHandler {
   async getStoreReviewUrl(): Promise<StoreReviewUrl> {
     const platform = this.platform;
     let url = '';
-    
+
     if (platform === 'ios') {
       const appStoreId = this.config.appStoreId || this.config.iosAppId;
       if (!appStoreId) {
@@ -69,7 +69,7 @@ export class PlatformReviewHandler {
       // Web fallback URL
       url = this.config.webReviewUrl || window.location.origin + '/review';
     }
-    
+
     return { url, platform: platform as any };
   }
 
@@ -91,7 +91,7 @@ export class PlatformReviewHandler {
     if (this.platform === 'web') {
       return this.simulateReviewRequest('ios');
     }
-    
+
     // Native implementation would call SKStoreReviewController.requestReview()
     return {
       displayed: true,
@@ -104,36 +104,40 @@ export class PlatformReviewHandler {
     if (this.platform === 'web') {
       return this.simulateReviewRequest('android');
     }
-    
+
     // Native implementation would use ReviewManager from Play Core
     return {
       displayed: true,
     };
   }
 
-  private async requestWebReview(options?: ReviewRequestOptions): Promise<ReviewResult> {
+  private async requestWebReview(
+    options?: ReviewRequestOptions
+  ): Promise<ReviewResult> {
     // For web, show a custom prompt
     return this.showCustomReviewPrompt(options);
   }
 
-  private async showCustomReviewPrompt(options?: ReviewRequestOptions): Promise<ReviewResult> {
+  private async showCustomReviewPrompt(
+    options?: ReviewRequestOptions
+  ): Promise<ReviewResult> {
     const message = options?.customMessage || 'Would you like to rate our app?';
-    
+
     // Create a simple modal for web
     if (typeof window !== 'undefined' && window.confirm) {
       const result = window.confirm(message);
-      
+
       if (result) {
         // User agreed, open store
         const storeUrl = await this.getStoreReviewUrl();
         await this.openUrl(storeUrl.url);
       }
-      
+
       return {
         displayed: true,
       };
     }
-    
+
     return {
       displayed: false,
       reason: 'Custom UI not available',
@@ -143,7 +147,7 @@ export class PlatformReviewHandler {
   private simulateReviewRequest(platform: string): ReviewResult {
     // Simulate native behavior for testing
     this.logger.log(`Simulating ${platform} review request`);
-    
+
     // Simulate that the prompt was shown
     return {
       displayed: true,
@@ -152,7 +156,7 @@ export class PlatformReviewHandler {
 
   private isIOSVersionSupported(): boolean {
     if (this.platform !== 'ios') return false;
-    
+
     // Check iOS version (10.3+ required for SKStoreReviewController)
     // This would be checked in native code
     return true;

@@ -20,7 +20,7 @@ describe('ConfigManager', () => {
       };
 
       configManager.configure(config);
-      
+
       expect(configManager.get('baseUrl')).toBe('https://updates.example.com');
       expect(configManager.get('publicKey')).toBe('test-public-key');
       expect(configManager.get('enableLogging')).toBe(true);
@@ -77,7 +77,10 @@ describe('ConfigManager', () => {
       const allConfig = configManager.getAll();
 
       expect(allConfig).toMatchObject(config);
-      expect(allConfig).toHaveProperty('baseUrl', 'https://updates.example.com');
+      expect(allConfig).toHaveProperty(
+        'baseUrl',
+        'https://updates.example.com'
+      );
       expect(allConfig).toHaveProperty('retryAttempts', 3);
       expect(allConfig).toHaveProperty('enableLogging', true);
     });

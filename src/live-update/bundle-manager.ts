@@ -48,7 +48,7 @@ export class BundleManager {
       if (value) {
         const bundles: BundleInfo[] = JSON.parse(value);
         this.cache.clear();
-        bundles.forEach(bundle => this.cache.set(bundle.bundleId, bundle));
+        bundles.forEach((bundle) => this.cache.set(bundle.bundleId, bundle));
       }
       this.cacheExpiry = Date.now() + 5000; // 5 second cache
     } catch (error) {
@@ -65,7 +65,7 @@ export class BundleManager {
       const bundles = Array.from(this.cache.values());
       await this.preferences!.set({
         key: this.STORAGE_KEY,
-        value: JSON.stringify(bundles)
+        value: JSON.stringify(bundles),
       });
       this.logger.debug('Saved bundles to storage', { count: bundles.length });
     } catch (error) {
@@ -85,7 +85,10 @@ export class BundleManager {
     this.validateBundleInfo(bundle);
     this.cache.set(bundle.bundleId, bundle);
     await this.saveCache();
-    this.logger.info('Bundle saved', { bundleId: bundle.bundleId, version: bundle.version });
+    this.logger.info('Bundle saved', {
+      bundleId: bundle.bundleId,
+      version: bundle.version,
+    });
   }
 
   /**
@@ -93,16 +96,28 @@ export class BundleManager {
    */
   private validateBundleInfo(bundle: BundleInfo): void {
     if (!bundle.bundleId || typeof bundle.bundleId !== 'string') {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Invalid bundle ID');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Invalid bundle ID'
+      );
     }
     if (!bundle.version || typeof bundle.version !== 'string') {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Invalid bundle version');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Invalid bundle version'
+      );
     }
     if (!bundle.path || typeof bundle.path !== 'string') {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Invalid bundle path');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Invalid bundle path'
+      );
     }
     if (typeof bundle.size !== 'number' || bundle.size < 0) {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Invalid bundle size');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Invalid bundle size'
+      );
     }
   }
 
@@ -119,7 +134,10 @@ export class BundleManager {
    */
   async getBundle(bundleId: string): Promise<BundleInfo | null> {
     if (!bundleId) {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Bundle ID is required');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Bundle ID is required'
+      );
     }
     await this.loadCache();
     return this.cache.get(bundleId) || null;
@@ -130,7 +148,10 @@ export class BundleManager {
    */
   async deleteBundle(bundleId: string): Promise<void> {
     if (!bundleId) {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Bundle ID is required');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Bundle ID is required'
+      );
     }
 
     await this.loadCache();
@@ -167,7 +188,10 @@ export class BundleManager {
    */
   async setActiveBundle(bundleId: string): Promise<void> {
     if (!bundleId) {
-      throw new StorageError(ErrorCode.INVALID_BUNDLE_FORMAT, 'Bundle ID is required');
+      throw new StorageError(
+        ErrorCode.INVALID_BUNDLE_FORMAT,
+        'Bundle ID is required'
+      );
     }
 
     const bundle = await this.getBundle(bundleId);
@@ -191,10 +215,13 @@ export class BundleManager {
 
     await this.preferences!.set({
       key: this.ACTIVE_BUNDLE_KEY,
-      value: bundleId
+      value: bundleId,
     });
 
-    this.logger.info('Active bundle set', { bundleId, version: bundle.version });
+    this.logger.info('Active bundle set', {
+      bundleId,
+      version: bundle.version,
+    });
   }
 
   /**
@@ -202,7 +229,9 @@ export class BundleManager {
    */
   async getActiveBundleId(): Promise<string | null> {
     try {
-      const { value } = await this.preferences!.get({ key: this.ACTIVE_BUNDLE_KEY });
+      const { value } = await this.preferences!.get({
+        key: this.ACTIVE_BUNDLE_KEY,
+      });
       return value;
     } catch (error) {
       this.logger.error('Failed to get active bundle ID', error);
@@ -234,7 +263,10 @@ export class BundleManager {
    */
   async cleanupOldBundles(keepCount: number): Promise<void> {
     if (keepCount < 1) {
-      throw new StorageError(ErrorCode.INVALID_CONFIG, 'Keep count must be at least 1');
+      throw new StorageError(
+        ErrorCode.INVALID_CONFIG,
+        'Keep count must be at least 1'
+      );
     }
 
     const bundles = await this.getAllBundles();
@@ -268,7 +300,10 @@ export class BundleManager {
     }
 
     if (deletedCount > 0) {
-      this.logger.info('Cleaned up old bundles', { deleted: deletedCount, kept });
+      this.logger.info('Cleaned up old bundles', {
+        deleted: deletedCount,
+        kept,
+      });
     }
   }
 
@@ -277,7 +312,10 @@ export class BundleManager {
    */
   async getBundlesOlderThan(timestamp: number): Promise<BundleInfo[]> {
     if (timestamp < 0) {
-      throw new StorageError(ErrorCode.INVALID_CONFIG, 'Timestamp must be non-negative');
+      throw new StorageError(
+        ErrorCode.INVALID_CONFIG,
+        'Timestamp must be non-negative'
+      );
     }
     const bundles = await this.getAllBundles();
     return bundles.filter((b) => b.downloadTime < timestamp);
@@ -313,7 +351,7 @@ export class BundleManager {
   async isStorageLimitExceeded(additionalSize: number = 0): Promise<boolean> {
     const totalUsed = await this.getTotalStorageUsed();
     const maxStorage = this.configManager.get('maxBundleSize') * 3; // Allow 3x max bundle size
-    return (totalUsed + additionalSize) > maxStorage;
+    return totalUsed + additionalSize > maxStorage;
   }
 
   /**
@@ -339,7 +377,7 @@ export class BundleManager {
     const expirationTime = this.configManager.get('cacheExpiration');
     const cutoffTime = Date.now() - expirationTime;
     const expiredBundles = await this.getBundlesOlderThan(cutoffTime);
-    
+
     for (const bundle of expiredBundles) {
       // Don't delete active bundle
       const activeBundleId = await this.getActiveBundleId();

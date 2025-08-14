@@ -15,7 +15,7 @@ export class ReviewRateLimiter {
   private config: PluginConfig;
   private logger: Logger;
   private storageKey = 'cap_review_rate_limit';
-  
+
   // Platform-specific limits
   private readonly IOS_MAX_PROMPTS_PER_YEAR = 3;
   private readonly ANDROID_MIN_DAYS_BETWEEN = 30; // Recommended
@@ -29,12 +29,12 @@ export class ReviewRateLimiter {
   async canRequestReview(): Promise<CanRequestReviewResult> {
     const data = await this.getRateLimitData();
     const platform = this.getPlatform();
-    
+
     // Check last request date
     if (data.lastRequestDate) {
       const daysSinceLastRequest = this.getDaysSince(data.lastRequestDate);
       const minDays = this.getMinDaysBetweenPrompts(platform);
-      
+
       if (daysSinceLastRequest < minDays) {
         return {
           canRequest: false,
@@ -42,12 +42,12 @@ export class ReviewRateLimiter {
         };
       }
     }
-    
+
     // iOS-specific: Check yearly limit
     if (platform === 'ios') {
       const currentYear = new Date().getFullYear().toString();
       const requestsThisYear = data.requestsByYear[currentYear] || 0;
-      
+
       if (requestsThisYear >= this.IOS_MAX_PROMPTS_PER_YEAR) {
         return {
           canRequest: false,
@@ -55,19 +55,19 @@ export class ReviewRateLimiter {
         };
       }
     }
-    
+
     // Check version-specific limits
     const currentVersion = await this.getCurrentVersion();
     const requestsThisVersion = data.requestsByVersion[currentVersion] || 0;
     const maxPerVersion = this.config.maxPromptsPerVersion || 1;
-    
+
     if (requestsThisVersion >= maxPerVersion) {
       return {
         canRequest: false,
         reason: `Version limit reached: ${requestsThisVersion}/${maxPerVersion} prompts for v${currentVersion}`,
       };
     }
-    
+
     return {
       canRequest: true,
     };
@@ -77,32 +77,32 @@ export class ReviewRateLimiter {
     const data = await this.getRateLimitData();
     const currentVersion = await this.getCurrentVersion();
     const currentYear = new Date().getFullYear().toString();
-    
+
     // Update counters
     data.totalRequests++;
     data.lastRequestDate = Date.now();
-    
+
     if (wasDisplayed) {
       data.successfulDisplays++;
     }
-    
+
     // Update version-specific count
     if (!data.requestsByVersion[currentVersion]) {
       data.requestsByVersion[currentVersion] = 0;
     }
     data.requestsByVersion[currentVersion]++;
-    
+
     // Update year-specific count (for iOS)
     if (!data.requestsByYear[currentYear]) {
       data.requestsByYear[currentYear] = 0;
     }
     data.requestsByYear[currentYear]++;
-    
+
     await this.saveRateLimitData(data);
     this.logger.log('Recorded review request', {
       total: data.totalRequests,
       version: currentVersion,
-      year: currentYear
+      year: currentYear,
     });
   }
 
@@ -111,22 +111,24 @@ export class ReviewRateLimiter {
       totalRequests: 0,
       successfulDisplays: 0,
       requestsByVersion: {},
-      requestsByYear: {}
+      requestsByYear: {},
     });
   }
 
   async getMetrics(): Promise<ReviewMetrics> {
     const data = await this.getRateLimitData();
     const installDate = await this.getInstallDate();
-    
+
     return {
       totalRequests: data.totalRequests,
       successfulDisplays: data.successfulDisplays,
-      lastRequestDate: data.lastRequestDate ? new Date(data.lastRequestDate) : undefined,
+      lastRequestDate: data.lastRequestDate
+        ? new Date(data.lastRequestDate)
+        : undefined,
       requestsByVersion: data.requestsByVersion,
       significantEvents: [], // This would come from conditions checker
       appLaunches: 0, // This would come from conditions checker
-      installDate: new Date(installDate)
+      installDate: new Date(installDate),
     };
   }
 
@@ -139,12 +141,12 @@ export class ReviewRateLimiter {
     } catch (error) {
       this.logger.error('Failed to read rate limit data', error);
     }
-    
+
     return {
       totalRequests: 0,
       successfulDisplays: 0,
       requestsByVersion: {},
-      requestsByYear: {}
+      requestsByYear: {},
     };
   }
 
@@ -163,9 +165,13 @@ export class ReviewRateLimiter {
 
   private getMinDaysBetweenPrompts(platform: string): number {
     if (platform === 'android') {
-      return this.config.minimumDaysSinceLastPrompt || this.ANDROID_MIN_DAYS_BETWEEN;
+      return (
+        this.config.minimumDaysSinceLastPrompt || this.ANDROID_MIN_DAYS_BETWEEN
+      );
     }
-    return this.config.minimumDaysSinceLastPrompt || this.DEFAULT_MIN_DAYS_BETWEEN;
+    return (
+      this.config.minimumDaysSinceLastPrompt || this.DEFAULT_MIN_DAYS_BETWEEN
+    );
   }
 
   private getPlatform(): string {
@@ -192,7 +198,7 @@ export class ReviewRateLimiter {
     if (stored) {
       return parseInt(stored, 10);
     }
-    
+
     const now = Date.now();
     localStorage.setItem(installKey, now.toString());
     return now;

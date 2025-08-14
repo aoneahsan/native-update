@@ -2,7 +2,7 @@ export interface AppUpdateInfo {
   updateAvailable: boolean;
   currentVersion: string;
   availableVersion?: string;
-  updatePriority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'IMMEDIATE';
+  updatePriority?: number;
   releaseNotes?: string;
   updateSize?: number;
   immediateUpdateAllowed?: boolean;
@@ -34,7 +34,7 @@ export enum AppUpdateInstallStatus {
   INSTALLED = 4,
   FAILED = 5,
   CANCELED = 6,
-  DOWNLOADED = 11
+  DOWNLOADED = 11,
 }
 
 export interface AppUpdateOptions {

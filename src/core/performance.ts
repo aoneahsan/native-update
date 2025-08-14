@@ -41,7 +41,7 @@ export class PerformanceMonitor {
   endTimer(operation: string, version?: string): number {
     const key = version ? `${operation}-${version}` : operation;
     const startTime = this.timers.get(key);
-    
+
     if (!startTime) {
       this.logger.warn(`No timer found for: ${key}`);
       return 0;
@@ -49,10 +49,10 @@ export class PerformanceMonitor {
 
     const duration = Date.now() - startTime;
     this.timers.delete(key);
-    
+
     // Update metrics
     const metrics = this.metrics.get(version || 'current') || {};
-    
+
     switch (operation) {
       case 'check':
         metrics.checkDuration = duration;
@@ -67,10 +67,10 @@ export class PerformanceMonitor {
         metrics.totalDuration = duration;
         break;
     }
-    
+
     this.metrics.set(version || 'current', metrics);
     this.logger.debug(`Performance timer ended: ${key} = ${duration}ms`);
-    
+
     return duration;
   }
 
@@ -82,9 +82,9 @@ export class PerformanceMonitor {
     metrics.downloadSize = size;
     metrics.downloadDuration = duration;
     metrics.networkSpeed = size / (duration / 1000); // bytes per second
-    
+
     this.metrics.set(version, metrics);
-    
+
     this.logger.info('Download performance', {
       version,
       size: `${(size / 1024 / 1024).toFixed(2)} MB`,
@@ -123,21 +123,26 @@ export class PerformanceMonitor {
    */
   getOptimalChunkSize(): number {
     const recentMetrics = Array.from(this.metrics.values()).slice(-3);
-    
+
     if (recentMetrics.length === 0) {
       return 1024 * 1024; // Default 1MB chunks
     }
 
-    const avgSpeed = recentMetrics
-      .filter(m => m.networkSpeed)
-      .reduce((sum, m) => sum + (m.networkSpeed || 0), 0) / recentMetrics.length;
+    const avgSpeed =
+      recentMetrics
+        .filter((m) => m.networkSpeed)
+        .reduce((sum, m) => sum + (m.networkSpeed || 0), 0) /
+      recentMetrics.length;
 
     // Adjust chunk size based on speed
-    if (avgSpeed > 10 * 1024 * 1024) { // > 10 MB/s
+    if (avgSpeed > 10 * 1024 * 1024) {
+      // > 10 MB/s
       return 5 * 1024 * 1024; // 5MB chunks
-    } else if (avgSpeed > 5 * 1024 * 1024) { // > 5 MB/s
+    } else if (avgSpeed > 5 * 1024 * 1024) {
+      // > 5 MB/s
       return 2 * 1024 * 1024; // 2MB chunks
-    } else if (avgSpeed > 1 * 1024 * 1024) { // > 1 MB/s
+    } else if (avgSpeed > 1 * 1024 * 1024) {
+      // > 1 MB/s
       return 1024 * 1024; // 1MB chunks
     } else {
       return 512 * 1024; // 512KB chunks for slow connections
@@ -154,15 +159,15 @@ export class PerformanceMonitor {
     suitable: boolean;
   }> {
     const cpuCores = navigator.hardwareConcurrency || 1;
-    
+
     // Estimate available memory (if available)
     const memory = (navigator as any).deviceMemory || 4; // GB
-    
+
     // Check storage (placeholder - implement per platform)
     const storage = 1000; // MB - placeholder
-    
+
     const suitable = cpuCores >= 2 && memory >= 2 && storage >= 100;
-    
+
     return {
       cpuCores,
       memory,
