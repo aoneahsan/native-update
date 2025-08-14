@@ -1,4 +1,4 @@
-import { CapacitorNativeUpdate } from 'native-update';
+import { NativeUpdate } from 'native-update';
 import type {
   UpdateConfig,
   SyncResult,
@@ -65,7 +65,7 @@ export class UpdateService {
     if (this.isConfigured) return;
 
     try {
-      await CapacitorNativeUpdate.configure(this.config);
+      await NativeUpdate.configure(this.config);
       this.setupListeners();
       this.isConfigured = true;
       console.log('Update service initialized');
@@ -77,13 +77,13 @@ export class UpdateService {
 
   private setupListeners(): void {
     // Listen for download progress
-    CapacitorNativeUpdate.addListener('downloadProgress', (event) => {
+    NativeUpdate.addListener('downloadProgress', (event) => {
       console.log(`Download progress: ${event.percent}%`);
       this.downloadProgressCallback?.(event);
     });
 
     // Listen for state changes
-    CapacitorNativeUpdate.addListener('updateStateChanged', (event) => {
+    NativeUpdate.addListener('updateStateChanged', (event) => {
       console.log('Update state changed:', event);
       this.stateChangeCallback?.(event);
     });
@@ -93,7 +93,7 @@ export class UpdateService {
 
   async checkForUpdates(): Promise<SyncResult> {
     try {
-      return await CapacitorNativeUpdate.sync();
+      return await NativeUpdate.sync();
     } catch (error) {
       console.error('Failed to check for updates:', error);
       throw error;
@@ -106,7 +106,7 @@ export class UpdateService {
     checksum: string
   ): Promise<BundleInfo> {
     try {
-      return await CapacitorNativeUpdate.download({
+      return await NativeUpdate.download({
         url,
         version,
         checksum,
@@ -121,9 +121,9 @@ export class UpdateService {
 
   async applyUpdate(bundle: BundleInfo): Promise<void> {
     try {
-      await CapacitorNativeUpdate.set(bundle);
+      await NativeUpdate.set(bundle);
       // Optionally reload immediately
-      // await CapacitorNativeUpdate.reload();
+      // await NativeUpdate.reload();
     } catch (error) {
       console.error('Failed to apply update:', error);
       throw error;
@@ -131,61 +131,61 @@ export class UpdateService {
   }
 
   async reloadApp(): Promise<void> {
-    await CapacitorNativeUpdate.reload();
+    await NativeUpdate.reload();
   }
 
   async resetToOriginal(): Promise<void> {
-    await CapacitorNativeUpdate.reset();
-    await CapacitorNativeUpdate.reload();
+    await NativeUpdate.reset();
+    await NativeUpdate.reload();
   }
 
   async getCurrentBundle(): Promise<BundleInfo> {
-    return await CapacitorNativeUpdate.current();
+    return await NativeUpdate.current();
   }
 
   async listBundles(): Promise<BundleInfo[]> {
-    return await CapacitorNativeUpdate.list();
+    return await NativeUpdate.list();
   }
 
   async deleteBundle(bundleId: string): Promise<void> {
-    await CapacitorNativeUpdate.delete({ bundleId });
+    await NativeUpdate.delete({ bundleId });
   }
 
   async cleanupOldBundles(keepVersions: number = 3): Promise<void> {
-    await CapacitorNativeUpdate.delete({ keepVersions });
+    await NativeUpdate.delete({ keepVersions });
   }
 
   async notifyAppReady(): Promise<void> {
-    await CapacitorNativeUpdate.notifyAppReady();
+    await NativeUpdate.notifyAppReady();
   }
 
   async getLatestVersion(): Promise<LatestVersion> {
-    return await CapacitorNativeUpdate.getLatest();
+    return await NativeUpdate.getLatest();
   }
 
   async setChannel(channel: string): Promise<void> {
-    await CapacitorNativeUpdate.setChannel(channel);
+    await NativeUpdate.setChannel(channel);
   }
 
   // App Update Methods
 
   async checkAppStoreUpdate(): Promise<AppUpdateInfo> {
-    return await CapacitorNativeUpdate.getAppUpdateInfo();
+    return await NativeUpdate.getAppUpdateInfo();
   }
 
   async performImmediateUpdate(): Promise<void> {
-    await CapacitorNativeUpdate.performImmediateUpdate();
+    await NativeUpdate.performImmediateUpdate();
   }
 
   async openAppStore(): Promise<void> {
-    await CapacitorNativeUpdate.openAppStore();
+    await NativeUpdate.openAppStore();
   }
 
   // App Review Methods
 
   async requestReview(): Promise<boolean> {
     try {
-      const result = await CapacitorNativeUpdate.requestReview();
+      const result = await NativeUpdate.requestReview();
       return result.shown;
     } catch (error) {
       console.error('Failed to request review:', error);
@@ -194,17 +194,17 @@ export class UpdateService {
   }
 
   async canRequestReview(): Promise<{ canRequest: boolean; reason?: string }> {
-    return await CapacitorNativeUpdate.canRequestReview();
+    return await NativeUpdate.canRequestReview();
   }
 
   // Security Methods
 
   async getSecurityInfo(): Promise<any> {
-    return await CapacitorNativeUpdate.getSecurityInfo();
+    return await NativeUpdate.getSecurityInfo();
   }
 
   async validateUpdate(bundlePath: string, checksum: string): Promise<boolean> {
-    const result = await CapacitorNativeUpdate.validateUpdate({
+    const result = await NativeUpdate.validateUpdate({
       bundlePath,
       checksum,
       maxSize: 50 * 1024 * 1024,

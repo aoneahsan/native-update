@@ -1,14 +1,4 @@
-export interface NativeUpdatePlugin {
-  /**
-   * Configure the plugin with initial settings
-   */
-  configure(options: { config: PluginInitConfig }): Promise<void>;
-
-  /**
-   * Get current security configuration
-   */
-  getSecurityInfo(): Promise<SecurityInfo>;
-}
+// Core plugin interface will be defined later after other interfaces
 
 /**
  * Live Update Plugin Interface
@@ -176,11 +166,20 @@ export interface BackgroundUpdatePlugin {
  * Combined plugin interface
  */
 export interface NativeUpdateCombinedPlugin
-  extends NativeUpdatePlugin,
-    LiveUpdatePlugin,
+  extends LiveUpdatePlugin,
     AppUpdatePlugin,
     AppReviewPlugin,
-    BackgroundUpdatePlugin {}
+    BackgroundUpdatePlugin {
+  /**
+   * Configure the plugin with initial settings
+   */
+  configure(options: { config: PluginInitConfig }): Promise<void>;
+
+  /**
+   * Get current security configuration
+   */
+  getSecurityInfo(): Promise<SecurityInfo>;
+}
 
 /**
  * Configuration Types

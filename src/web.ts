@@ -807,4 +807,4 @@ export class NativeUpdateWeb
 }
 
 // Alias for backward compatibility with tests
-export { NativeUpdateWeb };
+// Already exported above

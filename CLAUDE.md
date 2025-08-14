@@ -81,7 +81,7 @@ The plugin follows the standard Capacitor plugin structure with separate impleme
 ### Key Configuration Files
 
 - `capacitor.config.ts` - Capacitor configuration with app ID `com.aoneahsan.nativeupdate`
-- `CapacitorNativeUpdate.podspec` - iOS CocoaPods specification for the plugin
+- `NativeUpdate.podspec` - iOS CocoaPods specification for the plugin
 - `rollup.config.js` - Bundler configuration for multiple output formats
 
 ### Development Workflow
