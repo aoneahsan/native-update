@@ -777,7 +777,7 @@ async function trackUpdateMetrics(event: string, data: any) {
 
 - Configure [App Reviews](./app-reviews.md) for user feedback
 - Implement [Security Best Practices](../guides/security-best-practices.md)
-- Set up [Update Monitoring](../guides/monitoring.md)
+- Review [Testing Guide](../guides/testing-guide.md)
 - Review [API Reference](../api/app-update-api.md)
 
 ---

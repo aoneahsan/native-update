@@ -25,20 +25,22 @@ await NativeUpdate.configure({
 });
 ```
 
-### sync()
+### sync(options?)
 
 Sync with update server and apply updates based on strategy.
 
 ```typescript
 const result = await NativeUpdate.sync({
-  installMode?: 'IMMEDIATE' | 'ON_NEXT_RESTART' | 'ON_NEXT_RESUME';
-  minimumBackgroundDuration?: number; // Minimum background time (ms)
+  channel?: string;           // Update channel (optional)
+  updateMode?: UpdateMode;    // Update mode (optional)
 });
 // Returns:
 {
-  status: 'UP_TO_DATE' | 'UPDATE_AVAILABLE' | 'UPDATE_INSTALLED' | 'ERROR';
-  bundle?: BundleInfo;        // Bundle information if update available/installed
-  error?: { code: string; message: string; };
+  status: SyncStatus;         // 'UP_TO_DATE' | 'UPDATE_AVAILABLE' | 'UPDATE_INSTALLED' | 'ERROR'
+  version?: string;           // Version if update available
+  description?: string;       // Update description
+  mandatory?: boolean;        // Is update mandatory
+  error?: UpdateError;        // Error details if status is ERROR
 }
 ```
 
@@ -48,15 +50,25 @@ Download a specific bundle version.
 
 ```typescript
 const result = await NativeUpdate.download({
-  version: string;            // Version to download
+  url: string;                // Bundle URL (required)
+  version: string;            // Version to download (required)
+  checksum: string;           // Expected SHA-256 checksum (required)
+  signature?: string;         // Optional bundle signature
+  maxRetries?: number;        // Max download retries
+  timeout?: number;           // Download timeout in ms
 });
 // Returns:
 {
   bundleId: string;           // Unique bundle ID
   version: string;            // Bundle version
   path: string;              // Local path
+  downloadTime: number;       // Download timestamp
   size: number;              // File size
+  status: BundleStatus;       // Bundle status
   checksum: string;           // SHA-256 checksum
+  signature?: string;         // Bundle signature if provided
+  verified: boolean;          // Signature verification status
+  metadata?: Record<string, unknown>; // Optional metadata
 }
 ```
 
@@ -115,7 +127,8 @@ Delete bundles.
 ```typescript
 await NativeUpdate.delete({
   bundleId?: string;          // Delete specific bundle
-  keepLatest?: number;        // Keep N most recent versions
+  keepVersions?: number;      // Keep N most recent versions
+  olderThan?: number;         // Delete bundles older than timestamp
 });
 ```
 
@@ -135,21 +148,6 @@ Notify that the app has successfully started with the new bundle.
 await NativeUpdate.notifyAppReady();
 ```
 
-### pauseAutoUpdates()
-
-Temporarily pause automatic update checks.
-
-```typescript
-await NativeUpdate.pauseAutoUpdates();
-```
-
-### resumeAutoUpdates()
-
-Resume automatic update checks.
-
-```typescript
-await NativeUpdate.resumeAutoUpdates();
-```
 
 ### setChannel(channel)
 
@@ -172,7 +170,7 @@ await NativeUpdate.setUpdateUrl(url: string);
 Validate a bundle's integrity.
 
 ```typescript
-const result = await NativeUpdate.validateUpdate({
+const result = await NativeUpdate.LiveUpdate.validateUpdate({
   bundlePath: string;
   checksum: string;
   signature?: string;
@@ -210,13 +208,23 @@ NativeUpdate.addListener('downloadProgress', (progress) => {
 });
 ```
 
-### error
+### backgroundUpdateProgress
 
-Fired when an error occurs.
+Fired during background update operations.
 
 ```typescript
-NativeUpdate.addListener('error', (error) => {
-  console.error('Update error:', error.code, error.message);
+NativeUpdate.addListener('backgroundUpdateProgress', (progress) => {
+  console.log('Background update:', progress.status);
+});
+```
+
+### backgroundUpdateNotification
+
+Fired when background update notifications are triggered.
+
+```typescript
+NativeUpdate.addListener('backgroundUpdateNotification', (notification) => {
+  console.log('Update notification:', notification.type);
 });
 ```
 

@@ -168,41 +168,41 @@ export class UpdateService {
 
   async checkForUpdates(silent = false) {
     try {
-      const { available, version, mandatory, notes } =
-        await NativeUpdate.sync();
+      const result = await NativeUpdate.sync();
 
-      if (!available) {
+      if (result.status === 'UP_TO_DATE') {
         if (!silent) {
           await this.showAlert('No Updates', 'Your app is up to date!');
         }
         return;
       }
 
-      // Show update dialog
-      const alert = await this.alertCtrl.create({
-        header: 'Update Available',
-        message: `Version ${version} is available.\n\n${notes || 'Bug fixes and improvements'}`,
-        buttons: [
-          {
-            text: mandatory ? 'Update Now' : 'Later',
-            role: 'cancel',
-            handler: () => {
-              if (mandatory) {
-                // Force update for mandatory updates
+      if (result.status === 'UPDATE_AVAILABLE' || result.status === 'UPDATE_INSTALLED') {
+        // Show update dialog
+        const alert = await this.alertCtrl.create({
+          header: 'Update Available',
+          message: `Version ${result.version} is available.\n\n${result.description || 'Bug fixes and improvements'}`,
+          buttons: [
+            {
+              text: result.mandatory ? 'Update Now' : 'Later',
+              role: 'cancel',
+              handler: () => {
+                if (result.mandatory) {
+                  // Force update for mandatory updates
+                  this.downloadAndApplyUpdate();
+                  return false;
+                }
+              },
+            },
+            {
+              text: 'Update',
+              handler: () => {
                 this.downloadAndApplyUpdate();
-                return false;
-              }
+              },
             },
-          },
-          {
-            text: 'Update',
-            handler: () => {
-              this.downloadAndApplyUpdate();
-            },
-          },
-        ],
-        backdropDismiss: !mandatory,
-      });
+          ],
+          backdropDismiss: !result.mandatory,
+        });
 
       await alert.present();
     } catch (error) {
@@ -220,11 +220,14 @@ export class UpdateService {
 
     try {
       // Download with progress
-      await NativeUpdate.download({
-        onProgress: (progress) => {
+      // The sync method already handles downloading
+      // Progress tracking would be done via event listeners
+      const downloadListener = NativeUpdate.addListener(
+        'downloadProgress',
+        (progress) => {
           loading.message = `Downloading... ${Math.round(progress.percent)}%`;
-        },
-      });
+        }
+      );
 
       loading.message = 'Applying update...';
 
@@ -291,31 +294,25 @@ export class AppComponent implements OnInit {
 export class UpdateStrategies {
   // Immediate update (default)
   async immediateUpdate() {
-    const { available } = await NativeUpdate.sync();
-    if (available) {
-      await NativeUpdate.download();
+    const result = await NativeUpdate.sync();
+    if (result.status === 'UPDATE_INSTALLED') {
       await NativeUpdate.reload(); // Restarts immediately
     }
   }
 
   // Update on next restart
   async updateOnRestart() {
-    const { available } = await NativeUpdate.sync();
-    if (available) {
-      await NativeUpdate.download();
-      await NativeUpdate.applyUpdate({
-        reloadStrategy: 'on-next-restart',
-      });
-      // Update will be applied next time app starts
+    const result = await NativeUpdate.sync();
+    if (result.status === 'UPDATE_INSTALLED') {
+      // Update is already installed, just don't reload immediately
+      // Update will be applied on next app restart
     }
   }
 
   // Update with confirmation
   async updateWithConfirmation() {
-    const { available } = await NativeUpdate.sync();
-    if (available) {
-      await NativeUpdate.download();
-
+    const result = await NativeUpdate.sync();
+    if (result.status === 'UPDATE_INSTALLED') {
       // Show confirmation dialog
       const confirmed = await this.showUpdateReadyDialog();
       if (confirmed) {
@@ -429,45 +426,51 @@ await NativeUpdate.setChannel({ channel: 'beta' });
 ### 2. Delta Updates
 
 ```typescript
-// Enable delta updates to reduce download size
-await NativeUpdate.configureDeltaUpdates({
-  enabled: true,
-  threshold: 0.3, // Use delta if size < 30% of full bundle
-});
+// Delta updates would be handled server-side
+// The sync() method will automatically use delta updates if available
+// Configure your server to provide delta updates when appropriate
 ```
 
 ### 3. Rollback Support
 
 ```typescript
-// List available versions
-const { versions } = await NativeUpdate.getVersions();
+// List all downloaded bundles
+const bundles = await NativeUpdate.list();
 
-// Rollback to previous version
-if (versions.length > 1) {
-  await NativeUpdate.reset();
+// Rollback to original app bundle
+await NativeUpdate.reset();
+
+// Rollback to a specific bundle
+if (bundles.length > 1) {
+  const previousBundle = bundles[bundles.length - 2];
+  await NativeUpdate.set(previousBundle);
+  await NativeUpdate.reload();
 }
-
-// Rollback to specific version
-await NativeUpdate.switchVersion({
-  version: '1.0.0',
-});
 ```
 
 ### 4. Update Metrics
 
 ```typescript
-// Track update success
-await NativeUpdate.reportUpdateSuccess({
-  version: '1.0.1',
-  duration: 5000,
-});
+// Implement your own metrics tracking
+class UpdateMetrics {
+  async trackSuccess(version: string, duration: number) {
+    // Send to your analytics service
+    await analytics.track('update_success', {
+      version,
+      duration,
+      timestamp: Date.now()
+    });
+  }
 
-// Track update failure
-await NativeUpdate.reportUpdateFailure({
-  version: '1.0.1',
-  error: 'DOWNLOAD_FAILED',
-  details: 'Network timeout',
-});
+  async trackFailure(version: string, error: string) {
+    // Send to your analytics service
+    await analytics.track('update_failure', {
+      version,
+      error,
+      timestamp: Date.now()
+    });
+  }
+}
 ```
 
 ### 5. Custom Update UI
@@ -484,7 +487,7 @@ class CustomUpdateUI {
     // Custom check
     const update = await NativeUpdate.sync();
 
-    if (update.available) {
+    if (update.status === 'UPDATE_AVAILABLE' || update.status === 'UPDATE_INSTALLED') {
       // Show custom UI
       const modal = await this.modalCtrl.create({
         component: UpdateModalComponent,
@@ -561,15 +564,13 @@ await NativeUpdate.setChannel({
 // Download during off-peak hours
 const now = new Date().getHours();
 if (now >= 2 && now <= 6) {
-  await NativeUpdate.download({
-    priority: 'low',
-  });
+  // Download priority would be configured during sync
+  await NativeUpdate.sync();
 }
 
-// Pause/resume downloads
-const downloadId = await NativeUpdate.startDownload();
-await NativeUpdate.pauseDownload({ id: downloadId });
-await NativeUpdate.resumeDownload({ id: downloadId });
+// Download management would be handled by the sync() method
+// For custom download control, implement your own download manager
+// that uses the download() method with proper retry logic
 ```
 
 ## Troubleshooting
@@ -579,42 +580,56 @@ await NativeUpdate.resumeDownload({ id: downloadId });
 1. **Update not applying**
 
    ```typescript
-   // Check if update was downloaded
-   const { ready } = await NativeUpdate.isUpdateReady();
-   if (ready) {
-     // Force apply
-     await NativeUpdate.applyUpdate({ force: true });
+   // Check current bundle status
+   const current = await NativeUpdate.current();
+   console.log('Current bundle:', current);
+   
+   // List all bundles to see if update was downloaded
+   const bundles = await NativeUpdate.list();
+   console.log('Available bundles:', bundles);
+   
+   // If update bundle exists but not active, set it
+   const updateBundle = bundles.find(b => b.version === 'new-version');
+   if (updateBundle && updateBundle.bundleId !== current.bundleId) {
+     await NativeUpdate.set(updateBundle);
+     await NativeUpdate.reload();
    }
    ```
 
 2. **Signature verification fails**
 
    ```typescript
-   // Verify public key configuration
-   const config = await NativeUpdate.getConfiguration();
-   console.log('Public key:', config.publicKey);
+   // Check current configuration by examining the plugin setup
+   // Configuration is set during plugin initialization
+   console.log('Verify your capacitor.config.json for publicKey setting');
    ```
 
 3. **Storage issues**
    ```typescript
-   // Clear old versions
-   await NativeUpdate.cleanup({
-     keepVersions: 1,
+   // Delete old bundles, keeping only the latest N versions
+   await NativeUpdate.delete({
+     keepVersions: 2  // Keep only 2 most recent versions
+   });
+   
+   // Or delete bundles older than a certain date
+   const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+   await NativeUpdate.delete({
+     olderThan: thirtyDaysAgo
    });
    ```
 
 ### Debug Mode
 
 ```typescript
-// Enable debug logging
-await NativeUpdate.setDebugMode({ enabled: true });
+// Enable debug logging through your app's logging system
+// The plugin will log errors and important events automatically
 
 // Monitor update events
-NativeUpdate.addListener('updateDownloadProgress', (progress) => {
+NativeUpdate.addListener('downloadProgress', (progress) => {
   console.log('Download progress:', progress);
 });
 
-NativeUpdate.addListener('updateStateChange', (state) => {
+NativeUpdate.addListener('updateStateChanged', (state) => {
   console.log('Update state:', state);
 });
 ```
@@ -622,15 +637,25 @@ NativeUpdate.addListener('updateStateChange', (state) => {
 ### Health Checks
 
 ```typescript
-// Verify update system health
-const health = await NativeUpdate.getHealth();
-console.log('Update system health:', {
-  enabled: health.enabled,
-  lastCheck: health.lastCheck,
-  lastUpdate: health.lastUpdate,
-  currentVersion: health.currentVersion,
-  availableSpace: health.availableSpace,
-});
+// Implement your own health check system
+class UpdateHealthCheck {
+  async checkHealth() {
+    const current = await NativeUpdate.current();
+    const bundles = await NativeUpdate.list();
+    
+    const health = {
+      currentVersion: current.version,
+      currentBundleId: current.bundleId,
+      bundleStatus: current.status,
+      totalBundles: bundles.length,
+      lastUpdateTime: current.downloadTime,
+      isVerified: current.verified
+    };
+    
+    console.log('Update system health:', health);
+    return health;
+  }
+}
 ```
 
 ## Security Considerations

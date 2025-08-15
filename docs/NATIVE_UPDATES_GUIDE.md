@@ -201,10 +201,12 @@ export class AndroidFlexibleUpdate {
       );
 
       // Listen for download completion
-      NativeUpdate.addListener('onAppUpdateDownloaded', () => {
-        console.log('Update downloaded');
-        this.updateDownloaded = true;
-        this.showInstallPrompt();
+      NativeUpdate.addListener('updateStateChanged', (event) => {
+        if (event.status === 'DOWNLOADED') {
+          console.log('Update downloaded');
+          this.updateDownloaded = true;
+          this.showInstallPrompt();
+        }
       });
     } catch (error) {
       console.error('Flexible update failed:', error);
@@ -411,7 +413,7 @@ export class UpdateStatusManager {
 
   private setupUpdateListeners() {
     // Installation status
-    NativeUpdate.addListener('onAppUpdateInstallStatus', (status) => {
+    NativeUpdate.addListener('updateStateChanged', (status) => {
       switch (status.status) {
         case 'PENDING':
           console.log('Update pending');
@@ -650,9 +652,8 @@ if (state.status === 'FAILED') {
 #### 3. iOS App Store Not Opening
 
 ```typescript
-// Verify App Store ID configuration
-const config = await NativeUpdate.getConfiguration();
-console.log('App Store ID:', config.appStoreId);
+// App Store ID is configured in capacitor.config.json
+// Check your configuration file for the appStoreId setting
 
 // Manual fallback
 if (!config.appStoreId) {

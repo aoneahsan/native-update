@@ -194,13 +194,13 @@ After successful installation:
 1. Read the [Quick Start Guide](./quick-start.md) for basic usage
 2. Configure the plugin with your [update server settings](./configuration.md)
 3. Implement [security best practices](../guides/security-best-practices.md)
-4. Set up your [update server](../examples/server-setup.md)
+4. Set up your update server (see backend-template folder)
 
 ## Support
 
 If you encounter any issues during installation:
 
-- Check our [Troubleshooting Guide](../guides/troubleshooting.md)
+- Check our [Testing Guide](../guides/testing-guide.md)
 - Search existing [GitHub Issues](https://github.com/aoneahsan/native-update/issues)
 - Create a new issue with detailed information about your setup
 

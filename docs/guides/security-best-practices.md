@@ -1048,9 +1048,9 @@ const productionSecurityConfig = {
 ## Next Steps
 
 - Review [Production Readiness](../production-readiness.md) checklist
-- Implement [Monitoring and Analytics](../examples/monitoring-setup.md)
-- Set up [Incident Response](../guides/incident-response.md) procedures
-- Configure [Update Server Security](../examples/server-security.md)
+- Implement proper monitoring and analytics
+- Set up incident response procedures
+- Configure update server security (see backend-template folder)
 
 ---
 

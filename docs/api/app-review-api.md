@@ -92,27 +92,7 @@ await NativeUpdate.trackSignificantEvent(eventName: string);
 
 ## Events
 
-### reviewPromptDisplayed
-
-Fired when review prompt is shown.
-
-```typescript
-NativeUpdate.addListener('reviewPromptDisplayed', (event) => {
-  console.log('Review prompt shown on:', event.platform);
-  analytics.track('review_prompt_displayed');
-});
-```
-
-### reviewPromptDismissed
-
-Fired when review prompt is dismissed.
-
-```typescript
-NativeUpdate.addListener('reviewPromptDismissed', (event) => {
-  console.log('Review prompt dismissed');
-  analytics.track('review_prompt_dismissed');
-});
-```
+Note: App review events are handled natively by the platform's review system. The plugin does not expose custom events for review prompts as these are controlled by iOS StoreKit and Android Play Core.
 
 ## Platform Implementation
 

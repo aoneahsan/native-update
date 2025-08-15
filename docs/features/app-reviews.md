@@ -966,7 +966,7 @@ async function monitorReviewSuccess() {
 ## Next Steps
 
 - Implement [Security Best Practices](../guides/security-best-practices.md)
-- Set up [Analytics Tracking](../examples/analytics-integration.md)
+- Review the [API Reference](../api/app-review-api.md)
 - Configure [Live Updates](./live-updates.md)
 - Review [API Reference](../api/app-review-api.md)
 

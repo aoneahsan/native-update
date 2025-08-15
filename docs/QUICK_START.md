@@ -238,19 +238,21 @@ export class AndroidUpdateProgress {
     );
 
     // Handle completion
-    NativeUpdate.addListener('onAppUpdateDownloaded', async () => {
-      const alert = await this.alertController.create({
-        header: 'Update Ready',
-        message: 'Update has been downloaded. Install now?',
-        buttons: [
-          { text: 'Later' },
-          {
-            text: 'Install',
-            handler: () => NativeUpdate.completeFlexibleUpdate(),
-          },
-        ],
-      });
-      await alert.present();
+    NativeUpdate.addListener('updateStateChanged', async (event) => {
+      if (event.status === 'DOWNLOADED') {
+        const alert = await this.alertController.create({
+          header: 'Update Ready',
+          message: 'Update has been downloaded. Install now?',
+          buttons: [
+            { text: 'Later' },
+            {
+              text: 'Install',
+              handler: () => NativeUpdate.completeFlexibleUpdate(),
+            },
+          ],
+        });
+        await alert.present();
+      }
     });
   }
 }
@@ -533,11 +535,10 @@ curl -X POST http://localhost:3000/api/v1/bundles \
 ### 3. Test App Reviews
 
 ```typescript
-// Enable debug mode
-await NativeUpdate.setReviewDebugMode({ enabled: true });
-
-// Force show review (debug only)
-await NativeUpdate.requestReview({ force: true });
+// Test review prompts
+// Note: Reviews may not show in development builds
+// Test with TestFlight (iOS) or Internal Test Track (Android)
+await NativeUpdate.requestReview();
 ```
 
 ## What's Next?
@@ -566,12 +567,11 @@ Now that you have the basics working:
 ### Live Updates Not Working?
 
 ```typescript
-// Enable debug logging
-await NativeUpdate.setDebugMode({ enabled: true });
+// Enable debug logging in your app
+console.log('Checking update configuration...');
 
-// Check configuration
-const config = await NativeUpdate.getConfiguration();
-console.log('Update URL:', config.updateUrl);
+// Configuration is set in capacitor.config.json
+// Check your config file for updateUrl and other settings
 ```
 
 ### Native Updates Not Detected?

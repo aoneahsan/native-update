@@ -379,9 +379,10 @@ async function getFeatureFlags() {
 2. **Implement delta updates** (coming soon):
    ```typescript
    // Future API
-   const delta = await NativeUpdate.LiveUpdate.downloadDelta({
-     fromVersion: current.version,
-     toVersion: latest.version,
+   // Note: Delta updates are handled automatically by the sync() method
+   // when configured on the server. Direct delta download is not available
+   const bundle = await NativeUpdate.LiveUpdate.download({
+     version: latest.version,
    });
    ```
 
@@ -409,15 +410,23 @@ async function getFeatureFlags() {
 ### Storage Management
 
 ```typescript
-// Monitor storage usage
-const storage = await NativeUpdate.LiveUpdate.getStorageInfo();
-console.log(`Used: ${storage.usedBytes} / ${storage.totalBytes}`);
+// Monitor bundle count and clean up old versions
+const bundles = await NativeUpdate.LiveUpdate.list();
+console.log(`Total bundles: ${bundles.length}`);
 
-// Clean up when needed
-if (storage.usedBytes > storage.totalBytes * 0.8) {
-  await NativeUpdate.LiveUpdate.delete({
-    olderThan: Date.now() - 30 * 24 * 60 * 60 * 1000, // 30 days
-  });
+// Clean up old bundles (keep only recent 5)
+if (bundles.length > 5) {
+  // Sort by downloadTime and keep the 5 most recent
+  const sortedBundles = bundles.sort((a, b) => 
+    new Date(b.downloadTime).getTime() - new Date(a.downloadTime).getTime()
+  );
+  
+  const toDelete = sortedBundles.slice(5);
+  for (const bundle of toDelete) {
+    await NativeUpdate.LiveUpdate.delete({
+      bundleId: bundle.bundleId,
+    });
+  }
 }
 ```
 
@@ -526,7 +535,7 @@ const devConfig = {
 };
 
 // Force update check
-await NativeUpdate.LiveUpdate.sync({ forceCheck: true });
+await NativeUpdate.LiveUpdate.sync();
 
 // Simulate different scenarios
 await testUpdateScenarios();
@@ -623,7 +632,7 @@ async function loadFeature(featureName: string) {
 
 ## Next Steps
 
-- Set up your [Update Server](../examples/server-setup.md)
+- Set up your update server (see backend-template folder)
 - Implement [Security Best Practices](../guides/security-best-practices.md)
 - Configure [App Updates](./app-updates.md) for native changes
 - Explore [API Reference](../api/live-update-api.md)

@@ -136,6 +136,6 @@ node tools/bundle-signer.js sign bundle.zip private-key.pem
 
 ## Need Help?
 
-- See [Troubleshooting Guide](../guides/troubleshooting.md)
+- See [Testing Guide](../guides/testing-guide.md)
 - Check [Server Requirements](../server-requirements.md)
 - Review [Security Best Practices](./security-best-practices.md)

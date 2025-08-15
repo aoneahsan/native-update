@@ -23,8 +23,11 @@ async function checkForDeltaUpdate() {
 }
 
 async function downloadDeltaUpdate(deltaUrl: string) {
+  // Download requires url, version, and checksum parameters
   const download = await NativeUpdate.download({
-    version: 'delta-version'
+    url: result.deltaUrl,
+    version: result.version,
+    checksum: result.checksum
   });
   
   // Set the bundle as active
@@ -108,12 +111,14 @@ async function setupBackgroundUpdates() {
 }
 
 // Handle background update events
-NativeUpdate.addListener('backgroundUpdateReady', (event) => {
+NativeUpdate.addListener('backgroundUpdateNotification', (event) => {
   // Notify user that update is ready
-  showUpdateNotification({
-    version: event.version,
-    releaseNotes: event.releaseNotes
-  });
+  if (event.updateAvailable) {
+    showUpdateNotification({
+      version: event.version,
+      type: event.type
+    });
+  }
 });
 ```
 
@@ -190,7 +195,9 @@ async function setupABTest(config: ABTestConfig) {
     : config.variants.control;
     
   const download = await NativeUpdate.download({
-    version: variant
+    url: bundleUrl,
+    version: variant,
+    checksum: 'bundle-checksum' // This should come from server
   });
   
   // Set the bundle as active
@@ -247,8 +254,11 @@ class UpdateManager {
     );
     
     try {
+      // Download requires url, version, and checksum
       const download = await NativeUpdate.download({
-        version: updateInfo.version
+        url: updateInfo.url,
+        version: updateInfo.version,
+        checksum: updateInfo.checksum
       });
       
       this.updateState = { status: 'installing' };
@@ -296,11 +306,13 @@ async function secureUpdateCheck() {
 
 async function downloadWithIntegrityCheck(url: string, expectedHash: string) {
   const download = await NativeUpdate.download({
-    version: 'secure-version'
+    url: url,
+    version: 'secure-version',
+    checksum: expectedHash
   });
   
   // Additional verification
-  const verified = await NativeUpdate.validateUpdate({
+  const verified = await NativeUpdate.LiveUpdate.validateUpdate({
     bundlePath: download.path,
     checksum: download.checksum,
     signature: 'bundle-signature'
@@ -344,7 +356,9 @@ class UpdateMetrics {
       // Download phase
       metrics.downloadStarted = Date.now();
       const download = await NativeUpdate.download({
-        version: result.version
+        url: result.url,
+        version: result.version,
+        checksum: result.checksum
       });
       metrics.downloadCompleted = Date.now();
       metrics.downloadSize = download.size;

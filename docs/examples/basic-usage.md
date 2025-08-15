@@ -41,6 +41,7 @@ async function downloadAndInstall(version: string) {
   
   // Set the downloaded bundle as active
   await NativeUpdate.set({
+    bundleId: download.bundleId,
     version: download.version,
     checksum: download.checksum
   });

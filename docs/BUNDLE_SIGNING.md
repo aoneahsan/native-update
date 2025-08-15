@@ -240,12 +240,18 @@ Response: {
 ### Plugin Methods
 
 ```typescript
-// Manual verification (advanced use)
-const isValid = await NativeUpdate.verifySignature({
+// Signature verification is handled automatically during sync/download
+// Use validateUpdate for manual verification
+const result = await NativeUpdate.LiveUpdate.validateUpdate({
   bundlePath: '/path/to/bundle.zip',
-  signature: 'base64-signature',
-  publicKey: 'base64-public-key', // Optional, uses config if not provided
+  checksum: 'expected-sha256-checksum',
+  signature: 'base64-signature' // Optional
 });
+
+console.log('Validation result:', result.isValid);
+if (!result.isValid) {
+  console.log('Validation details:', result.details);
+}
 ```
 
 ## Compliance

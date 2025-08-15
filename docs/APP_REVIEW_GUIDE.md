@@ -765,4 +765,4 @@ Key takeaways for implementing app reviews:
 
 - Review the [Quick Start Guide](./QUICK_START.md)
 - Check the [API Reference](./api/app-review-api.md)
-- See [Example Implementation](../example/src/services/review.service.ts)
+- See example implementation in the `/example` directory

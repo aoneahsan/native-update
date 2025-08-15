@@ -460,7 +460,7 @@ try {
 ## Next Steps
 
 - Implement [Security Best Practices](../guides/security-best-practices.md)
-- Set up your [Update Server](../examples/server-setup.md)
+- Set up your update server (see backend-template folder)
 - Explore [Advanced Features](../features/live-updates.md)
 
 ---

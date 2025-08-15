@@ -53,7 +53,7 @@ initializeUpdates();
 // Sync with server and apply updates if available
 async function syncUpdates() {
   try {
-    const result = await NativeUpdate.LiveUpdate.sync();
+    const result = await NativeUpdate.sync();
 
     if (result.status === 'UPDATE_INSTALLED') {
       console.log('Update installed:', result.bundle.version);
@@ -259,7 +259,7 @@ class UpdateManager {
 
   async checkForUpdates() {
     try {
-      const result = await NativeUpdate.LiveUpdate.sync();
+      const result = await NativeUpdate.sync();
 
       if (result.status === 'UPDATE_INSTALLED') {
         // Notify user about update
@@ -349,7 +349,7 @@ async function safeUpdateCheck() {
 
 Now that you have the basics working:
 
-1. Set up your [Update Server](../examples/server-setup.md)
+1. Set up your update server (see backend-template folder)
 2. Implement [Security Best Practices](../guides/security-best-practices.md)
 3. Configure [Advanced Options](./configuration.md)
 4. Explore [API Reference](../api/live-update-api.md) for all available methods
