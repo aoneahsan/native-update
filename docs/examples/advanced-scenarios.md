@@ -10,13 +10,10 @@ Minimize download sizes by only downloading changed files:
 import { NativeUpdate } from 'native-update';
 
 async function checkForDeltaUpdate() {
-  const currentManifest = await NativeUpdate.getCurrentManifest();
+  const currentManifest = await NativeUpdate.current();
   
-  const result = await NativeUpdate.checkForUpdate({
-    updateUrl: 'https://your-update-server.com/api/check',
-    currentVersion: currentManifest.version,
-    currentChecksum: currentManifest.checksum,
-    supportsDelta: true
+  const result = await NativeUpdate.sync({
+    installMode: 'ON_NEXT_RESTART'
   });
   
   if (result.updateAvailable && result.deltaAvailable) {
@@ -26,15 +23,15 @@ async function checkForDeltaUpdate() {
 }
 
 async function downloadDeltaUpdate(deltaUrl: string) {
-  const download = await NativeUpdate.downloadUpdate({
-    url: deltaUrl,
-    isDelta: true
+  const download = await NativeUpdate.download({
+    version: 'delta-version'
   });
   
-  // Apply delta patch
-  await NativeUpdate.applyDelta({
+  // Set the bundle as active
+  await NativeUpdate.set({
     bundleId: download.bundleId,
-    baseVersion: getCurrentVersion()
+    version: download.version,
+    checksum: download.checksum
   });
 }
 ```
@@ -63,9 +60,7 @@ async function switchToBetaChannel() {
   await setupUpdateChannel(UpdateChannel.BETA);
   
   // Check for updates in the new channel
-  const result = await NativeUpdate.checkForUpdate({
-    currentVersion: await getCurrentVersion()
-  });
+  const result = await NativeUpdate.sync();
   
   if (result.updateAvailable) {
     console.log(`Beta update ${result.version} available`);
@@ -82,13 +77,8 @@ async function checkStagedUpdate() {
   const deviceId = await getDeviceId();
   const rolloutPercentage = hashDeviceId(deviceId) % 100;
   
-  const result = await NativeUpdate.checkForUpdate({
-    updateUrl: 'https://your-update-server.com/api/check',
-    currentVersion: '1.0.0',
-    metadata: {
-      deviceId,
-      rolloutGroup: rolloutPercentage
-    }
+  const result = await NativeUpdate.sync({
+    installMode: 'ON_NEXT_RESTART'
   });
   
   if (result.updateAvailable && result.rolloutPercentage >= rolloutPercentage) {
@@ -110,11 +100,10 @@ async function setupBackgroundUpdates() {
     autoInstallMode: 'on-restart'
   });
   
-  // Schedule background update checks
-  await NativeUpdate.scheduleBackgroundCheck({
-    interval: 14400000, // 4 hours
-    requiresWifi: true,
-    requiresCharging: false
+  // Configure automatic update checks
+  await NativeUpdate.configure({
+    checkInterval: 14400, // 4 hours in seconds
+    autoCheck: true
   });
 }
 
@@ -134,14 +123,15 @@ Implement automatic rollback on update failures:
 
 ```typescript
 async function safeUpdate() {
-  // Save current version info before update
-  const backup = await NativeUpdate.createBackup();
+  // Get current version info before update
+  const backup = await NativeUpdate.current();
   
   try {
     // Attempt update
-    await NativeUpdate.installUpdate({
+    await NativeUpdate.set({
       bundleId: 'new-update-id',
-      validateAfterInstall: true
+      version: 'new-version',
+      checksum: 'bundle-checksum'
     });
     
     // Verify update success
@@ -150,15 +140,13 @@ async function safeUpdate() {
       throw new Error('Health check failed');
     }
     
-    // Confirm successful update
-    await NativeUpdate.confirmUpdate();
+    // Notify app is ready with new bundle
+    await NativeUpdate.notifyAppReady();
   } catch (error) {
     console.error('Update failed, rolling back:', error);
     
     // Automatic rollback
-    await NativeUpdate.rollback({
-      backupId: backup.id
-    });
+    await NativeUpdate.reset();
     
     // Report failure to analytics
     reportUpdateFailure(error);
@@ -201,18 +189,15 @@ async function setupABTest(config: ABTestConfig) {
     ? config.variants.treatment 
     : config.variants.control;
     
-  const download = await NativeUpdate.downloadUpdate({
-    url: bundleUrl,
-    metadata: {
-      testId: config.testId,
-      variant
-    }
+  const download = await NativeUpdate.download({
+    version: variant
   });
   
-  // Install with test metadata
-  await NativeUpdate.installUpdate({
+  // Set the bundle as active
+  await NativeUpdate.set({
     bundleId: download.bundleId,
-    preserveData: true
+    version: download.version,
+    checksum: download.checksum
   });
 }
 ```
@@ -227,10 +212,7 @@ class UpdateManager {
   
   async checkAndPromptUpdate() {
     // Check for update
-    const result = await NativeUpdate.checkForUpdate({
-      updateUrl: 'https://your-update-server.com/api/check',
-      currentVersion: await this.getCurrentVersion()
-    });
+    const result = await NativeUpdate.sync();
     
     if (!result.updateAvailable) return;
     
@@ -265,15 +247,17 @@ class UpdateManager {
     );
     
     try {
-      const download = await NativeUpdate.downloadUpdate({
-        url: updateInfo.downloadUrl
+      const download = await NativeUpdate.download({
+        version: updateInfo.version
       });
       
       this.updateState = { status: 'installing' };
       this.updateUI();
       
-      await NativeUpdate.installUpdate({
-        bundleId: download.bundleId
+      await NativeUpdate.set({
+        bundleId: download.bundleId,
+        version: download.version,
+        checksum: download.checksum
       });
       
       this.updateState = { status: 'ready' };
@@ -300,18 +284,7 @@ async function secureUpdateCheck() {
     version: getCurrentVersion()
   });
   
-  const result = await NativeUpdate.checkForUpdate({
-    updateUrl: 'https://your-update-server.com/api/check',
-    currentVersion: getCurrentVersion(),
-    headers: {
-      'X-Timestamp': timestamp.toString(),
-      'X-Nonce': nonce,
-      'X-Signature': signature
-    },
-    certificatePins: [
-      'sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
-    ]
-  });
+  const result = await NativeUpdate.sync();
   
   // Verify response signature
   if (!await verifyUpdateSignature(result)) {
@@ -322,20 +295,18 @@ async function secureUpdateCheck() {
 }
 
 async function downloadWithIntegrityCheck(url: string, expectedHash: string) {
-  const download = await NativeUpdate.downloadUpdate({
-    url,
-    validateChecksum: true,
-    expectedChecksum: expectedHash,
-    algorithm: 'sha256'
+  const download = await NativeUpdate.download({
+    version: 'secure-version'
   });
   
   // Additional verification
-  const verified = await NativeUpdate.verifyBundle({
-    bundleId: download.bundleId,
-    publicKey: await getPublicKey()
+  const verified = await NativeUpdate.validateUpdate({
+    bundlePath: download.path,
+    checksum: download.checksum,
+    signature: 'bundle-signature'
   });
   
-  if (!verified.valid) {
+  if (!verified.isValid) {
     throw new Error('Bundle verification failed');
   }
   
@@ -362,10 +333,7 @@ class UpdateMetrics {
     
     try {
       // Check phase
-      const result = await NativeUpdate.checkForUpdate({
-        updateUrl: 'https://your-update-server.com/api/check',
-        currentVersion: getCurrentVersion()
-      });
+      const result = await NativeUpdate.sync();
       
       if (!result.updateAvailable) {
         metrics.checkCompleted = Date.now();
@@ -375,16 +343,18 @@ class UpdateMetrics {
       
       // Download phase
       metrics.downloadStarted = Date.now();
-      const download = await NativeUpdate.downloadUpdate({
-        url: result.downloadUrl
+      const download = await NativeUpdate.download({
+        version: result.version
       });
       metrics.downloadCompleted = Date.now();
       metrics.downloadSize = download.size;
       
       // Install phase
       metrics.installStarted = Date.now();
-      await NativeUpdate.installUpdate({
-        bundleId: download.bundleId
+      await NativeUpdate.set({
+        bundleId: download.bundleId,
+        version: download.version,
+        checksum: download.checksum
       });
       metrics.installCompleted = Date.now();
       
@@ -405,6 +375,6 @@ class UpdateMetrics {
 
 ## Next Steps
 
-- Review [Integration Examples](./integration-examples.md) for framework-specific implementations
-- See the [API Reference](../api/README.md) for detailed method documentation
+- Review [Basic Usage](./basic-usage.md) for framework-specific implementations
+- See the [API Reference](../api/live-update-api.md) for detailed method documentation
 - Check [Basic Usage](./basic-usage.md) for simpler examples

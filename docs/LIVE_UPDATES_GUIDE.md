@@ -127,25 +127,25 @@ import { NativeUpdate } from 'native-update';
 export class UpdateManager {
   async checkAndUpdate() {
     try {
-      // Check for updates
-      const { available, version } =
-        await NativeUpdate.checkForUpdate();
+      // Sync with the update server
+      const result = await NativeUpdate.sync();
 
-      if (available) {
-        console.log(`Update available: ${version}`);
-
-        // Download the update
-        const { success } = await NativeUpdate.downloadUpdate({
-          onProgress: (progress) => {
-            console.log(`Download progress: ${progress.percent}%`);
-          },
-        });
-
-        if (success) {
-          // Apply the update
-          await NativeUpdate.applyUpdate();
-          // App will restart automatically
-        }
+      switch (result.status) {
+        case 'UPDATE_AVAILABLE':
+          console.log(`Update available: ${result.bundle?.version}`);
+          // Update will be downloaded automatically by sync
+          break;
+        case 'UPDATE_INSTALLED':
+          console.log(`Update installed: ${result.bundle?.version}`);
+          // Reload the app to apply the update
+          await NativeUpdate.reload();
+          break;
+        case 'UP_TO_DATE':
+          console.log('App is up to date');
+          break;
+        case 'ERROR':
+          console.error('Update error:', result.error);
+          break;
       }
     } catch (error) {
       console.error('Update failed:', error);
@@ -169,7 +169,7 @@ export class UpdateService {
   async checkForUpdates(silent = false) {
     try {
       const { available, version, mandatory, notes } =
-        await NativeUpdate.checkForUpdate();
+        await NativeUpdate.sync();
 
       if (!available) {
         if (!silent) {
@@ -220,7 +220,7 @@ export class UpdateService {
 
     try {
       // Download with progress
-      await NativeUpdate.downloadUpdate({
+      await NativeUpdate.download({
         onProgress: (progress) => {
           loading.message = `Downloading... ${Math.round(progress.percent)}%`;
         },
@@ -229,7 +229,7 @@ export class UpdateService {
       loading.message = 'Applying update...';
 
       // Apply the update
-      await NativeUpdate.applyUpdate();
+      await NativeUpdate.reload();
 
       // The app will restart automatically
     } catch (error) {
@@ -291,18 +291,18 @@ export class AppComponent implements OnInit {
 export class UpdateStrategies {
   // Immediate update (default)
   async immediateUpdate() {
-    const { available } = await NativeUpdate.checkForUpdate();
+    const { available } = await NativeUpdate.sync();
     if (available) {
-      await NativeUpdate.downloadUpdate();
-      await NativeUpdate.applyUpdate(); // Restarts immediately
+      await NativeUpdate.download();
+      await NativeUpdate.reload(); // Restarts immediately
     }
   }
 
   // Update on next restart
   async updateOnRestart() {
-    const { available } = await NativeUpdate.checkForUpdate();
+    const { available } = await NativeUpdate.sync();
     if (available) {
-      await NativeUpdate.downloadUpdate();
+      await NativeUpdate.download();
       await NativeUpdate.applyUpdate({
         reloadStrategy: 'on-next-restart',
       });
@@ -312,14 +312,14 @@ export class UpdateStrategies {
 
   // Update with confirmation
   async updateWithConfirmation() {
-    const { available } = await NativeUpdate.checkForUpdate();
+    const { available } = await NativeUpdate.sync();
     if (available) {
-      await NativeUpdate.downloadUpdate();
+      await NativeUpdate.download();
 
       // Show confirmation dialog
       const confirmed = await this.showUpdateReadyDialog();
       if (confirmed) {
-        await NativeUpdate.applyUpdate();
+        await NativeUpdate.reload();
       }
     }
   }
@@ -444,7 +444,7 @@ const { versions } = await NativeUpdate.getVersions();
 
 // Rollback to previous version
 if (versions.length > 1) {
-  await NativeUpdate.rollback();
+  await NativeUpdate.reset();
 }
 
 // Rollback to specific version
@@ -482,7 +482,7 @@ await NativeUpdate.configure({
 class CustomUpdateUI {
   async showUpdateFlow() {
     // Custom check
-    const update = await NativeUpdate.checkForUpdate();
+    const update = await NativeUpdate.sync();
 
     if (update.available) {
       // Show custom UI
@@ -519,7 +519,7 @@ const skipVersions = ['1.0.2', '1.0.3']; // Known bad versions
 class RobustUpdateManager {
   async safeUpdate() {
     try {
-      await NativeUpdate.checkForUpdate();
+      await NativeUpdate.sync();
     } catch (error) {
       if (error.code === 'NETWORK_ERROR') {
         // Retry with exponential backoff
@@ -561,7 +561,7 @@ await NativeUpdate.setChannel({
 // Download during off-peak hours
 const now = new Date().getHours();
 if (now >= 2 && now <= 6) {
-  await NativeUpdate.downloadUpdate({
+  await NativeUpdate.download({
     priority: 'low',
   });
 }
@@ -646,5 +646,5 @@ console.log('Update system health:', {
 
 - Read the [Native App Updates Guide](./NATIVE_UPDATES_GUIDE.md)
 - Learn about [App Review Integration](./APP_REVIEW_GUIDE.md)
-- Check out [Security Best Practices](./SECURITY.md)
+- Check out [Security Best Practices](./guides/security-best-practices.md)
 - See [Bundle Signing Documentation](./BUNDLE_SIGNING.md)

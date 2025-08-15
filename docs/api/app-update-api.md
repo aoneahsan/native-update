@@ -73,35 +73,7 @@ await NativeUpdate.openAppStore({
 
 ## Events
 
-### appUpdateStateChanged
-
-Fired when app update state changes. Android only.
-
-```typescript
-NativeUpdate.addListener('appUpdateStateChanged', (state) => {
-  console.log('Install status:', state.installStatus);
-  // InstallStatus codes:
-  // 0: Unknown
-  // 1: Pending
-  // 2: Downloading
-  // 3: Installing
-  // 4: Installed
-  // 5: Failed
-  // 6: Canceled
-  // 11: Downloaded
-});
-```
-
-### appUpdateProgress
-
-Fired during flexible update download. Android only.
-
-```typescript
-NativeUpdate.addListener('appUpdateProgress', (progress) => {
-  console.log(`Downloaded: ${progress.bytesDownloaded}/${progress.totalBytesToDownload}`);
-  console.log(`Progress: ${progress.percentComplete}%`);
-});
-```
+Note: App update events are not directly exposed. Instead, use the `updateStateChanged` and `downloadProgress` events from the Live Update API when performing app updates. The native update process on Android and iOS is handled by the platform's native update mechanisms.
 
 ## Platform Differences
 
@@ -155,17 +127,10 @@ NativeUpdate.addListener('appUpdateProgress', (progress) => {
    // Start download
    await NativeUpdate.startFlexibleUpdate();
    
-   // Monitor progress
-   const listener = NativeUpdate.addListener('appUpdateProgress', (progress) => {
-     updateProgressBar(progress.percentComplete);
-   });
-   
-   // Complete when ready
-   const stateListener = NativeUpdate.addListener('appUpdateStateChanged', (state) => {
-     if (state.installStatus === 11) { // Downloaded
-       showUpdateReadyPrompt();
-     }
-   });
+   // Note: Progress monitoring for native app updates is handled
+   // internally by the platform. For Android, the Play Core library
+   // shows its own UI. For custom progress tracking, use Live Updates
+   // instead of native app updates.
    ```
 
 3. **Fallback for iOS**

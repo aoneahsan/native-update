@@ -25,58 +25,9 @@ await NativeUpdate.configure({
 });
 ```
 
-### checkForUpdate()
+### sync()
 
-Check if a new update is available.
-
-```typescript
-const result = await NativeUpdate.checkForUpdate();
-// Returns:
-{
-  available: boolean;          // Update available?
-  version?: string;            // Available version
-  url?: string;               // Download URL
-  notes?: string;             // Release notes
-  size?: number;              // Bundle size in bytes
-  mandatoryUpdate?: boolean;  // Force update?
-  checksum?: string;          // SHA-256 checksum
-  signature?: string;         // RSA signature
-}
-```
-
-### downloadUpdate(options?)
-
-Download an available update with progress tracking.
-
-```typescript
-const result = await NativeUpdate.downloadUpdate({
-  onProgress?: (progress: {
-    percent: number;          // 0-100
-    bytesDownloaded: number;
-    totalBytes: number;
-  }) => void;
-});
-// Returns:
-{
-  bundleId: string;           // Unique bundle ID
-  version: string;            // Bundle version
-  path: string;              // Local path
-  size: number;              // File size
-  downloadTime: number;      // Download duration (ms)
-}
-```
-
-### applyUpdate()
-
-Apply a downloaded update (restarts the app).
-
-```typescript
-await NativeUpdate.applyUpdate();
-```
-
-### sync(options?)
-
-Sync with server and apply updates based on strategy.
+Sync with update server and apply updates based on strategy.
 
 ```typescript
 const result = await NativeUpdate.sync({
@@ -86,17 +37,55 @@ const result = await NativeUpdate.sync({
 // Returns:
 {
   status: 'UP_TO_DATE' | 'UPDATE_AVAILABLE' | 'UPDATE_INSTALLED' | 'ERROR';
-  version?: string;
+  bundle?: BundleInfo;        // Bundle information if update available/installed
   error?: { code: string; message: string; };
 }
 ```
 
-### getCurrentBundle()
+### download(options)
 
-Get information about the currently active bundle.
+Download a specific bundle version.
 
 ```typescript
-const bundle = await NativeUpdate.getCurrentBundle();
+const result = await NativeUpdate.download({
+  version: string;            // Version to download
+});
+// Returns:
+{
+  bundleId: string;           // Unique bundle ID
+  version: string;            // Bundle version
+  path: string;              // Local path
+  size: number;              // File size
+  checksum: string;           // SHA-256 checksum
+}
+```
+
+### set(bundle)
+
+Set the active bundle.
+
+```typescript
+await NativeUpdate.set({
+  bundleId: string;
+  version: string;
+  checksum: string;
+});
+```
+
+### reload()
+
+Reload the app with current bundle.
+
+```typescript
+await NativeUpdate.reload();
+```
+
+### current()
+
+Get current bundle info.
+
+```typescript
+const bundle = await NativeUpdate.current();
 // Returns:
 {
   bundleId: string;
@@ -110,43 +99,23 @@ const bundle = await NativeUpdate.getCurrentBundle();
 }
 ```
 
-### getBundles()
+### list()
 
 List all downloaded bundles.
 
 ```typescript
-const result = await NativeUpdate.getBundles();
-// Returns:
-{
-  bundles: Array<{
-    bundleId: string;
-    version: string;
-    status: string;
-    size: number;
-    downloadTime: number;
-  }>;
-}
+const bundles = await NativeUpdate.list();
+// Returns: Array<BundleInfo>
 ```
 
-### setBundle(bundleId)
+### delete(options)
 
-Set a specific bundle as active.
-
-```typescript
-await NativeUpdate.setBundle(bundleId: string);
-```
-
-### deleteBundle(bundleId)
-
-Delete a specific bundle or clean up old bundles.
+Delete bundles.
 
 ```typescript
-// Delete specific bundle
-await NativeUpdate.deleteBundle(bundleId: string);
-
-// Or cleanup old bundles
-await NativeUpdate.deleteBundle({ 
-  keepVersions: number // Keep N most recent versions
+await NativeUpdate.delete({
+  bundleId?: string;          // Delete specific bundle
+  keepLatest?: number;        // Keep N most recent versions
 });
 ```
 

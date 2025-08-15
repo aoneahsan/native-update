@@ -55,12 +55,11 @@ src/__tests__/
 3. **Test Update Flow**
    ```typescript
    // Check for updates
-   const update = await NativeUpdate.checkForUpdate();
+   const update = await NativeUpdate.sync();
    
-   // Download if available
-   if (update.available) {
-     await NativeUpdate.downloadUpdate();
-     await NativeUpdate.applyUpdate();
+   // Update will be downloaded and applied based on sync result
+   if (update.status === 'UPDATE_INSTALLED') {
+     await NativeUpdate.reload();
    }
    ```
 
@@ -124,10 +123,11 @@ try {
 node tools/bundle-signer.js sign test-bundle.zip private-key.pem
 
 # Verify in app
-const isValid = await NativeUpdate.verifySignature(
-  bundleData,
-  signature
-);
+const isValid = await NativeUpdate.validateUpdate({
+  bundlePath: 'bundle-path',
+  checksum: 'bundle-checksum',
+  signature: signature
+});
 ```
 
 ### 4. Performance Testing
@@ -175,18 +175,16 @@ NativeUpdate.addListener('downloadProgress', (progress) => {
        publicKey: 'your-public-key',
      });
      
-     // Check
-     const update = await NativeUpdate.checkForUpdate();
-     if (!update.available) return;
+     // Sync will check, download and apply update
+     const result = await NativeUpdate.sync();
      
-     // Download with progress
-     await NativeUpdate.downloadUpdate();
-     
-     // Apply
-     await NativeUpdate.applyUpdate();
+     if (result.status === 'UPDATE_INSTALLED') {
+       // Reload to apply update
+       await NativeUpdate.reload();
+     }
      
      // Verify
-     const current = await NativeUpdate.getCurrentVersion();
+     const current = await NativeUpdate.current();
      console.log('Updated to:', current.version);
    }
    ```
@@ -196,7 +194,7 @@ NativeUpdate.addListener('downloadProgress', (progress) => {
 #### Network Failures
 ```typescript
 // Test offline behavior
-await NativeUpdate.checkForUpdate()
+await NativeUpdate.sync()
   .catch(error => {
     expect(error.code).toBe('NETWORK_ERROR');
   });
@@ -205,8 +203,9 @@ await NativeUpdate.checkForUpdate()
 #### Corrupted Bundles
 ```typescript
 // Test checksum validation
-const corruptedBundle = await fetch('corrupted-bundle.zip');
-await NativeUpdate.applyUpdate(corruptedBundle)
+await NativeUpdate.download({
+  version: 'corrupted-version'
+})
   .catch(error => {
     expect(error.code).toBe('CHECKSUM_ERROR');
   });
@@ -217,15 +216,15 @@ await NativeUpdate.applyUpdate(corruptedBundle)
 ```typescript
 // Test rollback mechanism
 async function testRollback() {
-  // Apply bad update
-  await NativeUpdate.applyUpdate(badUpdate);
+  // Set bad update
+  await NativeUpdate.set(badUpdate);
   
   // Simulate app crash
   await simulateCrash();
   
   // Verify rollback on restart
-  const version = await NativeUpdate.getCurrentVersion();
-  expect(version).toBe(previousVersion);
+  const version = await NativeUpdate.current();
+  expect(version.version).toBe(previousVersion);
 }
 ```
 
@@ -269,8 +268,8 @@ jobs:
   - [ ] Invalid configs rejected
   - [ ] Channel switching works
 
-- [ ] **Update Check**
-  - [ ] Returns correct update status
+- [ ] **Update Sync**
+  - [ ] Returns correct sync status
   - [ ] Respects version constraints
   - [ ] Handles network errors
 

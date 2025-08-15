@@ -73,11 +73,10 @@ codePush.sync({
 });
 
 // New (Capacitor Native Update)
-const update = await NativeUpdate.checkForUpdate();
-if (update.available) {
-  await NativeUpdate.downloadUpdate();
-  await NativeUpdate.applyUpdate();
-}
+const result = await NativeUpdate.sync({
+  installMode: 'IMMEDIATE'
+});
+// Sync handles check, download, and apply automatically
 ```
 
 ### 5. Bundle Creation
@@ -98,11 +97,11 @@ node tools/bundle-signer.js sign bundle.zip private-key.pem
 
 | CodePush Feature | Capacitor Native Update |
 |-----------------|------------------------|
-| sync() | checkForUpdate() + downloadUpdate() + applyUpdate() |
-| getUpdateMetadata() | getCurrentVersion() |
-| notifyAppReady() | confirmUpdate() |
-| restartApp() | applyUpdate() |
-| clearUpdates() | rollback() |
+| sync() | sync() |
+| getUpdateMetadata() | current() |
+| notifyAppReady() | notifyAppReady() |
+| restartApp() | reload() |
+| clearUpdates() | reset() |
 
 ## Migration Checklist
 
