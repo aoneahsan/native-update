@@ -5,7 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.1] - 2025-01-15
+## [1.0.7] - 2025-01-15
+
+### Fixed
+- **Critical Android Build Issues**:
+  - Fixed Google Play app-update library dependencies by using explicit version 2.1.0 instead of variable
+  - Resolved kotlinVersion resolution issues by hardcoding version in gradle plugin
+  - Made all Google Play Services dependencies use explicit versions to prevent resolution errors
+  - Added variables.gradle file for better variable management
+  - Ensured no manual intervention is required by users
+
+### Changed
+- Updated package version to 1.0.7
+- Hardcoded critical dependency versions in Android build.gradle to prevent resolution issues
+
+## [1.0.6] - 2025-01-15
 
 ### Fixed
 - **Android Build Issues**:

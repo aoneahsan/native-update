@@ -1,0 +1,5 @@
+ext {
+    kotlinVersion = project.hasProperty('kotlinVersion') ? rootProject.ext.kotlinVersion : '1.9.22'
+    playAppUpdateVersion = '2.1.0'
+    playReviewVersion = '2.0.1'
+}
