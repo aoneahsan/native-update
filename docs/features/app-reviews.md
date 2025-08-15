@@ -75,11 +75,11 @@ await NativeUpdate.configure({
 async function requestReview() {
   try {
     // Check if we can request a review
-    const canRequest = await NativeUpdate.AppReview.canRequestReview();
+    const canRequest = await NativeUpdate.canRequestReview();
 
     if (canRequest.allowed) {
       // Request the review
-      const result = await NativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       if (result.shown) {
         console.log('Review dialog was shown');
@@ -182,7 +182,7 @@ class AppReviewManager {
 
   private async analyzeReviewReadiness() {
     // Check basic eligibility
-    const canRequest = await NativeUpdate.AppReview.canRequestReview();
+    const canRequest = await NativeUpdate.canRequestReview();
 
     if (!canRequest.allowed) {
       return {
@@ -243,7 +243,7 @@ class AppReviewManager {
 
   async requestReview() {
     try {
-      const result = await NativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       // Track the request
       this.trackReviewRequest(result);
@@ -367,7 +367,7 @@ class ReviewFatigueManager {
   async canRequestReview(): Promise<boolean> {
     // Check platform limits
     const platformCheck =
-      await NativeUpdate.AppReview.canRequestReview();
+      await NativeUpdate.canRequestReview();
 
     if (!platformCheck.allowed) {
       return false;
@@ -596,7 +596,7 @@ class iOSReviewManager {
   async requestReview(): Promise<ReviewResult> {
     try {
       // Use StoreKit review controller
-      const result = await NativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       // iOS handles everything natively
       return {
@@ -614,7 +614,7 @@ class iOSReviewManager {
 
   private async fallbackToAppStore() {
     // Open App Store page
-    await NativeUpdate.AppUpdate.openAppStore();
+    await NativeUpdate.openAppStore();
 
     return {
       shown: true,
@@ -633,7 +633,7 @@ class AndroidReviewManager {
   async requestReview(): Promise<ReviewResult> {
     try {
       // Use Play Core in-app review
-      const result = await NativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       return {
         shown: result.shown,
@@ -650,7 +650,7 @@ class AndroidReviewManager {
 
   private async fallbackToPlayStore() {
     // Open Play Store page
-    await NativeUpdate.AppUpdate.openAppStore();
+    await NativeUpdate.openAppStore();
 
     return {
       shown: true,
@@ -921,10 +921,10 @@ const debugConfig = {
 // Test different scenarios
 async function testReviewScenarios() {
   // Test immediate request
-  await NativeUpdate.AppReview.requestReview();
+  await NativeUpdate.requestReview();
 
   // Test eligibility check
-  const canRequest = await NativeUpdate.AppReview.canRequestReview();
+  const canRequest = await NativeUpdate.canRequestReview();
   console.log('Can request review:', canRequest);
 
   // Test custom triggers

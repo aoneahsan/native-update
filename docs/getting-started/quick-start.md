@@ -72,8 +72,8 @@ async function syncUpdates() {
 ```typescript
 // Check for updates without downloading
 async function checkForUpdates() {
-  const latest = await NativeUpdate.LiveUpdate.getLatest();
-  const current = await NativeUpdate.LiveUpdate.current();
+  const latest = await NativeUpdate.getLatest();
+  const current = await NativeUpdate.current();
 
   if (latest.version !== current.version) {
     console.log(`Update available: ${latest.version}`);
@@ -86,15 +86,15 @@ async function checkForUpdates() {
 async function downloadAndInstallUpdate() {
   try {
     // Download the latest version
-    const bundle = await NativeUpdate.LiveUpdate.download({
+    const bundle = await NativeUpdate.download({
       version: 'latest',
     });
 
     // Set it as active
-    await NativeUpdate.LiveUpdate.set(bundle);
+    await NativeUpdate.set(bundle);
 
     // Reload the app to apply
-    await NativeUpdate.LiveUpdate.reload();
+    await NativeUpdate.reload();
   } catch (error) {
     console.error('Update failed:', error);
   }
@@ -105,7 +105,7 @@ async function downloadAndInstallUpdate() {
 
 ```typescript
 // Add download progress listener
-const progressListener = await NativeUpdate.LiveUpdate.addListener(
+const progressListener = await NativeUpdate.addListener(
   'downloadProgress',
   (progress) => {
     console.log(`Download: ${progress.percent}% complete`);
@@ -124,14 +124,14 @@ const progressListener = await NativeUpdate.LiveUpdate.addListener(
 ```typescript
 async function checkAppStoreUpdate() {
   try {
-    const updateInfo = await NativeUpdate.AppUpdate.getAppUpdateInfo();
+    const updateInfo = await NativeUpdate.getAppUpdateInfo();
 
     if (updateInfo.updateAvailable) {
       console.log(`New version available: ${updateInfo.availableVersion}`);
 
       if (updateInfo.updatePriority >= 4) {
         // High priority - immediate update
-        await NativeUpdate.AppUpdate.performImmediateUpdate();
+        await NativeUpdate.performImmediateUpdate();
       } else {
         // Optional update
         showUpdateDialog(updateInfo);
@@ -145,7 +145,7 @@ async function checkAppStoreUpdate() {
 function showUpdateDialog(updateInfo) {
   // Show your custom update UI
   if (userAcceptsUpdate) {
-    NativeUpdate.AppUpdate.openAppStore();
+    NativeUpdate.openAppStore();
   }
 }
 ```
@@ -155,10 +155,10 @@ function showUpdateDialog(updateInfo) {
 ```typescript
 // Start downloading in background
 async function startFlexibleUpdate() {
-  await NativeUpdate.AppUpdate.startFlexibleUpdate();
+  await NativeUpdate.startFlexibleUpdate();
 
   // Listen for download completion
-  const listener = await NativeUpdate.AppUpdate.addListener(
+  const listener = await NativeUpdate.addListener(
     'flexibleUpdateStateChanged',
     (state) => {
       if (state.status === 'DOWNLOADED') {
@@ -171,7 +171,7 @@ async function startFlexibleUpdate() {
 
 // Complete the update
 async function completeUpdate() {
-  await NativeUpdate.AppUpdate.completeFlexibleUpdate();
+  await NativeUpdate.completeFlexibleUpdate();
   // App will restart with new version
 }
 ```
@@ -184,11 +184,11 @@ async function completeUpdate() {
 async function requestReviewIfAppropriate() {
   try {
     // Check if we can request a review
-    const canRequest = await NativeUpdate.AppReview.canRequestReview();
+    const canRequest = await NativeUpdate.canRequestReview();
 
     if (canRequest.allowed) {
       // Request the review
-      const result = await NativeUpdate.AppReview.requestReview();
+      const result = await NativeUpdate.requestReview();
 
       if (result.shown) {
         console.log('Review dialog was shown');
@@ -218,7 +218,7 @@ import { NativeUpdate } from 'native-update';
 App.addListener('appStateChange', async ({ isActive }) => {
   if (isActive) {
     // Check for updates when app becomes active
-    await NativeUpdate.LiveUpdate.sync({
+    await NativeUpdate.sync({
       installMode: 'ON_NEXT_RESUME',
     });
   }
@@ -248,7 +248,7 @@ class UpdateManager {
 
   setupListeners() {
     // Listen for update state changes
-    NativeUpdate.LiveUpdate.addListener(
+    NativeUpdate.addListener(
       'updateStateChanged',
       (event) => {
         console.log('Update state:', event.status);
@@ -293,7 +293,7 @@ import { NativeUpdateError } from 'native-update';
 
 async function safeUpdateCheck() {
   try {
-    await NativeUpdate.LiveUpdate.sync();
+    await NativeUpdate.sync();
   } catch (error) {
     if (error instanceof NativeUpdateError) {
       switch (error.code) {
@@ -324,7 +324,7 @@ async function safeUpdateCheck() {
 1. **Use staging channel for testing**:
 
    ```typescript
-   await NativeUpdate.LiveUpdate.setChannel('staging');
+   await NativeUpdate.setChannel('staging');
    ```
 
 2. **Enable debug mode for app reviews**:
@@ -340,7 +340,7 @@ async function safeUpdateCheck() {
 3. **Force update check**:
    ```typescript
    // Clear cache and check
-   await NativeUpdate.LiveUpdate.sync({
+   await NativeUpdate.sync({
      forceCheck: true,
    });
    ```
@@ -361,10 +361,10 @@ Now that you have the basics working:
 | Method                         | Purpose                         |
 | ------------------------------ | ------------------------------- |
 | `configure()`                  | Initialize plugin with settings |
-| `LiveUpdate.sync()`            | Check and apply updates         |
-| `LiveUpdate.current()`         | Get current bundle info         |
-| `AppUpdate.getAppUpdateInfo()` | Check app store updates         |
-| `AppReview.requestReview()`    | Request user review             |
+| `sync()`                       | Check and apply updates         |
+| `current()`                    | Get current bundle info         |
+| `getAppUpdateInfo()`           | Check app store updates         |
+| `requestReview()`              | Request user review             |
 
 ### Key Events
 

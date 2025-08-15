@@ -66,7 +66,7 @@ await NativeUpdate.configure({
 });
 
 // 2. Sync updates (automatic with autoUpdate: true)
-const result = await NativeUpdate.LiveUpdate.sync();
+const result = await NativeUpdate.sync();
 
 // 3. Handle the result
 switch (result.status) {
@@ -108,7 +108,7 @@ class LiveUpdateManager {
 
   private setupUpdateListeners() {
     // Download progress
-    NativeUpdate.LiveUpdate.addListener(
+    NativeUpdate.addListener(
       'downloadProgress',
       (progress) => {
         this.updateDownloadProgress(progress.percent);
@@ -116,7 +116,7 @@ class LiveUpdateManager {
     );
 
     // State changes
-    NativeUpdate.LiveUpdate.addListener(
+    NativeUpdate.addListener(
       'updateStateChanged',
       (event) => {
         this.handleStateChange(event);
@@ -126,8 +126,8 @@ class LiveUpdateManager {
 
   async checkForUpdates() {
     try {
-      const latest = await NativeUpdate.LiveUpdate.getLatest();
-      const current = await NativeUpdate.LiveUpdate.current();
+      const latest = await NativeUpdate.getLatest();
+      const current = await NativeUpdate.current();
 
       if (this.isNewerVersion(latest.version, current.version)) {
         this.updateAvailable = true;
@@ -142,7 +142,7 @@ class LiveUpdateManager {
     if (!this.updateAvailable) return;
 
     try {
-      const bundle = await NativeUpdate.LiveUpdate.download({
+      const bundle = await NativeUpdate.download({
         version: 'latest',
         onProgress: (progress) => {
           console.log(`Download: ${progress.percent}%`);
@@ -150,7 +150,7 @@ class LiveUpdateManager {
       });
 
       // Validate the bundle
-      const validation = await NativeUpdate.LiveUpdate.validateUpdate({
+      const validation = await NativeUpdate.validateUpdate({
         bundleId: bundle.bundleId,
       });
 
@@ -166,10 +166,10 @@ class LiveUpdateManager {
 
   async installUpdate(bundle: BundleInfo) {
     // Set the bundle as active
-    await NativeUpdate.LiveUpdate.set(bundle);
+    await NativeUpdate.set(bundle);
 
     // Notify app is ready (important for rollback mechanism)
-    await NativeUpdate.LiveUpdate.notifyAppReady();
+    await NativeUpdate.notifyAppReady();
 
     // Schedule reload based on user preference
     this.scheduleReload();
@@ -177,12 +177,12 @@ class LiveUpdateManager {
 
   private scheduleReload() {
     // Option 1: Immediate reload
-    // await NativeUpdate.LiveUpdate.reload();
+    // await NativeUpdate.reload();
 
     // Option 2: Reload on next app resume
     App.addListener('appStateChange', ({ isActive }) => {
       if (isActive) {
-        NativeUpdate.LiveUpdate.reload();
+        NativeUpdate.reload();
       }
     });
 
@@ -254,7 +254,7 @@ The plugin uses semantic versioning (MAJOR.MINOR.PATCH):
 
 ```typescript
 // Version comparison
-const current = await NativeUpdate.LiveUpdate.current();
+const current = await NativeUpdate.current();
 console.log(current.version); // "1.2.3"
 
 // Check if update is major/minor/patch
@@ -273,7 +273,7 @@ function getUpdateType(oldVersion: string, newVersion: string) {
 
 ```typescript
 // List all downloaded bundles
-const bundles = await NativeUpdate.LiveUpdate.list();
+const bundles = await NativeUpdate.list();
 
 bundles.forEach((bundle) => {
   console.log(`Version: ${bundle.version}`);
@@ -283,7 +283,7 @@ bundles.forEach((bundle) => {
 });
 
 // Clean up old bundles
-await NativeUpdate.LiveUpdate.delete({
+await NativeUpdate.delete({
   keepNewest: 3, // Keep only 3 most recent bundles
 });
 ```
@@ -302,7 +302,7 @@ async function onAppReady() {
     await performHealthCheck();
 
     // Notify that app started successfully
-    await NativeUpdate.LiveUpdate.notifyAppReady();
+    await NativeUpdate.notifyAppReady();
   } catch (error) {
     // Don't call notifyAppReady() - automatic rollback will occur
     console.error('App startup failed:', error);
@@ -314,14 +314,14 @@ async function onAppReady() {
 
 ```typescript
 // Reset to original bundle
-await NativeUpdate.LiveUpdate.reset();
+await NativeUpdate.reset();
 
 // Or rollback to previous version
-const bundles = await NativeUpdate.LiveUpdate.list();
+const bundles = await NativeUpdate.list();
 const previousBundle = bundles[bundles.length - 2];
 if (previousBundle) {
-  await NativeUpdate.LiveUpdate.set(previousBundle);
-  await NativeUpdate.LiveUpdate.reload();
+  await NativeUpdate.set(previousBundle);
+  await NativeUpdate.reload();
 }
 ```
 
@@ -334,7 +334,7 @@ Use channels to manage different release tracks.
 ```typescript
 // Set channel based on user preference
 const channel = getUserPreference('updateChannel') || 'production';
-await NativeUpdate.LiveUpdate.setChannel(channel);
+await NativeUpdate.setChannel(channel);
 
 // Available channels examples:
 // - 'production': Stable releases
@@ -349,7 +349,7 @@ await NativeUpdate.LiveUpdate.setChannel(channel);
 ```typescript
 // Enable features based on channel
 async function getFeatureFlags() {
-  const bundle = await NativeUpdate.LiveUpdate.current();
+  const bundle = await NativeUpdate.current();
 
   switch (bundle.metadata?.channel) {
     case 'alpha':
@@ -381,7 +381,7 @@ async function getFeatureFlags() {
    // Future API
    // Note: Delta updates are handled automatically by the sync() method
    // when configured on the server. Direct delta download is not available
-   const bundle = await NativeUpdate.LiveUpdate.download({
+   const bundle = await NativeUpdate.download({
      version: latest.version,
    });
    ```
@@ -411,7 +411,7 @@ async function getFeatureFlags() {
 
 ```typescript
 // Monitor bundle count and clean up old versions
-const bundles = await NativeUpdate.LiveUpdate.list();
+const bundles = await NativeUpdate.list();
 console.log(`Total bundles: ${bundles.length}`);
 
 // Clean up old bundles (keep only recent 5)
@@ -423,7 +423,7 @@ if (bundles.length > 5) {
   
   const toDelete = sortedBundles.slice(5);
   for (const bundle of toDelete) {
-    await NativeUpdate.LiveUpdate.delete({
+    await NativeUpdate.delete({
       bundleId: bundle.bundleId,
     });
   }
@@ -436,7 +436,7 @@ if (bundles.length > 5) {
 
 ```typescript
 try {
-  await NativeUpdate.LiveUpdate.sync();
+  await NativeUpdate.sync();
 } catch (error) {
   switch (error.code) {
     case 'NETWORK_ERROR':
@@ -451,7 +451,7 @@ try {
 
     case 'CHECKSUM_ERROR':
       // Bundle corrupted
-      await NativeUpdate.LiveUpdate.delete({
+      await NativeUpdate.delete({
         bundleId: error.bundleId,
       });
       break;
@@ -483,7 +483,7 @@ class UpdateRetryManager {
 
   async syncWithRetry() {
     try {
-      await NativeUpdate.LiveUpdate.sync();
+      await NativeUpdate.sync();
       this.retryCount = 0; // Reset on success
     } catch (error) {
       if (this.shouldRetry(error)) {
@@ -535,7 +535,7 @@ const devConfig = {
 };
 
 // Force update check
-await NativeUpdate.LiveUpdate.sync();
+await NativeUpdate.sync();
 
 // Simulate different scenarios
 await testUpdateScenarios();
@@ -574,7 +574,7 @@ function shouldReceiveUpdate(userId: string, percentage: number): boolean {
 
 if (shouldReceiveUpdate(user.id, 10)) {
   // 10% rollout
-  await NativeUpdate.LiveUpdate.setChannel('beta');
+  await NativeUpdate.setChannel('beta');
 }
 ```
 
@@ -582,7 +582,7 @@ if (shouldReceiveUpdate(user.id, 10)) {
 
 ```typescript
 // Notify users about updates
-NativeUpdate.LiveUpdate.addListener('updateStateChanged', (event) => {
+NativeUpdate.addListener('updateStateChanged', (event) => {
   if (event.status === 'READY') {
     showNotification({
       title: 'Update Ready',

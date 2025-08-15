@@ -123,7 +123,7 @@ try {
 node tools/bundle-signer.js sign test-bundle.zip private-key.pem
 
 # Verify in app
-const isValid = await NativeUpdate.LiveUpdate.validateUpdate({
+const isValid = await NativeUpdate.validateUpdate({
   bundlePath: 'bundle-path',
   checksum: 'bundle-checksum',
   signature: signature
@@ -135,7 +135,7 @@ const isValid = await NativeUpdate.LiveUpdate.validateUpdate({
 #### Download Performance
 ```typescript
 // Monitor download speed
-NativeUpdate.LiveUpdate.addListener('downloadProgress', (progress) => {
+NativeUpdate.addListener('downloadProgress', (progress) => {
   console.log(`Speed: ${progress.speed} MB/s`);
   console.log(`Progress: ${progress.percent}%`);
 });

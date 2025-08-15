@@ -170,7 +170,7 @@ await NativeUpdate.setUpdateUrl(url: string);
 Validate a bundle's integrity.
 
 ```typescript
-const result = await NativeUpdate.LiveUpdate.validateUpdate({
+const result = await NativeUpdate.validateUpdate({
   bundlePath: string;
   checksum: string;
   signature?: string;

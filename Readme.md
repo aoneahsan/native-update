@@ -112,18 +112,26 @@ async function initializeApp() {
 // Check and apply live updates
 async function checkLiveUpdates() {
   try {
-    const { available, version } = await NativeUpdate.checkForUpdate();
+    const result = await NativeUpdate.sync();
 
-    if (available) {
-      // Download update with progress
-      await NativeUpdate.downloadUpdate({
-        onProgress: (progress) => {
-          console.log(`Downloading: ${progress.percent}%`);
-        },
+    if (result.status === 'UPDATE_AVAILABLE') {
+      // Download update with progress tracking
+      const listener = NativeUpdate.addListener('downloadProgress', (progress) => {
+        console.log(`Downloading: ${progress.percent}%`);
       });
 
-      // Apply update (app will restart)
-      await NativeUpdate.applyUpdate();
+      // Download the update
+      const bundle = await NativeUpdate.download({
+        url: result.url,
+        version: result.version,
+        checksum: result.checksum
+      });
+
+      // Set the bundle and reload
+      await NativeUpdate.set(bundle);
+      await NativeUpdate.reload();
+      
+      listener.remove();
     }
   } catch (error) {
     console.error('Update failed:', error);
@@ -136,7 +144,7 @@ async function checkLiveUpdates() {
 ```typescript
 // Check for app store updates
 async function checkNativeUpdates() {
-  const result = await NativeUpdate.checkAppUpdate();
+  const result = await NativeUpdate.getAppUpdateInfo();
 
   if (result.updateAvailable) {
     if (result.immediateUpdateAllowed) {
@@ -220,9 +228,9 @@ export class AppComponent implements OnInit {
   }
 
   async installLiveUpdate() {
-    // Download and apply
-    await NativeUpdate.downloadUpdate();
-    await NativeUpdate.applyUpdate(); // App restarts
+    // The sync method already handles download if needed
+    // Just reload to apply the update
+    await NativeUpdate.reload(); // App restarts
   }
 
   // Request review after positive events

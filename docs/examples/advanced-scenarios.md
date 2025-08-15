@@ -312,7 +312,7 @@ async function downloadWithIntegrityCheck(url: string, expectedHash: string) {
   });
   
   // Additional verification
-  const verified = await NativeUpdate.LiveUpdate.validateUpdate({
+  const verified = await NativeUpdate.validateUpdate({
     bundlePath: download.path,
     checksum: download.checksum,
     signature: 'bundle-signature'

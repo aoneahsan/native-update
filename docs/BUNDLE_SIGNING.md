@@ -242,7 +242,7 @@ Response: {
 ```typescript
 // Signature verification is handled automatically during sync/download
 // Use validateUpdate for manual verification
-const result = await NativeUpdate.LiveUpdate.validateUpdate({
+const result = await NativeUpdate.validateUpdate({
   bundlePath: '/path/to/bundle.zip',
   checksum: 'expected-sha256-checksum',
   signature: 'base64-signature' // Optional

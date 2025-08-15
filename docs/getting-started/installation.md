@@ -141,11 +141,11 @@ To verify the installation:
 
    ```typescript
    // Get current bundle info
-   const currentBundle = await NativeUpdate.LiveUpdate.current();
+   const currentBundle = await NativeUpdate.current();
    console.log('Current bundle:', currentBundle);
 
    // Check for updates
-   const latest = await NativeUpdate.LiveUpdate.getLatest();
+   const latest = await NativeUpdate.getLatest();
    console.log('Latest version available:', latest);
    ```
 

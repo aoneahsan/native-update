@@ -44,7 +44,7 @@ While Live Updates handle web assets, App Updates manage the native app binary i
 // Check for app updates on startup
 async function checkForAppUpdates() {
   try {
-    const updateInfo = await NativeUpdate.AppUpdate.getAppUpdateInfo();
+    const updateInfo = await NativeUpdate.getAppUpdateInfo();
 
     if (updateInfo.updateAvailable) {
       console.log(`Update available: ${updateInfo.availableVersion}`);
@@ -52,7 +52,7 @@ async function checkForAppUpdates() {
       // Handle based on priority
       if (updateInfo.updatePriority >= 4) {
         // High priority - immediate update
-        await NativeUpdate.AppUpdate.performImmediateUpdate();
+        await NativeUpdate.performImmediateUpdate();
       } else {
         // Optional update - show custom UI
         showUpdateDialog(updateInfo);
@@ -94,7 +94,7 @@ class AppUpdateManager {
 
   private setupUpdateListeners() {
     // Android flexible update state changes
-    NativeUpdate.AppUpdate.addListener(
+    NativeUpdate.addListener(
       'flexibleUpdateStateChanged',
       (state) => {
         this.handleFlexibleUpdateState(state);
@@ -102,7 +102,7 @@ class AppUpdateManager {
     );
 
     // Download progress for flexible updates
-    NativeUpdate.AppUpdate.addListener(
+    NativeUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
         this.downloadProgress = progress.percent;
@@ -114,7 +114,7 @@ class AppUpdateManager {
   async checkForUpdates() {
     try {
       this.updateInfo =
-        await NativeUpdate.AppUpdate.getAppUpdateInfo();
+        await NativeUpdate.getAppUpdateInfo();
 
       if (!this.updateInfo.updateAvailable) {
         console.log('App is up to date');
@@ -166,7 +166,7 @@ class AppUpdateManager {
       this.showImmediateUpdateUI();
 
       // Start immediate update
-      await NativeUpdate.AppUpdate.performImmediateUpdate();
+      await NativeUpdate.performImmediateUpdate();
 
       // App will restart automatically after update
     } catch (error) {
@@ -183,7 +183,7 @@ class AppUpdateManager {
   async startFlexibleUpdate() {
     try {
       // Start background download
-      await NativeUpdate.AppUpdate.startFlexibleUpdate();
+      await NativeUpdate.startFlexibleUpdate();
 
       // Show download progress UI
       this.showFlexibleUpdateUI();
@@ -223,7 +223,7 @@ class AppUpdateManager {
 
   async completeFlexibleUpdate() {
     try {
-      await NativeUpdate.AppUpdate.completeFlexibleUpdate();
+      await NativeUpdate.completeFlexibleUpdate();
       // App will restart with new version
     } catch (error) {
       console.error('Failed to complete update:', error);
@@ -265,17 +265,17 @@ const androidUpdate = {
   // Immediate update flow
   immediate: async () => {
     // Blocks UI until update is installed
-    await NativeUpdate.AppUpdate.performImmediateUpdate();
+    await NativeUpdate.performImmediateUpdate();
     // App restarts automatically
   },
 
   // Flexible update flow
   flexible: async () => {
     // Download in background
-    await NativeUpdate.AppUpdate.startFlexibleUpdate();
+    await NativeUpdate.startFlexibleUpdate();
 
     // Monitor progress
-    const listener = await NativeUpdate.AppUpdate.addListener(
+    const listener = await NativeUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
         console.log(
@@ -285,7 +285,7 @@ const androidUpdate = {
     );
 
     // Complete when ready
-    await NativeUpdate.AppUpdate.completeFlexibleUpdate();
+    await NativeUpdate.completeFlexibleUpdate();
   },
 };
 ```
@@ -299,7 +299,7 @@ iOS requires manual version checking and App Store redirection:
 const iosUpdate = {
   // Check version manually
   check: async () => {
-    const info = await NativeUpdate.AppUpdate.getAppUpdateInfo();
+    const info = await NativeUpdate.getAppUpdateInfo();
 
     if (info.updateAvailable) {
       // Show custom update dialog
@@ -307,7 +307,7 @@ const iosUpdate = {
 
       if (shouldUpdate) {
         // Open App Store
-        await NativeUpdate.AppUpdate.openAppStore();
+        await NativeUpdate.openAppStore();
       }
     }
   },
@@ -322,7 +322,7 @@ Web platforms show update notifications:
 // Web fallback
 const webUpdate = {
   notify: async () => {
-    const info = await NativeUpdate.AppUpdate.getAppUpdateInfo();
+    const info = await NativeUpdate.getAppUpdateInfo();
 
     if (info.updateAvailable) {
       // Show notification
@@ -455,13 +455,13 @@ async function enforceMinimumVersion() {
     },
   };
 
-  const info = await NativeUpdate.AppUpdate.getAppUpdateInfo();
+  const info = await NativeUpdate.getAppUpdateInfo();
 
   // Check if current version is below minimum
   if (isVersionBelow(info.currentVersion, config.appUpdate.minimumVersion)) {
     // Force immediate update
     try {
-      await NativeUpdate.AppUpdate.performImmediateUpdate();
+      await NativeUpdate.performImmediateUpdate();
     } catch (error) {
       // If update fails or is cancelled, restrict app usage
       showMinimumVersionRequired();
@@ -550,7 +550,7 @@ class UpdateProgressUI {
   showProgress() {
     this.createProgressUI();
 
-    NativeUpdate.AppUpdate.addListener(
+    NativeUpdate.addListener(
       'flexibleUpdateProgress',
       (progress) => {
         this.updateProgress(progress);
@@ -587,7 +587,7 @@ class UpdateProgressUI {
 ```typescript
 async function handleAppUpdateErrors() {
   try {
-    await NativeUpdate.AppUpdate.performImmediateUpdate();
+    await NativeUpdate.performImmediateUpdate();
   } catch (error) {
     switch (error.code) {
       case 'UPDATE_NOT_AVAILABLE':
@@ -635,7 +635,7 @@ class UpdateRetryStrategy {
 
   async retryUpdate() {
     try {
-      await NativeUpdate.AppUpdate.startFlexibleUpdate();
+      await NativeUpdate.startFlexibleUpdate();
       this.retryCount = 0;
     } catch (error) {
       if (this.shouldRetry(error)) {

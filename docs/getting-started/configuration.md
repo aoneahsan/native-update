@@ -332,13 +332,13 @@ await NativeUpdate.configure({
 
 ```typescript
 // Change update channel
-await NativeUpdate.LiveUpdate.setChannel('beta');
+await NativeUpdate.setChannel('beta');
 
 // Change server URL
-await NativeUpdate.LiveUpdate.setUpdateUrl('https://new-server.com');
+await NativeUpdate.setUpdateUrl('https://new-server.com');
 
 // Update security settings
-await NativeUpdate.Security.updateConfig({
+await NativeUpdate.updateConfig({
   enforceHttps: true,
   requireSignature: true,
 });
