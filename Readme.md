@@ -191,14 +191,14 @@ export class AppComponent implements OnInit {
 
   async checkAllUpdates() {
     // 1. Check live updates first (fastest)
-    const liveUpdate = await NativeUpdate.checkForUpdate();
-    if (liveUpdate.available) {
+    const liveUpdate = await NativeUpdate.sync();
+    if (liveUpdate.status === 'UPDATE_AVAILABLE' || liveUpdate.status === 'UPDATE_INSTALLED') {
       await this.promptLiveUpdate(liveUpdate);
       return; // Don't check native if live update is available
     }
 
     // 2. Check native updates
-    const nativeUpdate = await NativeUpdate.checkAppUpdate();
+    const nativeUpdate = await NativeUpdate.getAppUpdateInfo();
     if (nativeUpdate.updateAvailable) {
       await this.promptNativeUpdate(nativeUpdate);
     }

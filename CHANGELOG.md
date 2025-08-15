@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-01-15
+
+### Fixed
+- **Android Build Issues**:
+  - Fixed Google Play app-update library version error (changed from non-existent 18.2.0 to correct 2.1.0)
+  - Fixed `kotlinVersion` MissingPropertyException by properly defining it in buildscript ext block
+  - Added missing Kotlin stdlib dependency
+  - Reorganized build.gradle structure to ensure proper variable scope
+
+### Documentation Fixes
+- Corrected all API method references to match TypeScript definitions
+- Fixed method signatures and parameters across all documentation
+- Updated event names to match the 4 defined events (downloadProgress, updateStateChanged, backgroundUpdateProgress, backgroundUpdateNotification)
+- Removed references to non-existent methods
+- Fixed broken documentation links
+
+### Android Configuration
+- kotlinVersion: 1.9.22 (stable version)
+- playAppUpdateVersion: 2.1.0 (correct Google Play version)
+- playReviewVersion: 2.0.1
+- All dependencies now use proper version variables
+
 ## [1.4.0] - 2025-01-02
 
 ### Added

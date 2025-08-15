@@ -1,17 +1,7 @@
-ext {
-    compileSdkVersion = 34
-    targetSdkVersion = 34
-    minSdkVersion = 21
-    androidxAppCompatVersion = '1.6.1'
-    androidxCoreVersion = '1.13.1'
-    androidxWorkVersion = '2.9.0'
-    playServicesVersion = '18.2.0'
-    playReviewVersion = '2.0.1'
-    okhttpVersion = '4.12.0'
-    kotlinVersion = '2.0.21'
-}
-
 buildscript {
+    ext {
+        kotlinVersion = '1.9.22'
+    }
     repositories {
         google()
         mavenCentral()
@@ -20,6 +10,18 @@ buildscript {
         classpath 'com.android.tools.build:gradle:8.7.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
+}
+
+ext {
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+    minSdkVersion = 21
+    androidxAppCompatVersion = '1.6.1'
+    androidxCoreVersion = '1.13.1'
+    androidxWorkVersion = '2.9.0'
+    playAppUpdateVersion = '2.1.0'
+    playReviewVersion = '2.0.1'
+    okhttpVersion = '4.12.0'
 }
 
 apply plugin: 'com.android.library'
@@ -67,14 +69,17 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
     
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    
     // AndroidX
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation "androidx.core:core-ktx:$androidxCoreVersion"
     implementation "androidx.work:work-runtime-ktx:$androidxWorkVersion"
     
     // Google Play Services
-    implementation "com.google.android.play:app-update:$playServicesVersion"
-    implementation "com.google.android.play:app-update-ktx:$playServicesVersion"
+    implementation "com.google.android.play:app-update:$playAppUpdateVersion"
+    implementation "com.google.android.play:app-update-ktx:$playAppUpdateVersion"
     implementation "com.google.android.play:review:$playReviewVersion"
     implementation "com.google.android.play:review-ktx:$playReviewVersion"
     

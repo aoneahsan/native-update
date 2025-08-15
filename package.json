@@ -1,6 +1,6 @@
 {
   "name": "native-update",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Foundation package for building a comprehensive update system for Capacitor apps. Provides architecture and interfaces but requires backend implementation.",
   "type": "module",
   "main": "dist/plugin.cjs.js",
