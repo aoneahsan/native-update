@@ -33,6 +33,10 @@ class BackgroundUpdatePlugin : Plugin() {
         BackgroundUpdateManager.registerBackgroundUpdatePlugin(this)
     }
     
+    fun notifyBackgroundUpdateListeners(event: String, data: JSObject) {
+        notifyListeners(event, data)
+    }
+    
     @PluginMethod
     fun enableBackgroundUpdates(call: PluginCall) {
         try {
@@ -67,7 +71,7 @@ class BackgroundUpdatePlugin : Plugin() {
     
     @PluginMethod
     fun scheduleBackgroundCheck(call: PluginCall) {
-        val interval = call.getLong("interval", 24 * 60 * 60 * 1000L) // Default 24 hours
+        val interval = call.getLong("interval") ?: (24 * 60 * 60 * 1000L) // Default 24 hours
         scheduleBackgroundWork(interval)
         call.resolve()
     }
@@ -185,8 +189,8 @@ data class BackgroundUpdateConfig(
 ) {
     companion object {
         fun fromJSObject(obj: JSObject): BackgroundUpdateConfig {
-            val enabled = obj.getBoolean("enabled", false)
-            val checkInterval = obj.getInt("checkInterval", 24 * 60 * 60 * 1000)
+            val enabled = obj.getBoolean("enabled") ?: false
+            val checkInterval = obj.getInt("checkInterval") ?: (24 * 60 * 60 * 1000)
             val updateTypesArray = obj.getJSONArray("updateTypes")
             val updateTypes = mutableListOf<BackgroundUpdateType>()
             
@@ -201,14 +205,14 @@ data class BackgroundUpdateConfig(
                 enabled = enabled,
                 checkInterval = checkInterval,
                 updateTypes = updateTypes,
-                autoInstall = obj.getBoolean("autoInstall", false),
+                autoInstall = obj.getBoolean("autoInstall") ?: false,
                 notificationPreferences = notificationPrefs?.let { NotificationPreferences.fromJSObject(it) },
-                respectBatteryOptimization = obj.getBoolean("respectBatteryOptimization", true),
-                allowMeteredConnection = obj.getBoolean("allowMeteredConnection", false),
-                minimumBatteryLevel = obj.getInt("minimumBatteryLevel", 20),
-                requireWifi = obj.getBoolean("requireWifi", false),
-                maxRetries = obj.getInt("maxRetries", 3),
-                retryDelay = obj.getInt("retryDelay", 5000),
+                respectBatteryOptimization = obj.getBoolean("respectBatteryOptimization") ?: true,
+                allowMeteredConnection = obj.getBoolean("allowMeteredConnection") ?: false,
+                minimumBatteryLevel = obj.getInt("minimumBatteryLevel") ?: 20,
+                requireWifi = obj.getBoolean("requireWifi") ?: false,
+                maxRetries = obj.getInt("maxRetries") ?: 3,
+                retryDelay = obj.getInt("retryDelay") ?: 5000,
                 taskIdentifier = obj.getString("taskIdentifier")
             )
         }
@@ -274,7 +278,7 @@ data class BackgroundUpdateStatus(
 data class BackgroundCheckResult(
     val success: Boolean,
     val updatesFound: Boolean,
-    val appUpdate: AppUpdateInfo? = null,
+    val appUpdate: AppUpdateStatus? = null,
     val liveUpdate: LatestVersion? = null,
     val notificationSent: Boolean = false,
     val error: UpdateError? = null
@@ -306,7 +310,7 @@ data class UpdateError(
 }
 
 // Placeholder data classes - would be defined in other plugins
-data class AppUpdateInfo(
+data class AppUpdateStatus(
     val updateAvailable: Boolean,
     val currentVersion: String,
     val availableVersion: String? = null

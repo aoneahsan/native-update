@@ -214,12 +214,12 @@ class AppUpdatePlugin {
 
 // MARK: - Data Models
 
-struct AppUpdateInfo {
-    let updateAvailable: Bool
-    let currentVersion: String
-    let availableVersion: String?
+public struct AppUpdateInfo {
+    public let updateAvailable: Bool
+    public let currentVersion: String
+    public let availableVersion: String?
     
-    func toDictionary() -> [String: Any] {
+    public func toDictionary() -> [String: Any] {
         var obj: [String: Any] = [
             "updateAvailable": updateAvailable,
             "currentVersion": currentVersion

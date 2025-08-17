@@ -77,9 +77,7 @@ class NativeUpdatePlugin : Plugin() {
                 appReviewPlugin.configure(it)
             }
             
-            config.getJSObject("backgroundUpdate")?.let {
-                backgroundUpdatePlugin.configure(it)
-            }
+            // Background update configuration is handled separately via enableBackgroundUpdates
             
             call.resolve()
         } catch (e: Exception) {
@@ -259,7 +257,7 @@ class NativeUpdatePlugin : Plugin() {
         }
     }
     
-    private fun hasRequiredPermissions(): Boolean {
+    override fun hasRequiredPermissions(): Boolean {
         return hasPermission("storage")
     }
 }

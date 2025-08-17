@@ -65,7 +65,7 @@ class BackgroundUpdateWorker(
     
     private suspend fun performBackgroundCheck(config: BackgroundUpdateConfig): BackgroundCheckResult {
         try {
-            var appUpdate: AppUpdateInfo? = null
+            var appUpdate: AppUpdateStatus? = null
             var liveUpdate: LatestVersion? = null
             
             // Check for app updates
@@ -99,7 +99,7 @@ class BackgroundUpdateWorker(
         }
     }
     
-    private suspend fun checkForAppUpdate(): AppUpdateInfo? {
+    private suspend fun checkForAppUpdate(): AppUpdateStatus? {
         return withContext(Dispatchers.IO) {
             try {
                 val appUpdatePlugin = BackgroundUpdateManager.getAppUpdatePlugin()
@@ -111,7 +111,7 @@ class BackgroundUpdateWorker(
                     val currentVersion = getCurrentAppVersion()
                     val availableVersion = getAvailableAppVersion()
                     
-                    AppUpdateInfo(
+                    AppUpdateStatus(
                         updateAvailable = availableVersion != currentVersion,
                         currentVersion = currentVersion,
                         availableVersion = if (availableVersion != currentVersion) availableVersion else null
@@ -224,7 +224,7 @@ class BackgroundUpdateWorker(
             progressData.put("status", if (result.success) "completed" else "failed")
             progressData.put("percent", 100)
             
-            plugin?.notifyListeners("backgroundUpdateProgress", progressData)
+            plugin?.notifyBackgroundUpdateListeners("backgroundUpdateProgress", progressData)
             
             // Notify about notification if sent
             if (result.notificationSent) {
@@ -233,7 +233,7 @@ class BackgroundUpdateWorker(
                 notificationData.put("updateAvailable", result.updatesFound)
                 notificationData.put("action", "shown")
                 
-                plugin?.notifyListeners("backgroundUpdateNotification", notificationData)
+                plugin?.notifyBackgroundUpdateListeners("backgroundUpdateNotification", notificationData)
             }
         } catch (e: Exception) {
             android.util.Log.e(TAG, "Failed to notify listeners", e)

@@ -252,18 +252,18 @@ class AppUpdatePlugin(
     }
     
     // Async method for background update checks
-    suspend fun getAppUpdateInfoAsync(): AppUpdateInfo? {
+    suspend fun getAppUpdateInfoAsync(): AppUpdateStatus? {
         return try {
             val appUpdateInfo = appUpdateManager.appUpdateInfo.await()
             
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
-                AppUpdateInfo(
+                AppUpdateStatus(
                     updateAvailable = true,
                     currentVersion = getCurrentAppVersion(),
                     availableVersion = appUpdateInfo.availableVersionCode().toString()
                 )
             } else {
-                AppUpdateInfo(
+                AppUpdateStatus(
                     updateAvailable = false,
                     currentVersion = getCurrentAppVersion(),
                     availableVersion = null

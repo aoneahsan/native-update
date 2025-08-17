@@ -7,7 +7,7 @@ class LiveUpdatePlugin {
     private var config: [String: Any]?
     private var progressListener: (([String: Any]) -> Void)?
     private var stateChangeListener: (([String: Any]) -> Void)?
-    private var session: URLSession
+    private var session: URLSession!
     private var downloadTask: URLSessionDownloadTask?
     private let securityManager = SecurityManager()
     
@@ -444,10 +444,15 @@ class LiveUpdatePlugin {
     }
     
     private func getCurrentVersion() -> String {
-        if let bundle = getCurrentBundleInfo(),
-           let version = bundle["version"] as? String {
+        // First check if we have an active bundle with version
+        let defaults = UserDefaults.standard
+        if let activeBundleId = defaults.string(forKey: "native_update_active_bundle"),
+           let bundles = defaults.dictionary(forKey: "native_update_bundles"),
+           let bundleInfo = bundles[activeBundleId] as? [String: Any],
+           let version = bundleInfo["version"] as? String {
             return version
         }
+        // Fall back to app version
         return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
     }
     
@@ -484,7 +489,7 @@ class LiveUpdatePlugin {
         // Return default bundle
         return [
             "bundleId": "default",
-            "version": getCurrentVersion(),
+            "version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0",
             "path": "/",
             "downloadTime": Date().timeIntervalSince1970 * 1000,
             "size": 0,
@@ -555,19 +560,14 @@ class LiveUpdatePlugin {
         // Create destination directory
         try FileManager.default.createDirectory(at: destinationUrl, withIntermediateDirectories: true)
         
-        // Use system unzip command
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
-        process.arguments = ["-o", zipUrl.path, "-d", destinationUrl.path]
+        // Use FileManager to extract (requires iOS unzip library or manual implementation)
+        // For now, we'll use a simple file copy as placeholder
+        // In production, you would use a library like ZIPFoundation or SSZipArchive
         
-        try process.run()
-        process.waitUntilExit()
-        
-        if process.terminationStatus != 0 {
-            throw NSError(domain: "LiveUpdatePlugin", code: 5, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to extract bundle"
-            ])
-        }
+        // This is a placeholder - in real implementation, use a proper unzip library
+        throw NSError(domain: "LiveUpdatePlugin", code: 5, userInfo: [
+            NSLocalizedDescriptionKey: "Unzip functionality not implemented. Please integrate a zip library like ZIPFoundation."
+        ])
     }
     
     private func configureWebViewPath(_ path: String) {
@@ -581,11 +581,11 @@ class LiveUpdatePlugin {
 
 // MARK: - Data Models
 
-struct LatestVersion {
-    let available: Bool
-    let version: String?
+public struct LatestVersion {
+    public let available: Bool
+    public let version: String?
     
-    func toDictionary() -> [String: Any] {
+    public func toDictionary() -> [String: Any] {
         var obj: [String: Any] = [
             "available": available
         ]
@@ -646,8 +646,8 @@ class CertificatePinningDelegate: NSObject, URLSessionDelegate {
     
     private func getCertificatePins(for host: String) -> [String] {
         // Get pins from security manager configuration
-        guard let securityInfo = securityManager.getSecurityInfo(),
-              let certificatePinning = securityInfo["certificatePinning"] as? [String: Any],
+        let securityInfo = securityManager.getSecurityInfo()
+        guard let certificatePinning = securityInfo["certificatePinning"] as? [String: Any],
               certificatePinning["enabled"] as? Bool == true,
               let hostPins = certificatePinning["pins"] as? [String: [String]] else {
             return []

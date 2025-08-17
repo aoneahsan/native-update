@@ -106,7 +106,7 @@ class BackgroundNotificationManager(
     }
     
     fun sendUpdateNotification(
-        appUpdate: AppUpdateInfo?,
+        appUpdate: AppUpdateStatus?,
         liveUpdate: LatestVersion?
     ): Boolean {
         val permissionStatus = getPermissionStatus()
@@ -127,7 +127,7 @@ class BackgroundNotificationManager(
             eventData.put("version", appUpdate?.availableVersion ?: liveUpdate?.version ?: "unknown")
             eventData.put("action", "shown")
             
-            plugin.notifyListeners("backgroundUpdateNotification", eventData)
+            plugin.notifyBackgroundUpdateListeners("backgroundUpdateNotification", eventData)
             
             return true
         } catch (e: Exception) {
@@ -146,7 +146,7 @@ class BackgroundNotificationManager(
     }
     
     private fun createNotificationBuilder(
-        appUpdate: AppUpdateInfo?,
+        appUpdate: AppUpdateStatus?,
         liveUpdate: LatestVersion?
     ): NotificationCompat.Builder {
         val title = determineTitle(appUpdate, liveUpdate)
@@ -183,7 +183,7 @@ class BackgroundNotificationManager(
         return builder
     }
     
-    private fun determineTitle(appUpdate: AppUpdateInfo?, liveUpdate: LatestVersion?): String {
+    private fun determineTitle(appUpdate: AppUpdateStatus?, liveUpdate: LatestVersion?): String {
         return when {
             appUpdate?.updateAvailable == true && liveUpdate?.available == true -> "App Updates Available"
             appUpdate?.updateAvailable == true -> "App Update Available"
@@ -192,7 +192,7 @@ class BackgroundNotificationManager(
         }
     }
     
-    private fun determineContent(appUpdate: AppUpdateInfo?, liveUpdate: LatestVersion?): String {
+    private fun determineContent(appUpdate: AppUpdateStatus?, liveUpdate: LatestVersion?): String {
         return when {
             appUpdate?.updateAvailable == true && liveUpdate?.available == true -> 
                 "App version ${appUpdate.availableVersion} and content updates are available"
@@ -237,7 +237,7 @@ class BackgroundNotificationManager(
         }
     }
     
-    private fun createContentIntent(appUpdate: AppUpdateInfo?, liveUpdate: LatestVersion?): PendingIntent {
+    private fun createContentIntent(appUpdate: AppUpdateStatus?, liveUpdate: LatestVersion?): PendingIntent {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
             ?: Intent()
         
@@ -254,7 +254,7 @@ class BackgroundNotificationManager(
     
     private fun addActionButtons(
         builder: NotificationCompat.Builder,
-        appUpdate: AppUpdateInfo?,
+        appUpdate: AppUpdateStatus?,
         liveUpdate: LatestVersion?
     ) {
         val actionLabels = preferences.actionLabels ?: ActionLabels.default()
@@ -337,13 +337,13 @@ data class NotificationPreferences(
                 title = obj.getString("title"),
                 description = obj.getString("description"),
                 iconName = obj.getString("iconName"),
-                soundEnabled = obj.getBoolean("soundEnabled", true),
-                vibrationEnabled = obj.getBoolean("vibrationEnabled", true),
-                showActions = obj.getBoolean("showActions", true),
+                soundEnabled = obj.getBoolean("soundEnabled", true) ?: true,
+                vibrationEnabled = obj.getBoolean("vibrationEnabled", true) ?: true,
+                showActions = obj.getBoolean("showActions", true) ?: true,
                 actionLabels = actionLabelsObj?.let { ActionLabels.fromJSObject(it) } ?: ActionLabels.default(),
                 channelId = obj.getString("channelId"),
                 channelName = obj.getString("channelName"),
-                priority = NotificationPriority.fromString(priorityString)
+                priority = NotificationPriority.fromString(priorityString ?: "default")
             )
         }
     }

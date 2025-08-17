@@ -8,19 +8,16 @@ public class BackgroundUpdatePlugin: CAPPlugin {
     
     private let backgroundTaskIdentifier = "com.aoneahsan.nativeupdate.background"
     private var backgroundUpdateConfig: BackgroundUpdateConfig?
-    private var backgroundUpdateStatus: BackgroundUpdateStatus
+    private var backgroundUpdateStatus = BackgroundUpdateStatus(
+        enabled: false,
+        isRunning: false,
+        checkCount: 0,
+        failureCount: 0
+    )
     private var notificationManager: BackgroundNotificationManager?
     
     public override func load() {
         super.load()
-        
-        // Initialize background update status
-        backgroundUpdateStatus = BackgroundUpdateStatus(
-            enabled: false,
-            isRunning: false,
-            checkCount: 0,
-            failureCount: 0
-        )
         
         // Initialize notification manager
         notificationManager = BackgroundNotificationManager(plugin: self)
@@ -33,6 +30,11 @@ public class BackgroundUpdatePlugin: CAPPlugin {
         }
     }
     
+    func configure(_ config: [String: Any]) throws {
+        // Configuration is handled in enableBackgroundUpdates
+        // This method exists for consistency with other plugins
+    }
+    
     @objc func enableBackgroundUpdates(_ call: CAPPluginCall) {
         guard let configData = call.options else {
             call.reject("Missing configuration")
@@ -40,7 +42,13 @@ public class BackgroundUpdatePlugin: CAPPlugin {
         }
         
         do {
-            let config = try BackgroundUpdateConfig.from(configData)
+            // Convert [AnyHashable: Any] to [String: Any]
+            let stringKeyedConfig = configData.reduce(into: [String: Any]()) { result, pair in
+                if let key = pair.key as? String {
+                    result[key] = pair.value
+                }
+            }
+            let config = try BackgroundUpdateConfig.from(stringKeyedConfig)
             backgroundUpdateConfig = config
             backgroundUpdateStatus.enabled = config.enabled
             
@@ -88,7 +96,14 @@ public class BackgroundUpdatePlugin: CAPPlugin {
             return
         }
         
-        notificationManager?.setPreferences(preferences)
+        // Convert [AnyHashable: Any] to [String: Any]
+        let stringKeyedPreferences = preferences.reduce(into: [String: Any]()) { result, pair in
+            if let key = pair.key as? String {
+                result[key] = pair.value
+            }
+        }
+        
+        notificationManager?.setPreferences(stringKeyedPreferences)
         call.resolve()
     }
     
@@ -172,6 +187,8 @@ public class BackgroundUpdatePlugin: CAPPlugin {
             return BackgroundCheckResult(
                 success: false,
                 updatesFound: false,
+                appUpdate: nil,
+                liveUpdate: nil,
                 notificationSent: false,
                 error: UpdateError(code: "INVALID_CONFIG", message: "Background updates not enabled")
             )
@@ -214,7 +231,8 @@ public class BackgroundUpdatePlugin: CAPPlugin {
                 updatesFound: updatesFound,
                 appUpdate: appUpdate,
                 liveUpdate: liveUpdate,
-                notificationSent: notificationSent
+                notificationSent: notificationSent,
+                error: nil
             )
             
         } catch {
@@ -230,6 +248,8 @@ public class BackgroundUpdatePlugin: CAPPlugin {
             return BackgroundCheckResult(
                 success: false,
                 updatesFound: false,
+                appUpdate: nil,
+                liveUpdate: nil,
                 notificationSent: false,
                 error: updateError
             )

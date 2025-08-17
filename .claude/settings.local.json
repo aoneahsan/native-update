@@ -562,7 +562,8 @@
       "Bash(# Get files with Filter import warnings\nyarn lint 2>&1 | grep -E \"\"warning.*''Filter'' is defined but never used\"\" | awk -F'':'' ''{print $1}'' | sort -u)",
       "Bash(git push:*)",
       "Bash(npm test)",
-      "Bash(/Volumes/Personal/01-code-work/ai-projects/01-capacitor/02-native-update/docs/check-links.sh:*)"
+      "Bash(/Volumes/Personal/01-code-work/ai-projects/01-capacitor/02-native-update/docs/check-links.sh:*)",
+      "Bash(java:*)"
     ],
     "deny": []
   }
