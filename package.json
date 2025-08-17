@@ -1,6 +1,6 @@
 {
   "name": "native-update",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Foundation package for building a comprehensive update system for Capacitor apps. Provides architecture and interfaces but requires backend implementation.",
   "type": "module",
   "main": "dist/plugin.cjs.js",
@@ -62,11 +62,11 @@
   },
   "dependencies": {
     "archiver": "^7.0.1",
-    "chalk": "^5.3.0",
-    "commander": "^12.1.0",
-    "express": "^4.21.2",
-    "ora": "^8.1.1",
-    "prompts": "^2.5.0"
+    "chalk": "^5.6.0",
+    "commander": "^14.0.0",
+    "express": "^5.1.0",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2"
   },
   "devDependencies": {
     "@capacitor/android": "^7.4.2",
