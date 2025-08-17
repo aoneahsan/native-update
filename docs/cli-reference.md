@@ -71,7 +71,7 @@ npx native-update bundle verify ./bundle.zip --key ./keys/public.pem
 
 #### `keys generate`
 
-Generates a new key pair for bundle signing.
+Generates a new cryptographic key pair for bundle signing. This is the recommended way to create keys for the Native Update plugin.
 
 ```bash
 npx native-update keys generate
@@ -82,14 +82,29 @@ npx native-update keys generate
 #   -s, --size <size>   Key size - RSA: 2048/4096, EC: 256/384 (default: 2048)
 ```
 
+**What it creates:**
+- `private-{timestamp}.pem` - Private key for signing (keep SECRET on server)
+- `public-{timestamp}.pem` - Public key for verification (include in app)
+- Sets proper file permissions (600) on private key
+- Timestamps prevent accidental overwriting
+
 **Example:**
 ```bash
-# Generate strong RSA keys for production
+# Generate strong RSA keys for production (recommended)
 npx native-update keys generate --type rsa --size 4096
 
 # Generate EC keys for smaller signature size
 npx native-update keys generate --type ec --size 256
+
+# Generate in custom directory
+npx native-update keys generate --output ./my-keys --type rsa --size 4096
 ```
+
+**Security Notes:**
+- NEVER commit private keys to version control
+- Store private keys in secure locations with restricted access
+- Use environment variables or key management services in production
+- See [Key Management Guide](./guides/key-management.md) for best practices
 
 ### Backend Templates
 

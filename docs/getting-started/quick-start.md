@@ -366,10 +366,11 @@ npm run dev
 
 ### Creating and Deploying Updates
 
-1. **Generate signing keys**:
+1. **Generate signing keys** (see [Key Management Guide](../guides/key-management.md) for details):
    ```bash
    npx native-update keys generate --type rsa --size 4096
    ```
+   This creates a private key (keep secret) and public key (add to app config)
 
 2. **Build and create update bundle**:
    ```bash

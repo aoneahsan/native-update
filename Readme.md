@@ -339,6 +339,8 @@ npx native-update backend create express --with-admin
 ✅ **Key Management**
 - Generate keys: `npx native-update keys generate --type rsa --size 4096`
 - Supports RSA (2048/4096) and EC (256/384) keys
+- Creates timestamped key pairs with proper permissions
+- See [Key Management Guide](./docs/guides/key-management.md) for detailed instructions
 
 ✅ **Backend Templates**
 - Express.js: `npx native-update backend create express --with-admin`

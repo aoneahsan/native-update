@@ -14,15 +14,23 @@ Bundle signing uses RSA-2048 with SHA-256 to create digital signatures that veri
 
 ### 1. Generate RSA Key Pair
 
+The easiest way is using our CLI tool:
+
 ```bash
+# Generate strong RSA keys for production
 npx native-update keys generate --type rsa --size 4096
+
+# Or generate EC keys for smaller signatures
+npx native-update keys generate --type ec --size 256
 ```
 
 This creates:
 
-- `private.key` - Keep secure on your server
-- `public.key` - Include in your app
-- `public.key.b64` - Base64 version for app config
+- `private-{timestamp}.pem` - Keep secure on your server (NEVER commit to git!)
+- `public-{timestamp}.pem` - Include in your app
+- Proper file permissions (600) are set automatically
+
+For detailed key management instructions, see the [Key Management Guide](./guides/key-management.md).
 
 ### 2. Secure Private Key
 

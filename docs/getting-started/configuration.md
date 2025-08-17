@@ -66,8 +66,9 @@ liveUpdate: {
   serverUrl: 'https://updates.yourserver.com',
   channel: 'production',
 
-  // Security
-  publicKey: 'YOUR_RSA_PUBLIC_KEY',
+  // Security (see Key Management Guide for generating keys)
+  // Generate keys: npx native-update keys generate --type rsa --size 4096
+  publicKey: 'YOUR_RSA_PUBLIC_KEY', // Base64 encoded public key
   requireSignature: true,
   checksumAlgorithm: 'SHA-256', // or 'SHA-512'
 

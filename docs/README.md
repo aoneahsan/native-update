@@ -33,6 +33,7 @@ Created by **Ahsan Mahmood** and open-sourced for the developer community, this 
 ### Guides
 
 - [**Security Best Practices**](./guides/security-best-practices.md) - Implement secure updates
+- [**Key Management**](./guides/key-management.md) - Generate and manage signing keys
 - [**Migration from CodePush**](./guides/migration-from-codepush.md) - Migrate from CodePush
 - [**Testing Guide**](./guides/testing-guide.md) - Testing your update implementation
 - [**Deployment Guide**](./guides/deployment-guide.md) - Deploy to production
