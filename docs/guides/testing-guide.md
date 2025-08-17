@@ -120,7 +120,7 @@ try {
 #### Signature Verification
 ```bash
 # Create signed bundle
-node tools/bundle-signer.js sign test-bundle.zip private-key.pem
+npx native-update bundle sign test-bundle.zip --key private-key.pem
 
 # Verify in app
 const isValid = await NativeUpdate.validateUpdate({
@@ -153,10 +153,10 @@ NativeUpdate.addListener('downloadProgress', (progress) => {
 1. **Prepare Test Bundle**
    ```bash
    # Create bundle
-   node tools/bundle-creator.js create ./www
+   npx native-update bundle create ./www
    
    # Sign bundle
-   node tools/bundle-signer.js sign bundle.zip private-key.pem
+   npx native-update bundle sign bundle.zip --key private-key.pem
    
    # Upload to server
    curl -X POST http://localhost:3000/api/updates/upload/update-id \
@@ -299,7 +299,7 @@ jobs:
 ### Bundle Testing
 ```bash
 # Create test bundle
-node tools/bundle-creator.js create ./test-www
+npx native-update bundle create ./test-www
 
 # Verify bundle
 unzip -t test-bundle.zip

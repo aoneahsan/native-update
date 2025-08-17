@@ -397,7 +397,7 @@ zip -r ../bundle-1.0.1.zip www/
 
 # 3. Sign the bundle (optional but recommended)
 cd ..
-node server-example/bundle-signer.js sign bundle-1.0.1.zip
+npx native-update bundle sign bundle-1.0.1.zip --key private.key
 
 # 4. Upload to server
 curl -X POST https://updates.example.com/api/v1/bundles \

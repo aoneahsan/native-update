@@ -41,6 +41,7 @@
 - **[App Update API](./docs/api/app-update-api.md)** - Native app update methods
 - **[App Review API](./docs/api/app-review-api.md)** - Review request methods
 - **[Events API](./docs/api/events-api.md)** - Event listeners and handlers
+- **[CLI Reference](./docs/cli-reference.md)** - Command-line tools documentation
 
 ### Examples
 
@@ -316,28 +317,43 @@ The **[example-app](./example-app)** directory contains a complete, production-r
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
-## 🛠️ New Development Tools
+## 🛠️ CLI Tools & Utilities
 
-### Available Tools
+### Zero-Install CLI Access
 
-✅ **Testing Framework**
-- Vitest test setup with example tests
-- Run tests: `npm test`
-- Coverage: `npm run test:coverage`
+All tools are available via `npx` without cloning the repo:
 
-✅ **Bundle Creation Tool**
-- Create update bundles: `node tools/bundle-creator.js create ./dist`
-- Generates ZIP bundle with manifest
+```bash
+# Quick start
+npx native-update init --example
+npx native-update backend create express --with-admin
+```
 
-✅ **Security Signing Tool**
-- Generate keys: `node tools/bundle-signer.js generate-keys`
-- Sign bundles: `node tools/bundle-signer.js sign bundle.zip private-key.pem`
-- Verify: `node tools/bundle-signer.js verify bundle.zip bundle.zip.sig public-key.pem`
+### Available Commands
 
-✅ **Minimal Backend Server**
-- Development server in `backend-template/`
-- Start: `cd backend-template && npm install && npm start`
-- Provides basic update API endpoints
+✅ **Bundle Management**
+- Create bundles: `npx native-update bundle create ./www`
+- Sign bundles: `npx native-update bundle sign bundle.zip --key private.pem`
+- Verify signatures: `npx native-update bundle verify bundle.zip --key public.pem`
+
+✅ **Key Management**
+- Generate keys: `npx native-update keys generate --type rsa --size 4096`
+- Supports RSA (2048/4096) and EC (256/384) keys
+
+✅ **Backend Templates**
+- Express.js: `npx native-update backend create express --with-admin`
+- Firebase: `npx native-update backend create firebase --with-monitoring`
+- Vercel: `npx native-update backend create vercel`
+
+✅ **Development Tools**
+- Start dev server: `npx native-update server start --port 3000`
+- Monitor updates: `npx native-update monitor --server https://your-server.com`
+- Validate config: `npx native-update config check`
+
+✅ **Migration Tools**
+- From CodePush: `npx native-update migrate --from codepush`
+
+See [CLI Reference](./docs/cli-reference.md) for complete documentation.
 
 ## 🏗️ Development Status
 

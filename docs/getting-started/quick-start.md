@@ -345,14 +345,65 @@ async function safeUpdateCheck() {
    });
    ```
 
+## Setting Up Backend & Creating Updates
+
+### Quick Backend Setup
+
+Use our CLI to quickly set up a backend:
+
+```bash
+# Create an Express.js backend with admin dashboard
+npx native-update backend create express --with-admin
+
+# Or create a Firebase Functions backend
+npx native-update backend create firebase --with-monitoring
+
+# Start the development server
+cd native-update-backend
+npm install
+npm run dev
+```
+
+### Creating and Deploying Updates
+
+1. **Generate signing keys**:
+   ```bash
+   npx native-update keys generate --type rsa --size 4096
+   ```
+
+2. **Build and create update bundle**:
+   ```bash
+   npm run build
+   npx native-update bundle create ./www --version 1.0.1
+   ```
+
+3. **Sign the bundle**:
+   ```bash
+   npx native-update bundle sign ./update-bundles/bundle-*.zip --key ./keys/private-*.pem
+   ```
+
+4. **Upload via admin dashboard or API**
+
+### Development Server
+
+For local testing:
+```bash
+# Start a local update server
+npx native-update server start --port 3000
+
+# Monitor updates in real-time
+npx native-update monitor --server http://localhost:3000
+```
+
 ## Next Steps
 
 Now that you have the basics working:
 
-1. Set up your update server (see backend-template folder)
+1. Deploy your backend to production
 2. Implement [Security Best Practices](../guides/security-best-practices.md)
 3. Configure [Advanced Options](./configuration.md)
 4. Explore [API Reference](../api/live-update-api.md) for all available methods
+5. See [CLI Reference](../cli-reference.md) for all available commands
 
 ## Quick Reference
 

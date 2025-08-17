@@ -79,7 +79,7 @@ firebase init
 ```bash
 # Generate RSA key pair for bundle signing
 cd ..
-node tools/bundle-signer.js generate-keys
+npx native-update keys generate --type rsa --size 4096
 
 # Copy the public key to capacitor.config.ts
 ```
@@ -180,12 +180,12 @@ yarn build
 
 2. **Create bundle**:
 ```bash
-node ../tools/bundle-creator.js create ./dist
+npx native-update bundle create ./dist
 ```
 
 3. **Sign bundle**:
 ```bash
-node ../tools/bundle-signer.js sign bundle.zip private-key.pem
+npx native-update bundle sign bundle.zip --key private-key.pem
 ```
 
 4. **Upload via Admin API** or Firebase Console

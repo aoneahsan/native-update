@@ -15,8 +15,7 @@ Bundle signing uses RSA-2048 with SHA-256 to create digital signatures that veri
 ### 1. Generate RSA Key Pair
 
 ```bash
-cd server-example
-node bundle-signer.js generate-keys
+npx native-update keys generate --type rsa --size 4096
 ```
 
 This creates:
@@ -55,7 +54,7 @@ const signature = signBundle(fileBuffer, privateKey);
 Sign bundles manually:
 
 ```bash
-node bundle-signer.js sign bundle-1.0.0.zip /secure/keys/private.key
+npx native-update bundle sign bundle-1.0.0.zip --key /secure/keys/private.key
 ```
 
 This creates `bundle-1.0.0.zip.sig` containing the base64 signature.
@@ -161,7 +160,7 @@ async function verifyBundle(
     PRIVATE_KEY: ${{ secrets.BUNDLE_SIGNING_KEY }}
   run: |
     echo "$PRIVATE_KEY" > private.key
-    node bundle-signer.js sign dist/bundle.zip
+    npx native-update bundle sign dist/bundle.zip --key private.key
     rm private.key
 ```
 
@@ -169,7 +168,7 @@ async function verifyBundle(
 
 ```groovy
 withCredentials([file(credentialsId: 'bundle-signing-key', variable: 'KEY_FILE')]) {
-    sh 'node bundle-signer.js sign dist/bundle.zip $KEY_FILE'
+    sh 'npx native-update bundle sign dist/bundle.zip --key $KEY_FILE'
 }
 ```
 
@@ -198,7 +197,7 @@ Test signature verification:
 
 ```bash
 # Verify manually
-node bundle-signer.js verify bundle.zip bundle.zip.sig public.key
+npx native-update bundle verify bundle.zip --key public.key
 
 # Check signature format
 cat bundle.zip.sig | base64 -d | xxd | head

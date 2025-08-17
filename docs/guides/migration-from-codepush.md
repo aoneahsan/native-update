@@ -23,10 +23,14 @@ This guide helps you migrate from Microsoft CodePush to Capacitor Native Update.
 First, you need to set up your own update server:
 
 ```bash
-# Use our backend template
-cd backend-template
+# Create a backend using our templates
+npx native-update backend create express --with-admin
+# or for Firebase
+npx native-update backend create firebase --with-monitoring
+
+cd native-update-backend
 npm install
-npm start
+npm run dev
 ```
 
 ### 2. Update Your App Code
@@ -88,8 +92,8 @@ Replace release process:
 code-push release-react MyApp ios -d Production
 
 # New (Capacitor Native Update)
-node tools/bundle-creator.js create ./www
-node tools/bundle-signer.js sign bundle.zip private-key.pem
+npx native-update bundle create ./www
+npx native-update bundle sign bundle.zip --key private-key.pem
 # Upload to your server
 ```
 

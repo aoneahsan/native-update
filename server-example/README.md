@@ -87,19 +87,19 @@ GET /api/v1/stats
 Generate key pair:
 
 ```bash
-node bundle-signer.js generate-keys
+npx native-update keys generate --type rsa --size 4096
 ```
 
 Sign a bundle:
 
 ```bash
-node bundle-signer.js sign bundle-1.0.0.zip
+npx native-update bundle sign bundle-1.0.0.zip --key private.key
 ```
 
 Verify signature:
 
 ```bash
-node bundle-signer.js verify bundle-1.0.0.zip bundle-1.0.0.zip.sig
+npx native-update bundle verify bundle-1.0.0.zip --key public.key
 ```
 
 ## Security
