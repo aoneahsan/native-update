@@ -90,11 +90,13 @@ pm2 startup
 
 ### 1. Production Keys
 
-```typescript
-// Generate RSA keys for production
-const keys = await generateKeyPair();
-// Store private key securely on server
-// Embed public key in app
+```bash
+# Generate RSA keys for production
+npx native-update keys generate --type rsa --size 4096
+
+# This creates:
+# - private-[timestamp].pem (keep secure on CI/CD server)
+# - public-[timestamp].pem (embed in app)
 ```
 
 ### 2. Configure Plugin
@@ -181,10 +183,10 @@ ServerDown:
 npm run build
 
 # Create bundle
-node tools/bundle-creator.js create ./www
+npx native-update bundle create ./www
 
 # Sign bundle
-node tools/bundle-signer.js sign bundle.zip private-key.pem
+npx native-update bundle sign bundle.zip --key private-key.pem
 ```
 
 ### 2. Upload to Server
