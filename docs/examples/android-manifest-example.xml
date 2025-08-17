@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    EXAMPLE: Complete Android Manifest for apps using native-update plugin
+    Location: android/app/src/main/AndroidManifest.xml (in YOUR app, not the plugin)
+    
+    This example shows the correct placement of all required elements for the
+    native-update plugin with background update support.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.yourcompany.yourapp">
+
+    <!-- Permissions are added automatically by the plugin, but listed here for reference -->
+    <!-- These permissions allow the plugin to function properly -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <!-- Your main activity and other components -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTask"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ============================================= -->
+        <!-- REQUIRED FOR NATIVE-UPDATE BACKGROUND UPDATES -->
+        <!-- ============================================= -->
+        
+        <!-- WorkManager Foreground Service -->
+        <!-- This service is REQUIRED for background downloads to work -->
+        <!-- Without it: Downloads will fail with ServiceNotFoundException -->
+        <!-- Purpose: Keeps downloads running when app is in background -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
+        <!-- Notification Action Receiver -->
+        <!-- This receiver is REQUIRED for notification buttons to work -->
+        <!-- Without it: Update notifications will show but buttons won't work -->
+        <!-- Purpose: Handles "Update Now", "Update Later", and "Dismiss" actions -->
+        <receiver
+            android:name="com.aoneahsan.nativeupdate.NotificationActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <!-- Action triggered when user taps "Update Now" -->
+                <action android:name="com.aoneahsan.nativeupdate.UPDATE_NOW" />
+                <!-- Action triggered when user taps "Update Later" -->
+                <action android:name="com.aoneahsan.nativeupdate.UPDATE_LATER" />
+                <!-- Action triggered when user dismisses the notification -->
+                <action android:name="com.aoneahsan.nativeupdate.DISMISS" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Other app components like providers, services, etc. -->
+        
+    </application>
+
+</manifest>

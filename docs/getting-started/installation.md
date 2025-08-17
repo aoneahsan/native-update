@@ -98,8 +98,73 @@ This command will:
    ```
 
 3. The plugin automatically adds required permissions to the manifest:
-   - `INTERNET` - For downloading updates
-   - `ACCESS_NETWORK_STATE` - For checking network availability
+   - **`INTERNET`** - Required for downloading update bundles from your server
+   - **`ACCESS_NETWORK_STATE`** - Required to check network availability before downloading
+   - **`WAKE_LOCK`** - Required to keep the device awake during background downloads
+   - **`FOREGROUND_SERVICE`** - Required for showing download progress notifications
+   - **`POST_NOTIFICATIONS`** - Required for update notifications on Android 13+ ([API 33](https://developer.android.com/develop/ui/views/notifications/notification-permission))
+   - **`RECEIVE_BOOT_COMPLETED`** - Required to resume interrupted downloads after device restart
+
+4. **CRITICAL: Android Manifest Configuration for Background Updates**
+
+   If you're using background updates, you **MUST** add these elements to your app's `AndroidManifest.xml` inside the `<application>` tag. Without these, background updates will fail silently:
+
+   ```xml
+   <application>
+       <!-- Your existing application configuration -->
+       
+       <!-- WorkManager Foreground Service (REQUIRED for background downloads) -->
+       <!-- Without this: Background downloads will be killed by the system after ~10 minutes -->
+       <!-- Documentation: https://developer.android.com/topic/libraries/architecture/workmanager/advanced/long-running -->
+       <service
+           android:name="androidx.work.impl.foreground.SystemForegroundService"
+           android:foregroundServiceType="dataSync"
+           tools:node="merge" />
+
+       <!-- Notification Action Receiver (REQUIRED for update notifications) -->
+       <!-- Without this: "Update Now" and "Dismiss" buttons in notifications won't work -->
+       <!-- The receiver handles user actions from update notifications -->
+       <receiver
+           android:name="com.aoneahsan.nativeupdate.NotificationActionReceiver"
+           android:exported="false">
+           <intent-filter>
+               <action android:name="com.aoneahsan.nativeupdate.UPDATE_NOW" />
+               <action android:name="com.aoneahsan.nativeupdate.UPDATE_LATER" />
+               <action android:name="com.aoneahsan.nativeupdate.DISMISS" />
+           </intent-filter>
+       </receiver>
+   </application>
+   ```
+
+   **What happens if you skip this step:**
+   - ❌ Background downloads will be terminated by Android after ~10 minutes
+   - ❌ Update notifications won't display progress
+   - ❌ Notification action buttons won't respond to taps
+   - ❌ Downloads won't resume after app restart
+   - ❌ Users will experience failed or incomplete updates
+
+   **Detailed Explanation of Each Component:**
+
+   - **SystemForegroundService**: Android's WorkManager service that handles long-running background tasks
+     - **Purpose**: Keeps downloads alive when app is backgrounded or device is locked
+     - **`foregroundServiceType="dataSync"`**: Tells Android this service downloads/syncs data
+     - **What breaks without it**: Background downloads crash with `ServiceNotFoundException`
+     - **Reference**: [WorkManager Long-running Workers](https://developer.android.com/topic/libraries/architecture/workmanager/advanced/long-running)
+
+   - **NotificationActionReceiver**: Handles user interactions with update notifications
+     - **`UPDATE_NOW`**: Triggered when user taps "Update Now" - starts immediate installation
+     - **`UPDATE_LATER`**: Triggered when user taps "Update Later" - schedules for later
+     - **`DISMISS`**: Triggered when user dismisses notification - cancels pending update
+     - **What breaks without it**: Buttons appear in notifications but don't do anything when tapped
+     - **Reference**: [Notification Actions](https://developer.android.com/develop/ui/views/notifications/notification-actions)
+
+   - **Security Attributes Explained**:
+     - **`android:exported="false"`**: Prevents other apps from sending intents to your receiver (security best practice)
+     - **`tools:node="merge"`**: Handles conflicts if multiple libraries define the same service
+
+   **Note:** If you're only using immediate (foreground) updates, these additions are optional.
+
+   📋 **[View Complete Android Manifest Example](../examples/android-manifest-example.xml)** - Shows the correct placement of all elements
 
 #### Web Setup
 
@@ -164,6 +229,40 @@ import type {
 ```
 
 ## Troubleshooting Installation
+
+### Android Manifest Errors
+
+1. **"AAPT: error: unexpected element <service> found in <manifest>"**
+   - **Cause**: Service/receiver elements placed outside `<application>` tag or in wrong manifest
+   - **Fix**: Add to your **app's** manifest at `android/app/src/main/AndroidManifest.xml`, NOT the plugin's manifest
+   - **Example of CORRECT placement**:
+     ```xml
+     <manifest>
+         <uses-permission ... />
+         <application>
+             <!-- HERE is where service and receiver go -->
+             <service ... />
+             <receiver ... />
+         </application>
+     </manifest>
+     ```
+
+2. **"ServiceNotFoundException" when downloading updates**
+   - **Cause**: Missing WorkManager service declaration
+   - **Symptoms**: App crashes when starting background download
+   - **Fix**: Add the SystemForegroundService to your app's manifest as shown above
+   - **Log message**: `java.lang.IllegalArgumentException: Service not registered: androidx.work.impl.foreground.SystemForegroundService`
+
+3. **Notification buttons don't work**
+   - **Cause**: Missing NotificationActionReceiver declaration
+   - **Symptoms**: Update notification appears but buttons don't respond
+   - **Fix**: Add the receiver with all three action filters to your app's manifest
+   - **Test**: Send a test notification and verify buttons trigger actions
+
+4. **"Permission denied" errors on Android 13+**
+   - **Cause**: Missing runtime permission request for notifications
+   - **Fix**: Request `POST_NOTIFICATIONS` permission at runtime
+   - **Reference**: [Android 13 Notification Permission](https://developer.android.com/develop/ui/views/notifications/notification-permission)
 
 ### Common Issues
 
