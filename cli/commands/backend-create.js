@@ -68,7 +68,7 @@ async function createExpressBackend(outputDir, options) {
       test: "vitest"
     },
     dependencies: {
-      express: "^4.21.2",
+      express: "^5.1.0",
       cors: "^2.8.5",
       "express-rate-limit": "^7.4.1",
       multer: "^1.4.5-lts.1",
@@ -438,7 +438,7 @@ async function createFirebaseBackend(outputDir, options) {
       "firebase-admin": "^12.0.0",
       "firebase-functions": "^5.0.0",
       cors: "^2.8.5",
-      "express": "^4.21.2"
+      "express": "^5.1.0"
     }
   };
 
@@ -576,178 +576,6 @@ firebase deploy
 - GET /health - Health check
 
 ${options.withMonitoring ? '## Monitoring\n\nUse Firebase Console for monitoring and analytics.' : ''}
-`;
-
-  await fs.writeFile(path.join(outputDir, 'README.md'), readme);
-}
-
-async function createVercelBackend(outputDir, options) {
-  // Create api directory
-  const apiDir = path.join(outputDir, 'api');
-  await fs.mkdir(apiDir, { recursive: true });
-
-  // Create package.json
-  const packageJson = {
-    name: "native-update-vercel",
-    version: "1.0.0",
-    description: "Native Update Vercel backend",
-    type: "module",
-    scripts: {
-      dev: "vercel dev",
-      deploy: "vercel",
-      build: "echo 'No build step required'"
-    },
-    dependencies: {
-      "@vercel/node": "^3.0.0"
-    }
-  };
-
-  await fs.writeFile(
-    path.join(outputDir, 'package.json'),
-    JSON.stringify(packageJson, null, 2)
-  );
-
-  // Create bundles API endpoint
-  const bundlesApi = `export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
-  if (req.method === 'GET') {
-    // Get latest bundle
-    const { appId, version, channel = 'production' } = req.query;
-    
-    // TODO: Implement bundle lookup from your storage solution
-    // This is a simplified example
-    const bundle = {
-      version: '1.0.1',
-      url: \`https://\${req.headers.host}/bundles/latest.zip\`,
-      checksum: 'sha256:...',
-      signature: 'signature...',
-      metadata: {
-        releaseNotes: 'Bug fixes and improvements'
-      }
-    };
-    
-    return res.status(200).json(bundle);
-  }
-
-  if (req.method === 'POST') {
-    // Handle bundle upload
-    const { version, channel, metadata } = req.body;
-    
-    // TODO: Handle file upload to storage (Vercel Blob, S3, etc.)
-    // TODO: Save metadata to database (Vercel KV, external DB, etc.)
-    
-    return res.status(200).json({
-      success: true,
-      bundle: {
-        version,
-        channel,
-        message: 'Bundle uploaded successfully'
-      }
-    });
-  }
-
-  return res.status(405).json({ error: 'Method not allowed' });
-}`;
-
-  await fs.writeFile(path.join(apiDir, 'bundles.js'), bundlesApi);
-
-  // Create health check endpoint
-  const healthApi = `export default function handler(req, res) {
-  res.status(200).json({
-    status: 'ok',
-    service: 'vercel-edge',
-    timestamp: new Date().toISOString()
-  });
-}`;
-
-  await fs.writeFile(path.join(apiDir, 'health.js'), healthApi);
-
-  // Create vercel.json
-  const vercelConfig = {
-    functions: {
-      "api/*.js": {
-        maxDuration: 30
-      }
-    },
-    rewrites: [
-      {
-        source: "/api/bundles/latest",
-        destination: "/api/bundles"
-      }
-    ]
-  };
-
-  await fs.writeFile(
-    path.join(outputDir, 'vercel.json'),
-    JSON.stringify(vercelConfig, null, 2)
-  );
-
-  // Create .env.example
-  const envExample = `# Storage Configuration
-STORAGE_URL=your-storage-url
-STORAGE_KEY=your-storage-key
-
-# Database Configuration (optional)
-DATABASE_URL=your-database-url
-
-# Security
-API_KEY=your-api-key-here
-`;
-
-  await fs.writeFile(path.join(outputDir, '.env.example'), envExample);
-
-  // Create README
-  const readme = `# Native Update Vercel Backend
-
-Serverless backend for Native Update plugin using Vercel Edge Functions.
-
-## Setup
-
-1. Install Vercel CLI: \`npm i -g vercel\`
-2. Copy \`.env.example\` to \`.env.local\` and configure
-3. Run \`npm install\`
-4. Run \`vercel dev\` for local development
-
-## Deployment
-
-\`\`\`bash
-vercel
-\`\`\`
-
-## API Endpoints
-
-- GET /api/bundles - Get latest bundle
-- POST /api/bundles - Upload new bundle
-- GET /api/health - Health check
-
-## Storage Options
-
-- Vercel Blob Storage
-- AWS S3
-- Cloudflare R2
-- Any S3-compatible storage
-
-## Database Options
-
-- Vercel KV
-- Vercel Postgres
-- PlanetScale
-- Supabase
-
-${options.withMonitoring ? '## Monitoring\\n\\nUse Vercel Analytics and Logs for monitoring.' : ''}
 `;
 
   await fs.writeFile(path.join(outputDir, 'README.md'), readme);
