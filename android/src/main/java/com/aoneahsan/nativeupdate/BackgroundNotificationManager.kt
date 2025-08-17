@@ -25,6 +25,14 @@ class BackgroundNotificationManager(
         private const val ACTION_UPDATE_NOW = "com.aoneahsan.nativeupdate.UPDATE_NOW"
         private const val ACTION_UPDATE_LATER = "com.aoneahsan.nativeupdate.UPDATE_LATER"
         private const val ACTION_DISMISS = "com.aoneahsan.nativeupdate.DISMISS"
+        
+        /**
+         * Static method to cancel notification from BroadcastReceiver
+         */
+        fun cancelNotificationStatic(context: Context) {
+            val notificationManager = NotificationManagerCompat.from(context)
+            notificationManager.cancel(NOTIFICATION_ID)
+        }
     }
     
     private var preferences: NotificationPreferences = NotificationPreferences.default()
@@ -131,6 +139,10 @@ class BackgroundNotificationManager(
     fun cancelNotification() {
         val notificationManager = NotificationManagerCompat.from(context)
         notificationManager.cancel(NOTIFICATION_ID)
+    }
+    
+    fun cancelUpdateNotification() {
+        cancelNotification()
     }
     
     private fun createNotificationBuilder(

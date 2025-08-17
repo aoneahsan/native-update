@@ -17,6 +17,7 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.google.android.play.core.ktx.isImmediateUpdateAllowed
+import com.google.android.gms.tasks.Tasks
 import kotlinx.coroutines.tasks.await
 
 class AppUpdatePlugin(

@@ -38,8 +38,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         }
         
         // Cancel the notification
-        val notificationManager = BackgroundNotificationManager(context)
-        notificationManager.cancelUpdateNotification()
+        BackgroundNotificationManager.cancelNotificationStatic(context)
     }
     
     private fun handleInstallNow(context: Context, intent: Intent) {
