@@ -38,9 +38,11 @@ ${chalk.bold('Documentation:')}
   });
 
 // Bundle Management Commands
-program
+const bundleCmd = program
   .command('bundle')
-  .description('Bundle management commands')
+  .description('Bundle management commands');
+
+bundleCmd
   .command('create <webDir>')
   .alias('create-bundle')
   .description(`Create an update bundle from your web directory
@@ -63,8 +65,7 @@ ${chalk.bold('Examples:')}
     await createBundle(webDir, options);
   });
 
-program
-  .command('bundle')
+bundleCmd
   .command('sign <bundlePath>')
   .alias('sign-bundle')
   .description(`Sign an update bundle with your private key
@@ -82,8 +83,7 @@ ${chalk.bold('Examples:')}
     await signBundle(bundlePath, options);
   });
 
-program
-  .command('bundle')
+bundleCmd
   .command('verify <bundlePath>')
   .alias('verify-bundle')
   .description(`Verify a signed bundle with public key
@@ -97,9 +97,11 @@ ${chalk.bold('Example:')}
   });
 
 // Key Management Commands
-program
+const keysCmd = program
   .command('keys')
-  .description('Key management commands')
+  .description('Key management commands');
+
+keysCmd
   .command('generate')
   .alias('generate-keys')
   .description(`Generate a new key pair for bundle signing
@@ -122,9 +124,11 @@ ${chalk.bold('Examples:')}
   });
 
 // Server Commands
-program
+const serverCmd = program
   .command('server')
-  .description('Development server commands')
+  .description('Development server commands');
+
+serverCmd
   .command('start')
   .alias('start-server')
   .description('Start a local update server for testing')
@@ -158,9 +162,11 @@ ${chalk.bold('Examples:')}
   });
 
 // Backend Commands
-program
+const backendCmd = program
   .command('backend')
-  .description('Backend template commands')
+  .description('Backend template commands');
+
+backendCmd
   .command('create <type>')
   .alias('create-backend')
   .description(`Create a backend template (express, firebase, vercel)
@@ -183,9 +189,11 @@ ${chalk.bold('Examples:')}
   });
 
 // Config Commands
-program
+const configCmd = program
   .command('config')
-  .description('Configuration commands')
+  .description('Configuration commands');
+
+configCmd
   .command('check')
   .description('Validate your native-update configuration')
   .action(async () => {
