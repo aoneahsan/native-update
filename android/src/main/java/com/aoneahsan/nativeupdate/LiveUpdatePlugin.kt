@@ -23,10 +23,13 @@ class LiveUpdatePlugin(
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private lateinit var okHttpClient: OkHttpClient
     private val securityManager = SecurityManager(context)
+    private val activeDownloads = mutableMapOf<String, Long>()
+    private var downloadManager: android.app.DownloadManager? = null
     
     init {
         // Initialize OkHttp with default settings
         okHttpClient = createOkHttpClient()
+        downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as? android.app.DownloadManager
     }
     
     private fun createOkHttpClient(): OkHttpClient {
@@ -493,6 +496,15 @@ class LiveUpdatePlugin(
                 bundle.getString("bundleId")?.let { deleteBundle(it) }
             }
         }
+    }
+    
+    fun cleanup() {
+        // Clean up any resources
+        // Cancel any ongoing downloads
+        activeDownloads.values.forEach { downloadId ->
+            downloadManager?.remove(downloadId)
+        }
+        activeDownloads.clear()
     }
     
     private fun markBundleAsVerified() {

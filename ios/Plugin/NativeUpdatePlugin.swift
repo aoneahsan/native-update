@@ -8,6 +8,7 @@ public class NativeUpdatePlugin: CAPPlugin {
     private var appReviewPlugin: AppReviewPlugin!
     private var backgroundUpdatePlugin: BackgroundUpdatePlugin!
     private var securityManager: SecurityManager!
+    private var isInitialized = false
     
     override public func load() {
         super.load()
@@ -32,6 +33,44 @@ public class NativeUpdatePlugin: CAPPlugin {
         appUpdatePlugin.setEventListener { [weak self] eventName, data in
             self?.notifyListeners(eventName, data: data)
         }
+    }
+    
+    @objc func initialize(_ call: CAPPluginCall) {
+        guard let config = call.getObject("config") else {
+            call.reject("Configuration object is required")
+            return
+        }
+        
+        do {
+            // Initialize with filesystem and preferences if provided
+            // In iOS, we typically don't need these as we use native APIs
+            
+            // Apply configuration
+            configure(call)
+            
+            isInitialized = true
+            call.resolve()
+        } catch {
+            call.reject("Initialization failed", error.localizedDescription)
+        }
+    }
+    
+    @objc func isInitialized(_ call: CAPPluginCall) {
+        call.resolve(["initialized": isInitialized])
+    }
+    
+    @objc func cleanup(_ call: CAPPluginCall) {
+        // Clean up any resources
+        liveUpdatePlugin.cleanup()
+        // Disable background updates through the plugin method
+        let disableCall = CAPPluginCall(
+            callbackId: "cleanup_disable",
+            options: [:],
+            success: { _ in },
+            error: { _ in }
+        )
+        backgroundUpdatePlugin.disableBackgroundUpdates(disableCall)
+        call.resolve()
     }
     
     @objc func configure(_ call: CAPPluginCall) {
@@ -93,6 +132,7 @@ public class NativeUpdatePlugin: CAPPlugin {
     
     @objc func reset(_ call: CAPPluginCall) {
         liveUpdatePlugin.reset(call)
+        isInitialized = false
     }
     
     @objc func current(_ call: CAPPluginCall) {

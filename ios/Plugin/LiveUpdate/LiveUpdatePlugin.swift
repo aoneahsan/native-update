@@ -517,6 +517,12 @@ class LiveUpdatePlugin {
         defaults.set(bundles, forKey: "native_update_bundles")
     }
     
+    func cleanup() {
+        // Clean up any resources
+        downloadTask?.cancel()
+        downloadTask = nil
+    }
+    
     private func cleanupOldBundles(keepVersions: Int) {
         let bundles = getAllBundles().sorted { bundle1, bundle2 in
             let time1 = bundle1["downloadTime"] as? Double ?? 0

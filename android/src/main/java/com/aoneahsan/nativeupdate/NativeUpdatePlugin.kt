@@ -23,6 +23,7 @@ class NativeUpdatePlugin : Plugin() {
     private lateinit var appReviewPlugin: AppReviewPlugin
     private lateinit var backgroundUpdatePlugin: BackgroundUpdatePlugin
     private lateinit var securityManager: SecurityManager
+    private var isInitialized = false
     
     override fun load() {
         super.load()
@@ -50,6 +51,45 @@ class NativeUpdatePlugin : Plugin() {
         
         liveUpdatePlugin.setStateChangeListener { state ->
             notifyListeners("updateStateChanged", state)
+        }
+    }
+    
+    @PluginMethod
+    fun initialize(call: PluginCall) {
+        val config = call.getObject("config")
+        if (config == null) {
+            call.reject("Configuration object is required")
+            return
+        }
+        
+        try {
+            // Initialize with filesystem and preferences if provided
+            // In Android, we typically don't need these as we use native APIs
+            
+            // Apply configuration
+            configure(call)
+            
+            isInitialized = true
+            call.resolve()
+        } catch (e: Exception) {
+            call.reject("Initialization failed", e)
+        }
+    }
+    
+    @PluginMethod
+    fun isInitialized(call: PluginCall) {
+        call.resolve(JSObject().put("initialized", isInitialized))
+    }
+    
+    @PluginMethod
+    fun cleanup(call: PluginCall) {
+        try {
+            // Clean up any resources
+            liveUpdatePlugin.cleanup()
+            backgroundUpdatePlugin.disableBackgroundUpdates()
+            call.resolve()
+        } catch (e: Exception) {
+            call.reject("Cleanup failed", e)
         }
     }
     
@@ -123,7 +163,13 @@ class NativeUpdatePlugin : Plugin() {
     
     @PluginMethod
     fun reset(call: PluginCall) {
-        liveUpdatePlugin.reset(call)
+        try {
+            // Reset plugin state
+            liveUpdatePlugin.reset(call)
+            isInitialized = false
+        } catch (e: Exception) {
+            call.reject("Reset failed", e)
+        }
     }
     
     @PluginMethod
