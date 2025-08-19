@@ -55,6 +55,32 @@ export type {
   // Error types
   UpdateError,
   UpdateErrorCode,
+  
+  // Background update types
+  BackgroundUpdatePlugin,
+  BackgroundUpdateConfig,
+  BackgroundUpdateStatus,
+  BackgroundCheckResult,
+  BackgroundUpdateType,
+  NotificationPreferences,
+  NotificationPermissionStatus,
+  NotificationPriority,
+  
+  // Security types
+  SecurityConfig,
+  SecurityInfo,
+  CertificatePinning,
+  CertificatePin,
+  
+  // Plugin init types
+  PluginInitConfig,
+  PluginListenerHandle,
+  
+  // Additional enums
+  SyncStatus,
+  InstallStatus,
+  UpdateMode,
+  ChecksumAlgorithm,
 } from './definitions';
 
 // Error exports
