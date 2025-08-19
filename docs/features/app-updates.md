@@ -95,7 +95,7 @@ class AppUpdateManager {
   private setupUpdateListeners() {
     // Android flexible update state changes
     NativeUpdate.addListener(
-      'flexibleUpdateStateChanged',
+      'appUpdateStateChanged',
       (state) => {
         this.handleFlexibleUpdateState(state);
       }
@@ -103,7 +103,7 @@ class AppUpdateManager {
 
     // Download progress for flexible updates
     NativeUpdate.addListener(
-      'flexibleUpdateProgress',
+      'appUpdateProgress',
       (progress) => {
         this.downloadProgress = progress.percent;
         this.updateProgressUI(progress);
@@ -276,7 +276,7 @@ const androidUpdate = {
 
     // Monitor progress
     const listener = await NativeUpdate.addListener(
-      'flexibleUpdateProgress',
+      'appUpdateProgress',
       (progress) => {
         console.log(
           `Downloaded: ${progress.bytesDownloaded}/${progress.totalBytes}`
@@ -551,7 +551,7 @@ class UpdateProgressUI {
     this.createProgressUI();
 
     NativeUpdate.addListener(
-      'flexibleUpdateProgress',
+      'appUpdateProgress',
       (progress) => {
         this.updateProgress(progress);
       }

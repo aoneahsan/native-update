@@ -37,6 +37,7 @@ import { NativeUpdateError, ErrorCode } from './core/errors';
 class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   private pluginManager: PluginManager;
   private initialized = false;
+  private windowEventListeners: Map<string, (event: CustomEvent) => void> = new Map();
 
   constructor() {
     this.pluginManager = PluginManager.getInstance();
@@ -46,6 +47,9 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   async initialize(config: PluginInitConfig): Promise<void> {
     await this.pluginManager.initialize(config);
     this.initialized = true;
+    
+    // Setup window event bridge for AppUpdateNotifier events
+    this.setupWindowEventBridge();
   }
 
   isInitialized(): boolean {
@@ -262,39 +266,28 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
 
   // AppUpdatePlugin methods
   async getAppUpdateInfo(): Promise<AppUpdateInfo> {
-    // Web doesn't have native app updates
-    return {
-      updateAvailable: false,
-      currentVersion: '1.0.0',
-    };
+    const appUpdateManager = this.pluginManager.getAppUpdateManager();
+    return appUpdateManager.getAppUpdateInfo();
   }
 
   async performImmediateUpdate(): Promise<void> {
-    throw new NativeUpdateError(
-      ErrorCode.PLATFORM_NOT_SUPPORTED,
-      'Native app updates are not supported on web'
-    );
+    const appUpdateManager = this.pluginManager.getAppUpdateManager();
+    return appUpdateManager.performImmediateUpdate();
   }
 
   async startFlexibleUpdate(): Promise<void> {
-    throw new NativeUpdateError(
-      ErrorCode.PLATFORM_NOT_SUPPORTED,
-      'Native app updates are not supported on web'
-    );
+    const appUpdateManager = this.pluginManager.getAppUpdateManager();
+    return appUpdateManager.startFlexibleUpdate();
   }
 
   async completeFlexibleUpdate(): Promise<void> {
-    throw new NativeUpdateError(
-      ErrorCode.PLATFORM_NOT_SUPPORTED,
-      'Native app updates are not supported on web'
-    );
+    const appUpdateManager = this.pluginManager.getAppUpdateManager();
+    return appUpdateManager.completeFlexibleUpdate();
   }
 
-  async openAppStore(_options?: OpenAppStoreOptions): Promise<void> {
-    throw new NativeUpdateError(
-      ErrorCode.PLATFORM_NOT_SUPPORTED,
-      'App store is not available on web'
-    );
+  async openAppStore(options?: OpenAppStoreOptions): Promise<void> {
+    const appUpdateManager = this.pluginManager.getAppUpdateManager();
+    return appUpdateManager.openAppStore(options);
   }
 
   // AppReviewPlugin methods
@@ -390,20 +383,50 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
 
   // Event listener methods
   async addListener(
-    _eventName: string,
-    _listenerFunc: (event: any) => void
+    eventName: string,
+    listenerFunc: (event: any) => void
   ): Promise<import('./definitions').PluginListenerHandle> {
-    // Web implementation doesn't support native events
-    // Return a dummy handle
+    const eventEmitter = this.pluginManager.getEventEmitter();
+    
+    // Add listener to central event emitter
+    const removeListener = eventEmitter.addListener(eventName, listenerFunc);
+    
     return {
       remove: async () => {
-        // No-op for web
+        removeListener();
       },
     };
   }
 
   async removeAllListeners(): Promise<void> {
-    // No-op for web implementation
+    const eventEmitter = this.pluginManager.getEventEmitter();
+    eventEmitter.removeAllListeners();
+  }
+
+  /**
+   * Setup bridge between window custom events and central event emitter
+   */
+  private setupWindowEventBridge(): void {
+    const eventEmitter = this.pluginManager.getEventEmitter();
+    
+    // List of events emitted by AppUpdateNotifier via window
+    const windowEvents = [
+      'appUpdateAvailable',
+      'appUpdateProgress',
+      'appUpdateReady',
+      'appUpdateFailed',
+      'appUpdateNotificationClicked',
+      'appUpdateInstallClicked'
+    ];
+    
+    windowEvents.forEach(eventName => {
+      const listener = (event: CustomEvent) => {
+        eventEmitter.emit(eventName, event.detail);
+      };
+      
+      window.addEventListener(eventName, listener as EventListener);
+      this.windowEventListeners.set(eventName, listener);
+    });
   }
 }
 

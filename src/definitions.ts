@@ -591,6 +591,44 @@ export interface BackgroundUpdateNotificationEvent {
 }
 
 /**
+ * App Update Events
+ */
+export interface AppUpdateStateChangedEvent {
+  status: InstallStatus;
+  installErrorCode?: number;
+}
+
+export interface AppUpdateProgressEvent {
+  percent: number;
+  bytesDownloaded: number;
+  totalBytes: number;
+}
+
+export interface AppUpdateAvailableEvent {
+  currentVersion: string;
+  availableVersion: string;
+  updatePriority: number;
+  updateSize?: number;
+  releaseNotes?: string[];
+  storeUrl?: string;
+}
+
+export interface AppUpdateReadyEvent {
+  message: string;
+}
+
+export interface AppUpdateFailedEvent {
+  error: string;
+  code: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface AppUpdateNotificationClickedEvent {}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface AppUpdateInstallClickedEvent {}
+
+/**
  * Plugin Events
  */
 export interface PluginListenerHandle {
@@ -628,6 +666,62 @@ export interface NativeUpdateListeners {
   addListener(
     eventName: 'backgroundUpdateNotification',
     listenerFunc: (event: BackgroundUpdateNotificationEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update state changes
+   */
+  addListener(
+    eventName: 'appUpdateStateChanged',
+    listenerFunc: (event: AppUpdateStateChangedEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update progress
+   */
+  addListener(
+    eventName: 'appUpdateProgress',
+    listenerFunc: (event: AppUpdateProgressEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update available
+   */
+  addListener(
+    eventName: 'appUpdateAvailable',
+    listenerFunc: (event: AppUpdateAvailableEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update ready
+   */
+  addListener(
+    eventName: 'appUpdateReady',
+    listenerFunc: (event: AppUpdateReadyEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update failed
+   */
+  addListener(
+    eventName: 'appUpdateFailed',
+    listenerFunc: (event: AppUpdateFailedEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update notification clicked
+   */
+  addListener(
+    eventName: 'appUpdateNotificationClicked',
+    listenerFunc: (event: AppUpdateNotificationClickedEvent) => void
+  ): Promise<PluginListenerHandle>;
+
+  /**
+   * Listen for app update install clicked
+   */
+  addListener(
+    eventName: 'appUpdateInstallClicked',
+    listenerFunc: (event: AppUpdateInstallClickedEvent) => void
   ): Promise<PluginListenerHandle>;
 
   /**

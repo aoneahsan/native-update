@@ -159,7 +159,7 @@ async function startFlexibleUpdate() {
 
   // Listen for download completion
   const listener = await NativeUpdate.addListener(
-    'flexibleUpdateStateChanged',
+    'appUpdateStateChanged',
     (state) => {
       if (state.status === 'DOWNLOADED') {
         // Prompt user to restart

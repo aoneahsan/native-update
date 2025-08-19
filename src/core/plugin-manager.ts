@@ -6,6 +6,8 @@ import { SecurityValidator } from './security';
 import { BundleManager } from '../live-update/bundle-manager';
 import { DownloadManager } from '../live-update/download-manager';
 import { VersionManager } from '../live-update/version-manager';
+import { AppUpdateManager } from '../app-update/app-update-manager';
+import { EventEmitter } from './event-emitter';
 import { NativeUpdateError, ErrorCode } from './errors';
 import { PluginInitConfig } from '../definitions';
 
@@ -18,15 +20,18 @@ export class PluginManager {
   private readonly configManager: ConfigManager;
   private readonly logger: Logger;
   private readonly securityValidator: SecurityValidator;
+  private readonly eventEmitter: EventEmitter;
   private bundleManager: BundleManager | null = null;
   private downloadManager: DownloadManager | null = null;
   private versionManager: VersionManager | null = null;
+  private appUpdateManager: AppUpdateManager | null = null;
   private initialized = false;
 
   private constructor() {
     this.configManager = ConfigManager.getInstance();
     this.logger = Logger.getInstance();
     this.securityValidator = SecurityValidator.getInstance();
+    this.eventEmitter = EventEmitter.getInstance();
   }
 
   static getInstance(): PluginManager {
@@ -66,6 +71,21 @@ export class PluginManager {
 
       this.versionManager = new VersionManager();
       await this.versionManager.initialize();
+
+      this.appUpdateManager = new AppUpdateManager({
+        serverUrl: config.serverUrl || config.baseUrl || '',
+        channel: config.channel || 'production',
+        autoCheck: config.autoCheck ?? true,
+        autoUpdate: config.autoUpdate ?? false,
+        updateStrategy: config.updateStrategy,
+        publicKey: config.publicKey,
+        requireSignature: config.requireSignature,
+        checksumAlgorithm: config.checksumAlgorithm,
+        checkInterval: config.checkInterval,
+        security: config.security,
+      });
+      // Wire up app update manager events to central event emitter
+      this.setupAppUpdateEventBridge();
 
       this.initialized = true;
       this.logger.info('Plugin initialized successfully');
@@ -140,6 +160,21 @@ export class PluginManager {
   }
 
   /**
+   * Get app update manager
+   */
+  getAppUpdateManager(): AppUpdateManager {
+    this.ensureInitialized();
+    return this.appUpdateManager!;
+  }
+
+  /**
+   * Get event emitter
+   */
+  getEventEmitter(): EventEmitter {
+    return this.eventEmitter;
+  }
+
+  /**
    * Reset plugin state
    */
   async reset(): Promise<void> {
@@ -162,7 +197,11 @@ export class PluginManager {
     this.bundleManager = null;
     this.downloadManager = null;
     this.versionManager = null;
+    this.appUpdateManager = null;
     this.initialized = false;
+    
+    // Clear all event listeners
+    this.eventEmitter.removeAllListeners();
 
     this.logger.info('Plugin reset complete');
   }
@@ -184,5 +223,22 @@ export class PluginManager {
     }
 
     this.logger.info('Cleanup complete');
+  }
+
+  /**
+   * Setup event bridge between AppUpdateManager and central EventEmitter
+   */
+  private setupAppUpdateEventBridge(): void {
+    if (!this.appUpdateManager) return;
+
+    // Bridge appUpdateStateChanged events
+    this.appUpdateManager.addListener('appUpdateStateChanged', (event) => {
+      this.eventEmitter.emit('appUpdateStateChanged', event);
+    });
+
+    // Bridge appUpdateProgress events
+    this.appUpdateManager.addListener('appUpdateProgress', (event) => {
+      this.eventEmitter.emit('appUpdateProgress', event);
+    });
   }
 }
