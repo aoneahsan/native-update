@@ -6,9 +6,14 @@ class AppUpdatePlugin {
     private weak var plugin: CAPPlugin?
     private var config: [String: Any]?
     private let iTunesLookupURL = "https://itunes.apple.com/lookup"
+    private var eventListener: ((String, [String: Any]) -> Void)?
     
     init(plugin: CAPPlugin) {
         self.plugin = plugin
+    }
+    
+    func setEventListener(_ listener: @escaping (String, [String: Any]) -> Void) {
+        self.eventListener = listener
     }
     
     func configure(_ config: [String: Any]) throws {
@@ -43,6 +48,16 @@ class AppUpdatePlugin {
                             result["clientVersionStalenessDays"] = days
                         }
                     }
+                    
+                    // Emit available event
+                    var availableData: [String: Any] = [
+                        "currentVersion": currentVersion,
+                        "availableVersion": storeVersion
+                    ]
+                    if let priority = result["updatePriority"] as? Int {
+                        availableData["updatePriority"] = priority
+                    }
+                    eventListener?("appUpdateAvailable", availableData)
                 }
                 
                 // iOS doesn't have the same update types as Android

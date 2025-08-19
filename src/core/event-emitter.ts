@@ -3,7 +3,7 @@
  */
 export class EventEmitter {
   private static instance: EventEmitter;
-  private listeners: Map<string, Set<(data: any) => void>> = new Map();
+  private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
 
   private constructor() {}
 
@@ -19,7 +19,7 @@ export class EventEmitter {
    */
   addListener(
     eventName: string,
-    listener: (data: any) => void
+    listener: (data: unknown) => void
   ): () => void {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, new Set());
@@ -42,7 +42,7 @@ export class EventEmitter {
   /**
    * Emit an event to all listeners
    */
-  emit(eventName: string, data: any): void {
+  emit(eventName: string, data: unknown): void {
     const listeners = this.listeners.get(eventName);
     if (listeners) {
       listeners.forEach(listener => {

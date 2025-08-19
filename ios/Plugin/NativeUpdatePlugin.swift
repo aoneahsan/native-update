@@ -27,6 +27,11 @@ public class NativeUpdatePlugin: CAPPlugin {
         liveUpdatePlugin.setStateChangeListener { [weak self] state in
             self?.notifyListeners("updateStateChanged", data: state)
         }
+        
+        // Set up app update event listener
+        appUpdatePlugin.setEventListener { [weak self] eventName, data in
+            self?.notifyListeners(eventName, data: data)
+        }
     }
     
     @objc func configure(_ call: CAPPluginCall) {

@@ -148,6 +148,22 @@ Notify that the app has successfully started with the new bundle.
 await NativeUpdate.notifyAppReady();
 ```
 
+### getLatest()
+
+Get information about the latest available update from the server.
+
+```typescript
+const latest = await NativeUpdate.getLatest();
+// Returns:
+{
+  available: boolean;         // Whether an update is available
+  version?: string;          // Version number of the latest update
+  url?: string;              // Download URL for the update
+  mandatory?: boolean;       // Whether this is a mandatory update
+  notes?: string;            // Release notes for the update
+  size?: number;             // Size in bytes of the update bundle
+}
+```
 
 ### setChannel(channel)
 

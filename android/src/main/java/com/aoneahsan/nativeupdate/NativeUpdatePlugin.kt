@@ -34,6 +34,11 @@ class NativeUpdatePlugin : Plugin() {
         backgroundUpdatePlugin = BackgroundUpdatePlugin()
         securityManager = SecurityManager(context)
         
+        // Set up app update event listener
+        appUpdatePlugin.setEventListener { eventName, data ->
+            notifyListeners(eventName, data)
+        }
+        
         // Register plugins with manager for background access
         BackgroundUpdateManager.registerLiveUpdatePlugin(liveUpdatePlugin)
         BackgroundUpdateManager.registerAppUpdatePlugin(appUpdatePlugin)

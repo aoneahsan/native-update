@@ -24,6 +24,7 @@ class AppUpdatePlugin(
     private val activity: Activity,
     private val context: Context
 ) {
+    private var eventListener: ((String, JSObject) -> Unit)? = null
     private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(context)
     private var config: JSObject? = null
     private var updateInfo: AppUpdateInfo? = null
@@ -42,6 +43,10 @@ class AppUpdatePlugin(
     
     fun configure(config: JSObject) {
         this.config = config
+    }
+    
+    fun setEventListener(listener: (String, JSObject) -> Unit) {
+        this.eventListener = listener
     }
     
     fun getAppUpdateInfo(call: PluginCall) {
@@ -64,6 +69,15 @@ class AppUpdatePlugin(
                 result.put("installStatus", getInstallStatusString(appUpdateInfo.installStatus()))
                 result.put("bytesDownloaded", appUpdateInfo.bytesDownloaded())
                 result.put("totalBytesToDownload", appUpdateInfo.totalBytesToDownload())
+            }
+            
+            // Emit available event if update is available
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                val availableData = JSObject()
+                availableData.put("currentVersion", getCurrentAppVersion())
+                availableData.put("availableVersion", appUpdateInfo.availableVersionCode().toString())
+                availableData.put("updatePriority", appUpdateInfo.updatePriority())
+                eventListener?.invoke("appUpdateAvailable", availableData)
             }
             
             call.resolve(result)
@@ -174,10 +188,33 @@ class AppUpdatePlugin(
     }
     
     private fun handleInstallState(state: InstallState) {
+        // Emit state change event
+        val eventData = JSObject()
+        eventData.put("status", getInstallStatusString(state.installStatus()))
+        if (state.installError() != 0) {
+            eventData.put("installErrorCode", state.installError())
+        }
+        eventListener?.invoke("appUpdateStateChanged", eventData)
+        
+        // Emit progress event for downloads
+        if (state.installStatus() == InstallStatus.DOWNLOADING) {
+            val progressData = JSObject()
+            progressData.put("percent", if (state.totalBytesToDownload() > 0) 
+                ((state.bytesDownloaded() * 100) / state.totalBytesToDownload()).toInt() else 0)
+            progressData.put("bytesDownloaded", state.bytesDownloaded())
+            progressData.put("totalBytes", state.totalBytesToDownload())
+            eventListener?.invoke("appUpdateProgress", progressData)
+        }
+        
         when (state.installStatus()) {
             InstallStatus.DOWNLOADED -> {
                 // Update has been downloaded, prompt user to restart
                 popupSnackbarForCompleteUpdate()
+                
+                // Emit ready event
+                val readyData = JSObject()
+                readyData.put("message", "Update downloaded and ready to install")
+                eventListener?.invoke("appUpdateReady", readyData)
             }
             InstallStatus.INSTALLED -> {
                 // Update installed, cleanup
@@ -185,6 +222,10 @@ class AppUpdatePlugin(
             }
             InstallStatus.FAILED -> {
                 // Update failed
+                val failedData = JSObject()
+                failedData.put("error", "Update installation failed")
+                failedData.put("code", "INSTALL_FAILED")
+                eventListener?.invoke("appUpdateFailed", failedData)
             }
             else -> {
                 // Handle other states
