@@ -73,7 +73,15 @@ await NativeUpdate.openAppStore({
 
 ## Events
 
-Note: App update events are not directly exposed. Instead, use the `updateStateChanged` and `downloadProgress` events from the Live Update API when performing app updates. The native update process on Android and iOS is handled by the platform's native update mechanisms.
+App update events are available for monitoring the native app update process. See the [Events API Reference](./events-api.md#app-update-events) for complete documentation of the following events:
+
+- `appUpdateStateChanged` - Fired when update state changes
+- `appUpdateProgress` - Monitor download progress for flexible updates
+- `appUpdateAvailable` - Notified when a new version is available
+- `appUpdateReady` - Update downloaded and ready to install
+- `appUpdateFailed` - Update process failed
+- `appUpdateNotificationClicked` - User clicked update notification
+- `appUpdateInstallClicked` - User clicked install in notification
 
 ## Platform Differences
 

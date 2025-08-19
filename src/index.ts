@@ -42,6 +42,15 @@ export type {
   
   // Events
   UpdateStateChangedEvent,
+  AppUpdateStateChangedEvent,
+  AppUpdateProgressEvent,
+  AppUpdateAvailableEvent,
+  AppUpdateReadyEvent,
+  AppUpdateFailedEvent,
+  AppUpdateNotificationClickedEvent,
+  AppUpdateInstallClickedEvent,
+  BackgroundUpdateProgressEvent,
+  BackgroundUpdateNotificationEvent,
   
   // Error types
   UpdateError,

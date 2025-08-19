@@ -64,6 +64,129 @@ NativeUpdate.addListener('downloadProgress', (progress) => {
 }
 ```
 
+## App Update Events
+
+### appUpdateStateChanged
+
+Fired when the native app update state changes.
+
+```typescript
+NativeUpdate.addListener('appUpdateStateChanged', (state) => {
+  console.log('App update state:', state.status);
+});
+```
+
+**Event Data:**
+```typescript
+{
+  status: InstallStatus; // See InstallStatus enum
+  installErrorCode?: number; // Error code if status is FAILED
+}
+```
+
+### appUpdateProgress
+
+Fired during app update download progress.
+
+```typescript
+NativeUpdate.addListener('appUpdateProgress', (progress) => {
+  console.log(`Download progress: ${progress.percent}%`);
+});
+```
+
+**Event Data:**
+```typescript
+{
+  percent: number; // Download percentage (0-100)
+  bytesDownloaded: number; // Bytes downloaded so far
+  totalBytes: number; // Total download size
+}
+```
+
+### appUpdateAvailable
+
+Fired when a new app update is detected.
+
+```typescript
+NativeUpdate.addListener('appUpdateAvailable', (info) => {
+  console.log(`Update available: ${info.availableVersion}`);
+});
+```
+
+**Event Data:**
+```typescript
+{
+  currentVersion: string;
+  availableVersion: string;
+  updatePriority: number; // 0-5, where 5 is critical
+  updateSize?: number; // Update size in bytes
+  releaseNotes?: string[]; // Release notes array
+  storeUrl?: string; // App store URL
+}
+```
+
+### appUpdateReady
+
+Fired when the app update is downloaded and ready to install.
+
+```typescript
+NativeUpdate.addListener('appUpdateReady', (event) => {
+  console.log('Update ready to install');
+  // Prompt user to restart/install
+});
+```
+
+**Event Data:**
+```typescript
+{
+  message: string; // "Update downloaded and ready to install"
+}
+```
+
+### appUpdateFailed
+
+Fired when an app update fails.
+
+```typescript
+NativeUpdate.addListener('appUpdateFailed', (error) => {
+  console.error('Update failed:', error.error);
+});
+```
+
+**Event Data:**
+```typescript
+{
+  error: string; // Error message
+  code: string; // Error code
+}
+```
+
+### appUpdateNotificationClicked
+
+Fired when the user clicks on an update notification.
+
+```typescript
+NativeUpdate.addListener('appUpdateNotificationClicked', () => {
+  console.log('User clicked update notification');
+  // Navigate to update screen
+});
+```
+
+**Event Data:** Empty object `{}`
+
+### appUpdateInstallClicked
+
+Fired when the user clicks the install button in an update notification.
+
+```typescript
+NativeUpdate.addListener('appUpdateInstallClicked', () => {
+  console.log('User clicked install in notification');
+  // Start update installation
+});
+```
+
+**Event Data:** Empty object `{}`
+
 ## Background Update Events
 
 ### backgroundUpdateProgress

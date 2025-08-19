@@ -229,7 +229,7 @@ export class AndroidUpdateProgress {
 
     // Track progress
     NativeUpdate.addListener(
-      'onAppUpdateDownloadProgress',
+      'appUpdateProgress',
       (progress) => {
         this.downloadProgress = Math.round(
           (progress.bytesDownloaded / progress.totalBytesToDownload) * 100

@@ -191,7 +191,7 @@ export class AndroidFlexibleUpdate {
 
       // Listen for download progress
       NativeUpdate.addListener(
-        'onAppUpdateDownloadProgress',
+        'appUpdateProgress',
         (progress) => {
           console.log(
             `Download progress: ${progress.bytesDownloaded} / ${progress.totalBytesToDownload}`

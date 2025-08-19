@@ -44,7 +44,17 @@
     "plugin",
     "native",
     "app-updates",
-    "native-updates"
+    "native-updates",
+    "ota",
+    "live-updates",
+    "hot-reload",
+    "app-store",
+    "google-play",
+    "in-app-updates",
+    "app-reviews",
+    "ios",
+    "android",
+    "hybrid"
   ],
   "scripts": {
     "build": "npm run clean && npm run tsc && rollup -c rollup.config.js",
