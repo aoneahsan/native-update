@@ -750,7 +750,8 @@ export interface PluginInitConfig {
  * Main plugin interface with initialization
  */
 export interface NativeUpdatePlugin
-  extends NativeUpdateCombinedPlugin {
+  extends NativeUpdateCombinedPlugin,
+    NativeUpdateListeners {
   /**
    * Initialize the plugin with configuration
    */

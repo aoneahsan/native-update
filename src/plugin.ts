@@ -387,6 +387,24 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   async requestNotificationPermissions(): Promise<boolean> {
     return false;
   }
+
+  // Event listener methods
+  async addListener(
+    _eventName: string,
+    _listenerFunc: (event: any) => void
+  ): Promise<import('./definitions').PluginListenerHandle> {
+    // Web implementation doesn't support native events
+    // Return a dummy handle
+    return {
+      remove: async () => {
+        // No-op for web
+      },
+    };
+  }
+
+  async removeAllListeners(): Promise<void> {
+    // No-op for web implementation
+  }
 }
 
 /**
