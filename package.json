@@ -79,28 +79,28 @@
     "prompts": "^2.4.2"
   },
   "devDependencies": {
-    "@capacitor/android": "^7.4.2",
-    "@capacitor/core": "^7.4.2",
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "@capacitor/filesystem": "^7.1.4",
-    "@capacitor/ios": "^7.4.2",
+    "@capacitor/ios": "^7.4.3",
     "@capacitor/preferences": "^7.0.2",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/node": "^24.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.40.0",
-    "@typescript-eslint/parser": "^8.40.0",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
     "@vitest/ui": "^3.2.4",
-    "eslint": "^9.33.0",
+    "eslint": "^9.34.0",
     "happy-dom": "^18.0.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "rollup": "^4.46.3",
+    "rollup": "^4.49.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "peerDependencies": {
-    "@capacitor/core": "^7.4.2"
+    "@capacitor/core": "^7.4.3"
   },
   "capacitor": {
     "ios": {
