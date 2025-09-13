@@ -563,7 +563,8 @@
       "Bash(git push:*)",
       "Bash(npm test)",
       "Bash(/Volumes/Personal/01-code-work/ai-projects/01-capacitor/02-native-update/docs/check-links.sh:*)",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "Bash(tar:*)"
     ],
     "deny": []
   }

@@ -17,7 +17,7 @@ export default {
       },
       sourcemap: true,
       inlineDynamicImports: true,
-      banner: '/*! Native Update Plugin v1.4.0 | MIT License */',
+      banner: '/*! Native Update Plugin v1.1.6 | MIT License */',
     },
     {
       file: 'dist/plugin.cjs.js',
