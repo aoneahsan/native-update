@@ -38,19 +38,26 @@ The plugin aims to be type-safe, framework-independent, secure, and highly perfo
 - Smart triggering with rate limiting
 - Platform-specific implementations (StoreKit for iOS, Play Core for Android)
 
+## Package Manager
+
+**CRITICAL: This project uses pnpm exclusively**
+- ✅ Use `pnpm` for all package management operations
+- ❌ Never use `npm` or `yarn`
+- Package manager is locked to `pnpm@9.15.4` via `packageManager` field in package.json
+
 ## Common Development Commands
 
 ### Build and Development
 
-- `npm run build` - Clean, compile TypeScript, and bundle with Rollup
-- `npm run watch` - Watch mode for TypeScript compilation during development
-- `npm run clean` - Remove dist directory
+- `pnpm run build` - Clean, compile TypeScript, and bundle with Rollup
+- `pnpm run watch` - Watch mode for TypeScript compilation during development
+- `pnpm run clean` - Remove dist directory
 
 ### Code Quality
 
-- `npm run lint` - Run ESLint on TypeScript files
-- `npm run prettier` - Format code with Prettier
-- `npm run swiftlint` - Lint Swift code (when iOS implementation exists)
+- `pnpm run lint` - Run ESLint on TypeScript files
+- `pnpm run prettier` - Format code with Prettier
+- `pnpm run swiftlint` - Lint Swift code (when iOS implementation exists)
 
 ## Architecture and Structure
 
