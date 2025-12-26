@@ -45,6 +45,36 @@ The plugin aims to be type-safe, framework-independent, secure, and highly perfo
 - ❌ Never use `npm` or `yarn`
 - Package manager is locked to `pnpm@9.15.4` via `packageManager` field in package.json
 
+## ESLint Configuration
+
+**CRITICAL: Never use @eslint/js package**
+- ❌ **NEVER** use `@eslint/js` package (versioning is broken in npm registry)
+- ✅ Use only `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`
+- ✅ Configure ESLint with flat config using TypeScript ESLint recommended rules only
+- ✅ Remove any imports of `@eslint/js` from eslint.config.js
+
+**Correct ESLint Setup**:
+```javascript
+import typescript from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
+
+export default [
+  {
+    files: ['**/*.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+    },
+    plugins: {
+      '@typescript-eslint': typescript,
+    },
+    rules: {
+      ...typescript.configs.recommended.rules,
+      // Your custom rules
+    },
+  },
+];
+```
+
 ## Common Development Commands
 
 ### Build and Development

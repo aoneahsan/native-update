@@ -1,4 +1,3 @@
-import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 
@@ -58,7 +57,6 @@ export default [
       '@typescript-eslint': typescript,
     },
     rules: {
-      ...js.configs.recommended.rules,
       ...typescript.configs.recommended.rules,
       'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
