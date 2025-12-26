@@ -39,6 +39,7 @@ describe('BundleManager', () => {
 
     // Initialize bundle manager with mocked preferences
     const { ConfigManager } = await import('../core/config');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ConfigManager.getInstance().set('preferences', mockPreferences as any);
     await bundleManager.initialize();
   });
@@ -68,7 +69,7 @@ describe('BundleManager', () => {
         // Missing required fields
         version: '1.0.0',
         size: 1024,
-      } as any;
+      } as unknown as BundleInfo;
 
       await expect(bundleManager.saveBundleInfo(bundle)).rejects.toThrow();
     });

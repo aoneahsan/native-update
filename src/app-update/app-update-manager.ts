@@ -27,7 +27,7 @@ export class AppUpdateManager implements AppUpdatePlugin {
   private checker: AppUpdateChecker;
   private installer: AppUpdateInstaller;
   private platformUpdate: PlatformAppUpdate;
-  private listeners: Map<string, Set<(data: any) => void>> = new Map();
+  private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
 
   constructor(config: PluginConfig) {
     this.config = config as ExtendedConfig;
@@ -206,7 +206,7 @@ export class AppUpdateManager implements AppUpdatePlugin {
 
   addListener(
     eventName: string,
-    listenerFunc: (data: any) => void
+    listenerFunc: (data: unknown) => void
   ): PluginListenerHandle {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, new Set());
@@ -232,7 +232,7 @@ export class AppUpdateManager implements AppUpdatePlugin {
     }
   }
 
-  private emit(eventName: string, data: any): void {
+  private emit(eventName: string, data: unknown): void {
     const listeners = this.listeners.get(eventName);
     if (listeners) {
       listeners.forEach((listener) => {

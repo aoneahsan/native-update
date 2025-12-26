@@ -368,7 +368,8 @@ export class SecurityValidator {
     certificate: string
   ): Promise<boolean> {
     // Certificate pinning is not available in PluginConfig type
-    const certificatePins = (this.configManager as any).certificatePins;
+    interface CertificatePin { hostname: string; sha256: string }
+    const certificatePins = (this.configManager as unknown as { certificatePins?: CertificatePin[] }).certificatePins;
     if (
       !certificatePins ||
       !Array.isArray(certificatePins) ||
@@ -379,7 +380,7 @@ export class SecurityValidator {
     }
 
     const hostPins = certificatePins.filter(
-      (pin: any) => pin.hostname === hostname
+      (pin) => pin.hostname === hostname
     );
     if (hostPins.length === 0) {
       // No pins for this host, allow connection
@@ -388,12 +389,12 @@ export class SecurityValidator {
 
     // Check if certificate matches any of the pins
     const certificateHash = await this.calculateCertificateHash(certificate);
-    const isValid = hostPins.some((pin: any) => pin.sha256 === certificateHash);
+    const isValid = hostPins.some((pin) => pin.sha256 === certificateHash);
 
     if (!isValid) {
       this.logger.error('Certificate pinning validation failed', {
         hostname,
-        expectedPins: hostPins.map((p: any) => p.sha256),
+        expectedPins: hostPins.map((p) => p.sha256),
         actualHash: certificateHash,
       });
     }

@@ -21,7 +21,7 @@ export interface ReviewConditions {
   minimumSignificantEvents?: number;
   requirePositiveEvents?: boolean;
   maxPromptsPerVersion?: number;
-  customConditions?: Record<string, any>;
+  customConditions?: Record<string, unknown>;
 }
 
 export interface StoreReviewUrl {

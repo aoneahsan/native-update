@@ -21,7 +21,7 @@ export class AppReviewManager implements AppReviewPlugin {
   private conditionsChecker: ReviewConditionsChecker;
   private rateLimiter: ReviewRateLimiter;
   private platformHandler: PlatformReviewHandler;
-  private listeners: Map<string, Set<(data: any) => void>> = new Map();
+  private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
 
   constructor(config: PluginConfig) {
     this.config = config;
@@ -175,15 +175,15 @@ export class AppReviewManager implements AppReviewPlugin {
     }
   }
 
-  async getReviewMetrics(): Promise<any> {
+  async getReviewMetrics(): Promise<Record<string, unknown>> {
     try {
       this.logger.log('Getting review metrics');
       const metrics = await this.rateLimiter.getMetrics();
       const conditions = await this.conditionsChecker.getStatus();
 
       return {
-        ...metrics,
-        ...conditions,
+        ...(metrics as unknown as Record<string, unknown>),
+        ...(conditions as unknown as Record<string, unknown>),
       };
     } catch (error) {
       this.logger.error('Failed to get review metrics', error);
@@ -193,7 +193,7 @@ export class AppReviewManager implements AppReviewPlugin {
 
   addListener(
     eventName: string,
-    listenerFunc: (data: any) => void
+    listenerFunc: (data: unknown) => void
   ): PluginListenerHandle {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, new Set());
@@ -219,7 +219,7 @@ export class AppReviewManager implements AppReviewPlugin {
     }
   }
 
-  private emit(eventName: string, data: any): void {
+  private emit(eventName: string, data: unknown): void {
     const listeners = this.listeners.get(eventName);
     if (listeners) {
       listeners.forEach((listener) => {

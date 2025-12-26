@@ -108,7 +108,7 @@ export class ReviewConditionsChecker {
     await this.saveStoredData(data);
   }
 
-  async getStatus(): Promise<any> {
+  async getStatus(): Promise<unknown> {
     const data = await this.getStoredData();
     return {
       installDate: new Date(data.installDate),
@@ -173,7 +173,7 @@ export class ReviewConditionsChecker {
     return '1.0.0';
   }
 
-  private evaluateCustomCondition(key: string, value: any): boolean {
+  private evaluateCustomCondition(key: string, value: unknown): boolean {
     // Implement custom condition evaluation logic
     // This can be extended based on specific needs
     switch (key) {

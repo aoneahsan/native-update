@@ -6,14 +6,14 @@ export interface UpdateEvent {
   success: boolean;
   duration?: number;
   error?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AnalyticsProvider {
   trackEvent(event: UpdateEvent): Promise<void>;
-  trackError(error: Error, context?: Record<string, any>): Promise<void>;
+  trackError(error: Error, context?: Record<string, unknown>): Promise<void>;
   setUserId(userId: string): void;
-  setProperties(properties: Record<string, any>): void;
+  setProperties(properties: Record<string, unknown>): void;
 }
 
 export class Analytics {
@@ -21,7 +21,7 @@ export class Analytics {
   private providers: AnalyticsProvider[] = [];
   private readonly logger: Logger;
   private userId?: string;
-  private properties: Record<string, any> = {};
+  private properties: Record<string, unknown> = {};
 
   private constructor() {
     this.logger = Logger.getInstance();
@@ -67,7 +67,7 @@ export class Analytics {
   /**
    * Track an error
    */
-  async trackError(error: Error, context?: Record<string, any>): Promise<void> {
+  async trackError(error: Error, context?: Record<string, unknown>): Promise<void> {
     this.logger.error('Analytics error', { error, context });
 
     const promises = this.providers.map((provider) =>
@@ -90,7 +90,7 @@ export class Analytics {
   /**
    * Set global properties
    */
-  setProperties(properties: Record<string, any>): void {
+  setProperties(properties: Record<string, unknown>): void {
     this.properties = { ...this.properties, ...properties };
     this.providers.forEach((provider) =>
       provider.setProperties(this.properties)
@@ -169,7 +169,7 @@ export class Analytics {
  */
 export class ConsoleAnalyticsProvider implements AnalyticsProvider {
   private userId?: string;
-  private properties: Record<string, any> = {};
+  private properties: Record<string, unknown> = {};
 
   async trackEvent(event: UpdateEvent): Promise<void> {
     console.log('[Analytics]', event.type, {
@@ -179,7 +179,7 @@ export class ConsoleAnalyticsProvider implements AnalyticsProvider {
     });
   }
 
-  async trackError(error: Error, context?: Record<string, any>): Promise<void> {
+  async trackError(error: Error, context?: Record<string, unknown>): Promise<void> {
     console.error('[Analytics Error]', {
       error: error.message,
       stack: error.stack,
@@ -193,7 +193,7 @@ export class ConsoleAnalyticsProvider implements AnalyticsProvider {
     this.userId = userId;
   }
 
-  setProperties(properties: Record<string, any>): void {
+  setProperties(properties: Record<string, unknown>): void {
     this.properties = { ...this.properties, ...properties };
   }
 }

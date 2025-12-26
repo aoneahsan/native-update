@@ -7,6 +7,7 @@ import type {
 } from '../definitions';
 
 import { BackgroundUpdateType, UpdateErrorCode } from '../definitions';
+import type { PluginConfig } from '../core/config';
 
 export class BackgroundScheduler {
   private config: BackgroundUpdateConfig | null = null;
@@ -157,7 +158,7 @@ export class BackgroundScheduler {
         size: updateAvailable ? 1024 * 1024 * 5 : undefined, // 5MB
       };
       // Store checksum separately if needed
-      (result as any).checksum = updateAvailable ? 'abc123def456' : undefined;
+      (result as LatestVersion & { checksum?: string }).checksum = updateAvailable ? 'abc123def456' : undefined;
       return result;
     } catch (error) {
       console.error('Failed to check live update:', error);
@@ -172,7 +173,7 @@ export class BackgroundScheduler {
     // Implementation for sending notifications
     try {
       // Check if notifications are enabled in config
-      const notificationEnabled = (this.config as any)?.notificationEnabled;
+      const notificationEnabled = (this.config as PluginConfig & { notificationEnabled?: boolean })?.notificationEnabled;
       if (!notificationEnabled) {
         return false;
       }

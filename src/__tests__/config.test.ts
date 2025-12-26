@@ -7,6 +7,7 @@ describe('ConfigManager', () => {
 
   beforeEach(() => {
     // Reset singleton
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ConfigManager['instance'] = undefined as any;
     configManager = ConfigManager.getInstance();
   });

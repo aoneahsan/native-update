@@ -82,7 +82,7 @@ export class PlatformAppUpdate {
       currentVersion: appInfo.version,
       buildNumber: appInfo.build,
       packageName: appInfo.id,
-      platform: this.platform as any,
+      platform: this.platform as 'web' | 'ios' | 'android',
       minimumVersion: this.config.minimumVersion,
     };
   }
@@ -108,7 +108,7 @@ export class PlatformAppUpdate {
       url = this.config.webUpdateUrl || window.location.origin;
     }
 
-    return { url, platform: platform as any };
+    return { url, platform: platform as 'web' | 'ios' | 'android' };
   }
 
   async openUrl(url: string): Promise<void> {

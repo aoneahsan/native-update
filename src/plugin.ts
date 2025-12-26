@@ -384,6 +384,7 @@ class NativeUpdatePluginWeb implements NativeUpdatePlugin {
   // Event listener methods
   async addListener(
     eventName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     listenerFunc: (event: any) => void
   ): Promise<import('./definitions').PluginListenerHandle> {
     const eventEmitter = this.pluginManager.getEventEmitter();

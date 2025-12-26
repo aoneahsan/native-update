@@ -70,7 +70,7 @@ export class PlatformReviewHandler {
       url = this.config.webReviewUrl || window.location.origin + '/review';
     }
 
-    return { url, platform: platform as any };
+    return { url, platform: platform as 'web' | 'ios' | 'android' };
   }
 
   async openUrl(url: string): Promise<void> {

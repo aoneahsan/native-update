@@ -63,7 +63,7 @@ export class AppUpdateNotifier {
     // Emit error event
     this.emitUpdateEvent('appUpdateFailed', {
       error: error.message,
-      code: (error as any).code || 'UNKNOWN_ERROR',
+      code: (error as Error & { code?: string }).code || 'UNKNOWN_ERROR',
     });
   }
 
@@ -104,14 +104,14 @@ export class AppUpdateNotifier {
       tag: 'app-update-ready',
     };
     // Actions are not supported in standard NotificationOptions
-    (notificationOptions as any).actions = [
+    (notificationOptions as NotificationOptions & { actions?: Array<{ action: string; title: string }> }).actions = [
       { action: 'install', title: 'Install Now' },
       { action: 'later', title: 'Later' },
     ];
 
     const notification = new Notification('Update Ready', notificationOptions);
 
-    notification.onclick = (event: any) => {
+    notification.onclick = (event: Event & { action?: string }) => {
       if (event.action === 'install') {
         this.emitUpdateEvent('appUpdateInstallClicked', {});
       }
@@ -119,7 +119,7 @@ export class AppUpdateNotifier {
     };
   }
 
-  private emitUpdateEvent(eventName: string, data: any): void {
+  private emitUpdateEvent(eventName: string, data: unknown): void {
     // Emit custom event
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(eventName, { detail: data }));

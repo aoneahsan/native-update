@@ -52,8 +52,8 @@ describe('SecurityValidator', () => {
     });
 
     it('should handle null and undefined', () => {
-      expect(SecurityValidator.sanitizeInput(null as any)).toBe('');
-      expect(SecurityValidator.sanitizeInput(undefined as any)).toBe('');
+      expect(SecurityValidator.sanitizeInput(null as unknown as string)).toBe('');
+      expect(SecurityValidator.sanitizeInput(undefined as unknown as string)).toBe('');
     });
   });
 

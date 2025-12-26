@@ -161,7 +161,7 @@ export class PerformanceMonitor {
     const cpuCores = navigator.hardwareConcurrency || 1;
 
     // Estimate available memory (if available)
-    const memory = (navigator as any).deviceMemory || 4; // GB
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4; // GB
 
     // Check storage (placeholder - implement per platform)
     const storage = 1000; // MB - placeholder

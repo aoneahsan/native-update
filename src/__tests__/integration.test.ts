@@ -23,7 +23,7 @@ describe('Integration Tests', () => {
       try {
         const result = await plugin.sync();
         expect(result).toBeDefined();
-      } catch (error: any) {
+      } catch (error: unknown) {
         expect(error).toBeDefined();
       }
     });
