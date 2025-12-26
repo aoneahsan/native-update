@@ -107,12 +107,20 @@ export class DownloadManager {
       const timeout = this.configManager.get('downloadTimeout');
       const timeoutId = setTimeout(() => abortController.abort(), timeout);
 
+      // Build headers including Range header for resume support
+      const headers: HeadersInit = {
+        'Cache-Control': 'no-cache',
+        Accept: 'application/octet-stream, application/zip',
+      };
+
+      // Add Range header if resuming from a previous position
+      if (downloadState.resumePosition && downloadState.resumePosition > 0) {
+        headers['Range'] = `bytes=${downloadState.resumePosition}-`;
+      }
+
       const response = await fetch(url, {
         signal: abortController.signal,
-        headers: {
-          'Cache-Control': 'no-cache',
-          Accept: 'application/octet-stream, application/zip',
-        },
+        headers,
       });
 
       clearTimeout(timeoutId);
@@ -176,11 +184,16 @@ export class DownloadManager {
 
         // Report progress
         if (onProgress) {
-          const percent = Math.round((receivedBytes / totalBytes) * 100);
+          // Calculate progress accounting for resumed position
+          const resumeOffset = downloadState.resumePosition || 0;
+          const adjustedLoaded = resumeOffset + receivedBytes;
+          const adjustedTotal = resumeOffset + totalBytes;
+
+          const percent = Math.round((adjustedLoaded / adjustedTotal) * 100);
           onProgress({
             percent,
-            bytesDownloaded: receivedBytes,
-            totalBytes,
+            bytesDownloaded: adjustedLoaded,
+            totalBytes: adjustedTotal,
             bundleId,
           });
         }
@@ -213,6 +226,51 @@ export class DownloadManager {
     } finally {
       // Clean up
       this.activeDownloads.delete(bundleId);
+    }
+  }
+
+  /**
+   * Resume a previously interrupted download
+   */
+  async resumeDownload(
+    url: string,
+    bundleId: string,
+    partialData: Blob,
+    onProgress?: (event: DownloadProgressEvent) => void
+  ): Promise<Blob> {
+    // Update download state with resume position
+    const downloadState = this.activeDownloads.get(bundleId);
+    if (downloadState) {
+      downloadState.resumePosition = partialData.size;
+    }
+
+    try {
+      // Download remaining bytes
+      const remainingData = await this.download(url, bundleId, onProgress);
+
+      // Combine partial and remaining data
+      return new Blob([partialData, remainingData]);
+    } catch (error) {
+      // Resume failed, clean up
+      this.activeDownloads.delete(bundleId);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a download can be resumed
+   */
+  async canResume(url: string): Promise<boolean> {
+    try {
+      const response = await fetch(url, {
+        method: 'HEAD',
+      });
+
+      // Check if server supports Range requests
+      const acceptRanges = response.headers.get('Accept-Ranges');
+      return acceptRanges === 'bytes';
+    } catch {
+      return false;
     }
   }
 

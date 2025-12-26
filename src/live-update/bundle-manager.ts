@@ -350,7 +350,24 @@ export class BundleManager {
    */
   async isStorageLimitExceeded(additionalSize: number = 0): Promise<boolean> {
     const totalUsed = await this.getTotalStorageUsed();
-    const maxStorage = this.configManager.get('maxBundleSize') * 3; // Allow 3x max bundle size
+
+    // Try to get actual device storage quota
+    let maxStorage = this.configManager.get('maxBundleSize') * 3; // Default: 3x max bundle size
+
+    try {
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        const estimate = await navigator.storage.estimate();
+        if (estimate.quota) {
+          // Use actual quota, but keep 100MB buffer for system
+          const bufferBytes = 100 * 1024 * 1024; // 100MB
+          maxStorage = Math.max(maxStorage, estimate.quota - bufferBytes);
+        }
+      }
+    } catch {
+      // Storage API not available, use config-based limit
+      this.logger.warn('Storage API not available for quota check, using config limit');
+    }
+
     return totalUsed + additionalSize > maxStorage;
   }
 

@@ -1,6 +1,7 @@
 import Foundation
 import Capacitor
 import CommonCrypto
+import ZIPFoundation
 
 class LiveUpdatePlugin {
     private weak var plugin: CAPPlugin?
@@ -548,40 +549,81 @@ class LiveUpdatePlugin {
     
     private func extractAndApplyBundle(_ bundleUrl: URL, bundleId: String) throws {
         let extractedPath = getUpdatesDirectory().appendingPathComponent(bundleId).appendingPathComponent("www")
-        
-        // Extract the zip bundle
-        try extractZipBundle(from: bundleUrl, to: extractedPath)
-        
-        // Update bundle info with extracted path
-        var bundleInfo = getAllBundles().first { $0["bundleId"] as? String == bundleId } ?? [:]
-        bundleInfo["extractedPath"] = extractedPath.path
-        bundleInfo["status"] = "READY"
-        saveBundleInfo(bundleInfo)
-        
-        // Configure WebView to use new path
-        configureWebViewPath(extractedPath.path)
+
+        do {
+            // Extract the zip bundle
+            try extractZipBundle(from: bundleUrl, to: extractedPath)
+
+            // Update bundle info with extracted path
+            var bundleInfo = getAllBundles().first { $0["bundleId"] as? String == bundleId } ?? [:]
+            bundleInfo["extractedPath"] = extractedPath.path
+            bundleInfo["status"] = "READY"
+            saveBundleInfo(bundleInfo)
+
+            // Configure WebView to use new path
+            configureWebViewPath(extractedPath.path)
+        } catch {
+            // Get the safe bundle path (current working bundle)
+            let safePath = UserDefaults.standard.string(forKey: "native_update_webview_path") ?? "/"
+
+            // Rollback to safe bundle
+            try? rollbackToSafeBundle(currentPath: extractedPath.path, safePath: safePath)
+
+            // Re-throw the error
+            throw error
+        }
     }
     
     private func extractZipBundle(from zipUrl: URL, to destinationUrl: URL) throws {
-        // Create destination directory
-        try FileManager.default.createDirectory(at: destinationUrl, withIntermediateDirectories: true)
-        
-        // Use FileManager to extract (requires iOS unzip library or manual implementation)
-        // For now, we'll use a simple file copy as placeholder
-        // In production, you would use a library like ZIPFoundation or SSZipArchive
-        
-        // This is a placeholder - in real implementation, use a proper unzip library
-        throw NSError(domain: "LiveUpdatePlugin", code: 5, userInfo: [
-            NSLocalizedDescriptionKey: "Unzip functionality not implemented. Please integrate a zip library like ZIPFoundation."
-        ])
+        // Ensure destination directory exists
+        try FileManager.default.createDirectory(at: destinationUrl, withIntermediateDirectories: true, attributes: nil)
+
+        // Extract the ZIP archive using ZIPFoundation
+        try FileManager.default.unzipItem(at: zipUrl, to: destinationUrl)
+
+        // Verify extraction succeeded by checking for index.html
+        let indexPath = destinationUrl.appendingPathComponent("index.html")
+        guard FileManager.default.fileExists(atPath: indexPath.path) else {
+            throw NSError(domain: "LiveUpdatePlugin", code: 6, userInfo: [
+                NSLocalizedDescriptionKey: "Bundle extraction failed: index.html not found in extracted bundle"
+            ])
+        }
+
+        // Clean up the ZIP file after successful extraction
+        try? FileManager.default.removeItem(at: zipUrl)
     }
     
     private func configureWebViewPath(_ path: String) {
         // Store the active bundle path
         UserDefaults.standard.set(path, forKey: "native_update_webview_path")
-        
-        // The actual WebView path configuration happens in the main plugin
-        // when the WebView is loaded or reloaded
+
+        // Configure Capacitor WebView to use the new bundle path
+        DispatchQueue.main.async { [weak self] in
+            guard let bridge = self?.plugin?.bridge else { return }
+
+            // Set the server base path to the extracted bundle directory
+            bridge.setServerBasePath(path)
+
+            // Optionally trigger a WebView reload (commented out by default)
+            // Uncomment if you want automatic reload after bundle extraction
+            // bridge.webView?.reload()
+        }
+    }
+
+    private func rollbackToSafeBundle(currentPath: String, safePath: String) throws {
+        // Remove the failed bundle directory
+        let currentUrl = URL(fileURLWithPath: currentPath)
+        try? FileManager.default.removeItem(at: currentUrl)
+
+        // Restore to the safe bundle
+        DispatchQueue.main.async { [weak self] in
+            guard let bridge = self?.plugin?.bridge else { return }
+            bridge.setServerBasePath(safePath)
+            bridge.webView?.reload()
+        }
+
+        // Update stored path
+        UserDefaults.standard.set(safePath, forKey: "native_update_webview_path")
     }
 }
 

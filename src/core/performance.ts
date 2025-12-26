@@ -163,8 +163,21 @@ export class PerformanceMonitor {
     // Estimate available memory (if available)
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4; // GB
 
-    // Check storage (placeholder - implement per platform)
-    const storage = 1000; // MB - placeholder
+    // Check available storage using Storage API
+    let storage = 1000; // MB - default fallback
+    try {
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        const estimate = await navigator.storage.estimate();
+        if (estimate.quota && estimate.usage) {
+          // Calculate available storage in MB
+          const availableBytes = estimate.quota - estimate.usage;
+          storage = Math.floor(availableBytes / (1024 * 1024)); // Convert to MB
+        }
+      }
+    } catch (error) {
+      // Storage API not supported or permission denied, use fallback
+      this.logger.warn('Storage API not available, using default estimate', error);
+    }
 
     const suitable = cpuCores >= 2 && memory >= 2 && storage >= 100;
 
