@@ -89,6 +89,36 @@ export default [
 - `pnpm run prettier` - Format code with Prettier
 - `pnpm run swiftlint` - Lint Swift code (when iOS implementation exists)
 
+## Assets and Design Guidelines
+
+**CRITICAL: Use SVG for all visual assets**
+
+- ✅ **ALWAYS** use SVG format for icons, logos, illustrations, and graphics
+- ✅ Create high-quality, scalable SVG assets with proper optimization
+- ✅ Use SVG inline in documentation when possible for better rendering
+- ✅ Optimize SVGs with tools like SVGO before committing
+- ❌ **NEVER** use PNG, JPG, or other raster formats unless absolutely necessary (e.g., photos, screenshots)
+- ❌ Avoid bloated SVGs with unnecessary metadata or complex paths
+
+**Benefits of SVG:**
+- Infinitely scalable without quality loss
+- Smaller file sizes compared to high-res rasters
+- Can be styled with CSS
+- Better for documentation and web display
+- Version control friendly (text-based)
+
+**When raster formats are acceptable:**
+- Screenshots of actual app interfaces (use PNG)
+- Photographic content (use optimized JPG/WebP)
+- Generated charts/graphs from external tools (convert to SVG if possible)
+
+**SVG Best Practices:**
+- Keep viewBox attribute for proper scaling
+- Remove unnecessary groups and transforms
+- Use semantic naming for IDs and classes
+- Ensure proper accessibility with title and desc elements
+- Minimize path complexity while maintaining visual quality
+
 ## Architecture and Structure
 
 ### Plugin Architecture

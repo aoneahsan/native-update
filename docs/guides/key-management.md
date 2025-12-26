@@ -277,7 +277,7 @@ cat intermediate.crt root.crt > chain.pem
 
 - Review [Security Best Practices](./security-best-practices.md)
 - Implement [Bundle Signing](../BUNDLE_SIGNING.md)
-- Set up [CI/CD Integration](../ci-cd-integration.md)
+- Set up [Deployment Guide](./deployment-guide.md) for production deployment
 
 ---
 
