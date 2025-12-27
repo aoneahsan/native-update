@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Container } from '@/components/ui/Container';
-import { LinkedInLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
+import { GitHubLogoIcon, LinkedInLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
 
 export function Footer() {
   return (
@@ -30,10 +30,20 @@ export function Footer() {
                 </svg>
               </a>
               <a
+                href="https://github.com/aoneahsan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-brand-600 transition-colors"
+                title="GitHub"
+              >
+                <GitHubLogoIcon className="h-5 w-5" />
+              </a>
+              <a
                 href="https://linkedin.com/in/aoneahsan"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-brand-600 transition-colors"
+                title="LinkedIn"
               >
                 <LinkedInLogoIcon className="h-5 w-5" />
               </a>
@@ -42,6 +52,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-brand-600 transition-colors"
+                title="Twitter"
               >
                 <TwitterLogoIcon className="h-5 w-5" />
               </a>

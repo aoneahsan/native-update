@@ -1,4 +1,5 @@
 {
+  "id": "com.aoneahsan.nativeupdate",
   "name": "Native Update - OTA Updates for Capacitor",
   "short_name": "Native Update",
   "description": "The complete update solution for Capacitor apps. Deploy instant OTA updates, manage native app store updates, and collect in-app reviews.",
