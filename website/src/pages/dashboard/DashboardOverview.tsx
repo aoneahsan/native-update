@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { Container } from '@/components/ui/Container';
@@ -30,12 +30,12 @@ export function DashboardOverview() {
       if (!user) return;
 
       try {
-        const userDocRef = collection(db, 'users');
-        const userQuery = query(userDocRef, where('uid', '==', user.uid), limit(1));
-        const userSnapshot = await getDocs(userQuery);
+        // Direct document access - more efficient and works with security rules
+        const userDocRef = doc(db, 'users', user.uid);
+        const userSnapshot = await getDoc(userDocRef);
 
-        if (!userSnapshot.empty) {
-          setUserData(userSnapshot.docs[0].data() as User);
+        if (userSnapshot.exists()) {
+          setUserData(userSnapshot.data() as User);
         }
 
         const buildsRef = collection(db, 'builds');

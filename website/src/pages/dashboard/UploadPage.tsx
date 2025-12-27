@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { Container } from '@/components/ui/Container';
@@ -184,14 +184,13 @@ export function UploadPage() {
         updatedAt: serverTimestamp(),
       });
 
-      const userRef = collection(db, 'users');
-      const userQuery = query(userRef, where('uid', '==', user.uid));
-      const userSnapshot = await getDocs(userQuery);
-      if (!userSnapshot.empty) {
-        const userDoc = userSnapshot.docs[0];
-        await updateDoc(doc(db, 'users', userDoc.id), {
-          buildsCount: (userDoc.data().buildsCount || 0) + 1,
-          storageUsed: (userDoc.data().storageUsed || 0) + driveResult.size,
+      const userDocRef = doc(db, 'users', user.uid);
+      const userSnapshot = await getDoc(userDocRef);
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data();
+        await updateDoc(userDocRef, {
+          buildsCount: (userData.buildsCount || 0) + 1,
+          storageUsed: (userData.storageUsed || 0) + driveResult.size,
           updatedAt: serverTimestamp(),
         });
       }

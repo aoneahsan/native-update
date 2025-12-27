@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
@@ -67,12 +67,11 @@ export function SettingsPage() {
     if (!user) return;
 
     try {
-      const userDocRef = collection(db, 'users');
-      const userQuery = query(userDocRef, where('uid', '==', user.uid));
-      const userSnapshot = await getDocs(userQuery);
+      const userDocRef = doc(db, 'users', user.uid);
+      const userSnapshot = await getDoc(userDocRef);
 
-      if (!userSnapshot.empty) {
-        const data = userSnapshot.docs[0].data() as User;
+      if (userSnapshot.exists()) {
+        const data = userSnapshot.data() as User;
         setUserData(data);
         setPreferences(data.preferences);
       }
@@ -89,20 +88,13 @@ export function SettingsPage() {
 
     setSaving(true);
     try {
-      const userDocRef = collection(db, 'users');
-      const userQuery = query(userDocRef, where('uid', '==', user.uid));
-      const userSnapshot = await getDocs(userQuery);
+      await updateDoc(doc(db, 'users', user.uid), {
+        preferences,
+        updatedAt: serverTimestamp(),
+      });
 
-      if (!userSnapshot.empty) {
-        const userDocId = userSnapshot.docs[0].id;
-        await updateDoc(doc(db, 'users', userDocId), {
-          preferences,
-          updatedAt: new Date(),
-        });
-
-        setUserData({ ...userData, preferences });
-        toast.success('Settings saved', 'Your preferences have been updated');
-      }
+      setUserData({ ...userData, preferences });
+      toast.success('Settings saved', 'Your preferences have been updated');
     } catch (error) {
       console.error('Error saving preferences:', error);
       toast.error('Failed to save settings', 'Please try again later');
@@ -169,14 +161,7 @@ export function SettingsPage() {
 
     setDeleting(true);
     try {
-      const userDocRef = collection(db, 'users');
-      const userQuery = query(userDocRef, where('uid', '==', user.uid));
-      const userSnapshot = await getDocs(userQuery);
-
-      if (!userSnapshot.empty) {
-        await deleteDoc(doc(db, 'users', userSnapshot.docs[0].id));
-      }
-
+      await deleteDoc(doc(db, 'users', user.uid));
       await deleteUser(user);
 
       toast.success('Account deleted', 'Your account has been permanently deleted');

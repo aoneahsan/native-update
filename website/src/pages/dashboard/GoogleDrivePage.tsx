@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { Container } from '@/components/ui/Container';
@@ -39,12 +39,11 @@ export function GoogleDrivePage() {
     if (!user) return;
 
     try {
-      const userDocRef = collection(db, 'users');
-      const userQuery = query(userDocRef, where('uid', '==', user.uid));
-      const userSnapshot = await getDocs(userQuery);
+      const userDocRef = doc(db, 'users', user.uid);
+      const userSnapshot = await getDoc(userDocRef);
 
-      if (!userSnapshot.empty) {
-        const data = userSnapshot.docs[0].data() as User;
+      if (userSnapshot.exists()) {
+        const data = userSnapshot.data() as User;
         setUserData(data);
 
         if (data.driveConnected) {
