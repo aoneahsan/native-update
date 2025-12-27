@@ -30,7 +30,7 @@ export default function PrivacyPage() {
             <p className="text-gray-700">
               Welcome to Native Update (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your
               personal data and respecting your privacy rights. This Privacy Policy explains how we collect,
-              use, store, and protect your information when you use our service at nativeupdate.dev and
+              use, store, and protect your information when you use our service at native-update.web.app and
               related mobile applications.
             </p>
             <p className="mt-4 text-gray-700">

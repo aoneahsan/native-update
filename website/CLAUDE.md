@@ -4,7 +4,7 @@
 - **Name:** Native Update Marketing Website & Dashboard
 - **Type:** React + Vite + TypeScript SPA
 - **Purpose:** Marketing site and user dashboard for Native Update plugin
-- **URL:** https://nativeupdate.dev
+- **URL:** https://native-update.web.app
 
 ## Dev Server Port
 - **Port:** 5942

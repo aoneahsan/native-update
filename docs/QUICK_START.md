@@ -588,8 +588,8 @@ console.log('Checking update configuration...');
 
 ## Support
 
-- 📖 [Documentation](https://github.com/aoneahsan/native-update)
-- 🐛 [Issue Tracker](https://github.com/aoneahsan/native-update/issues)
-- 💬 [Discussions](https://github.com/aoneahsan/native-update/discussions)
+- 📖 [Documentation](https://native-update.web.app/docs)
+- 📦 [NPM Package](https://www.npmjs.com/package/native-update)
+- 📧 Email: aoneahsan@gmail.com
 
 Happy updating! 🚀

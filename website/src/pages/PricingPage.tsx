@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { CheckCircledIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon } from '@radix-ui/react-icons';
 
 export default function PricingPage() {
   return (
@@ -66,14 +66,16 @@ export default function PricingPage() {
                   </Button>
                 </Link>
                 <a
-                  href="https://github.com/aoneahsan/native-update"
+                  href="https://www.npmjs.com/package/native-update"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 block"
                 >
                   <Button size="lg" variant="outline" className="w-full">
-                    <GitHubLogoIcon className="mr-2 h-5 w-5" />
-                    View on GitHub
+                    <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331z" />
+                    </svg>
+                    View on NPM
                   </Button>
                 </a>
               </div>

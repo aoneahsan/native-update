@@ -45,14 +45,21 @@ await NativeUpdate.configure({
               </CardHeader>
               <CardContent className="text-gray-600">
                 <p>
-                  Full API documentation is available in the{' '}
+                  Full API documentation is available on the{' '}
                   <a
-                    href="https://github.com/aoneahsan/native-update/tree/main/docs/api"
+                    href="https://www.npmjs.com/package/native-update"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-brand-600 hover:underline"
                   >
-                    GitHub repository
+                    NPM package page
+                  </a>
+                  . For questions, please{' '}
+                  <a
+                    href="mailto:aoneahsan@gmail.com"
+                    className="text-brand-600 hover:underline"
+                  >
+                    contact us
                   </a>
                   .
                 </p>

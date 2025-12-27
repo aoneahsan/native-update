@@ -30,7 +30,7 @@ ${chalk.bold('Quick Start:')}
   ${chalk.gray('npx native-update bundle create ./www')}     # Create update bundle
 
 ${chalk.bold('Documentation:')}
-  ${chalk.blue('https://github.com/aoneahsan/native-update/blob/main/docs/cli-reference.md')}`)
+  ${chalk.blue('https://native-update.web.app/docs')}`)
   .version(packageJson.version)
   .configureHelp({
     sortSubcommands: true,
@@ -249,14 +249,13 @@ program.on('--help', () => {
   console.log('    $ npx native-update backend create vercel --with-admin');
   console.log('');
   console.log(chalk.bold('Resources:'));
-  console.log('  Documentation: ' + chalk.blue('https://github.com/aoneahsan/native-update/blob/main/docs/'));
-  console.log('  CLI Reference: ' + chalk.blue('https://github.com/aoneahsan/native-update/blob/main/docs/cli-reference.md'));
-  console.log('  Quick Start:   ' + chalk.blue('https://github.com/aoneahsan/native-update/blob/main/docs/getting-started/quick-start.md'));
+  console.log('  Website:       ' + chalk.blue('https://native-update.web.app'));
+  console.log('  Documentation: ' + chalk.blue('https://native-update.web.app/docs'));
+  console.log('  NPM Package:   ' + chalk.blue('https://www.npmjs.com/package/native-update'));
   console.log('');
   console.log(chalk.bold('Support:'));
-  console.log('  Issues:  ' + chalk.blue('https://github.com/aoneahsan/native-update/issues'));
-  console.log('  Author:  Ahsan Mahmood (' + chalk.blue('https://aoneahsan.com') + ')');
   console.log('  Email:   ' + chalk.blue('aoneahsan@gmail.com'));
+  console.log('  Author:  Ahsan Mahmood (' + chalk.blue('https://aoneahsan.com') + ')');
 });
 
 // Error handling

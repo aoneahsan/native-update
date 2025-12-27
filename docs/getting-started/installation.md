@@ -300,8 +300,8 @@ After successful installation:
 If you encounter any issues during installation:
 
 - Check our [Testing Guide](../guides/testing-guide.md)
-- Search existing [GitHub Issues](https://github.com/aoneahsan/native-update/issues)
-- Create a new issue with detailed information about your setup
+- Visit [native-update.web.app/contact](https://native-update.web.app/contact) for support
+- Email aoneahsan@gmail.com with detailed information about your setup
 
 ---
 

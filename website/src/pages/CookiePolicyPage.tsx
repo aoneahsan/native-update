@@ -27,7 +27,7 @@ export default function CookiePolicyPage() {
             <h2 className="mb-4 text-2xl font-semibold">1. Introduction</h2>
             <p className="text-gray-700">
               This Cookie Policy explains how Native Update (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) uses cookies
-              and similar technologies when you visit our website at nativeupdate.dev. This policy
+              and similar technologies when you visit our website at native-update.web.app. This policy
               is designed to help you understand what cookies are, how we use them, and your choices
               regarding their use.
             </p>

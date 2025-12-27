@@ -21,10 +21,10 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 
 ## Setting Up Development Environment
 
-1. Clone the repository:
+1. Get the source code (contact aoneahsan@gmail.com for access):
 
 ```bash
-git clone https://github.com/aoneahsan/native-update.git
+# After receiving access, clone and enter the directory
 cd native-update
 ```
 

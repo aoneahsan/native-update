@@ -32,12 +32,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aoneahsan/native-update.git"
+    "url": "https://native-update.web.app"
   },
   "bugs": {
-    "url": "https://github.com/aoneahsan/native-update/issues"
+    "url": "https://native-update.web.app/contact"
   },
-  "homepage": "https://github.com/aoneahsan/native-update#readme",
+  "homepage": "https://native-update.web.app",
   "keywords": [
     "capacitor",
     "plugin",

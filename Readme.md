@@ -451,10 +451,10 @@ This package is **open-source** and created by **Ahsan Mahmood** for the develop
 
 ### Community Resources
 
-- **[GitHub Repository](https://github.com/aoneahsan/native-update)** - Source code and issues
+- **[NPM Package](https://www.npmjs.com/package/native-update)** - Package and versions
+- **[Website](https://native-update.web.app)** - Official website and dashboard
 - **[Documentation](./docs/README.md)** - Comprehensive documentation
 - **[Examples](./docs/examples/)** - Real-world usage examples
-- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute
 
 ### Professional Support
 
@@ -477,15 +477,15 @@ MIT License - see [LICENSE](./LICENSE) for details.
 ## Support
 
 - 📧 Email: aoneahsan@gmail.com
-- 🌐 Website: [Ahsan Mahmood](https://aoneahsan.com)
+- 🌐 Website: [native-update.web.app](https://native-update.web.app)
+- 📦 NPM: [native-update](https://www.npmjs.com/package/native-update)
 - 💼 LinkedIn: [Ahsan Mahmood](https://linkedin.com/in/aoneahsan)
-- 🐛 Issues: [GitHub Issues](https://github.com/aoneahsan/native-update/issues)
 
 ## Author
 
 **Ahsan Mahmood**
 
 - Portfolio: [aoneahsan.com](https://aoneahsan.com)
-- GitHub: [aoneahsan](https://github.com/aoneahsan)
+- LinkedIn: [linkedin.com/in/aoneahsan](https://linkedin.com/in/aoneahsan)
 - Email: aoneahsan@gmail.com
 - Phone: +923046619706

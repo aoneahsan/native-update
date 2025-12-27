@@ -4,12 +4,11 @@ import { Container } from '@/components/ui/Container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import {
-  GitHubLogoIcon,
   LinkedInLogoIcon,
   EnvelopeClosedIcon,
   ChatBubbleIcon,
 } from '@radix-ui/react-icons';
-import { Phone, Globe, MapPin, Clock, MessageCircle, Bug, HelpCircle } from 'lucide-react';
+import { Phone, Globe, MapPin, Clock, MessageCircle, Bug, Lightbulb, Package } from 'lucide-react';
 
 export default function ContactPage() {
   return (
@@ -58,42 +57,34 @@ export default function ContactPage() {
             </CardContent>
           </Card>
 
-          {/* GitHub */}
+          {/* NPM Package */}
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader className="text-center">
-              <GitHubLogoIcon className="mx-auto h-12 w-12 text-gray-800" />
-              <CardTitle>GitHub</CardTitle>
+              <Package className="mx-auto h-12 w-12 text-red-600" />
+              <CardTitle>NPM Package</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-4 text-gray-600">
-                Report bugs, request features, or contribute to the project.
+                Report bugs, request features, or check the latest version.
               </p>
               <a
-                href="https://github.com/aoneahsan/native-update"
+                href="https://www.npmjs.com/package/native-update"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-lg font-medium text-brand-600 hover:underline"
               >
-                View Repository
+                View Package
               </a>
               <div className="mt-4 flex justify-center gap-2">
                 <Button asChild variant="outline" size="sm">
-                  <a
-                    href="https://github.com/aoneahsan/native-update/issues/new?template=bug_report.md"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href="mailto:aoneahsan@gmail.com?subject=Bug%20Report%20-%20Native%20Update">
                     <Bug className="mr-1 h-4 w-4" />
                     Report Bug
                   </a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <a
-                    href="https://github.com/aoneahsan/native-update/issues/new?template=feature_request.md"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <HelpCircle className="mr-1 h-4 w-4" />
+                  <a href="mailto:aoneahsan@gmail.com?subject=Feature%20Request%20-%20Native%20Update">
+                    <Lightbulb className="mr-1 h-4 w-4" />
                     Request Feature
                   </a>
                 </Button>
@@ -168,24 +159,22 @@ export default function ContactPage() {
             </CardContent>
           </Card>
 
-          {/* Discussion */}
+          {/* Documentation */}
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader className="text-center">
               <ChatBubbleIcon className="mx-auto h-12 w-12 text-orange-600" />
-              <CardTitle>Community</CardTitle>
+              <CardTitle>Documentation</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-4 text-gray-600">
-                Join discussions, share tips, and connect with other users.
+                Learn how to use Native Update with guides and examples.
               </p>
-              <a
-                href="https://github.com/aoneahsan/native-update/discussions"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                to="/docs"
                 className="text-lg font-medium text-brand-600 hover:underline"
               >
-                GitHub Discussions
-              </a>
+                View Documentation
+              </Link>
             </CardContent>
           </Card>
         </motion.div>
@@ -313,32 +302,28 @@ export default function ContactPage() {
             <Card className="p-6">
               <h3 className="mb-2 font-semibold text-gray-900">Where should I report bugs?</h3>
               <p className="text-gray-600">
-                Please report bugs on our{' '}
+                Please report bugs via{' '}
                 <a
-                  href="https://github.com/aoneahsan/native-update/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="mailto:aoneahsan@gmail.com?subject=Bug%20Report%20-%20Native%20Update"
                   className="text-brand-600 hover:underline"
                 >
-                  GitHub Issues page
+                  email
                 </a>
-                . Include steps to reproduce, expected behavior, and your environment details.
+                . Include steps to reproduce, expected behavior, and your environment details (OS, plugin version, etc.).
               </p>
             </Card>
 
             <Card className="p-6">
-              <h3 className="mb-2 font-semibold text-gray-900">Is there a community forum?</h3>
+              <h3 className="mb-2 font-semibold text-gray-900">How can I request a feature?</h3>
               <p className="text-gray-600">
-                Yes! We use{' '}
+                Send us a{' '}
                 <a
-                  href="https://github.com/aoneahsan/native-update/discussions"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="mailto:aoneahsan@gmail.com?subject=Feature%20Request%20-%20Native%20Update"
                   className="text-brand-600 hover:underline"
                 >
-                  GitHub Discussions
+                  feature request via email
                 </a>{' '}
-                for community conversations, feature discussions, and sharing tips.
+                describing what you&apos;d like to see and how it would help your use case.
               </p>
             </Card>
 

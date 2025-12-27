@@ -319,7 +319,7 @@ export default function SecurityPage() {
             </p>
             <ul className="ml-6 mt-4 list-none space-y-2 text-gray-700">
               <li><strong>Email:</strong> <a href="mailto:aoneahsan@gmail.com" className="text-brand-600 hover:underline">aoneahsan@gmail.com</a></li>
-              <li><strong>GitHub:</strong> <a href="https://github.com/aoneahsan/native-update/security" className="text-brand-600 hover:underline">Security Advisories</a></li>
+              <li><strong>Subject:</strong> Please use &quot;Security Inquiry - Native Update&quot; in the subject line</li>
             </ul>
           </section>
 

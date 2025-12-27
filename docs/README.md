@@ -57,8 +57,8 @@ Created by **Ahsan Mahmood** and open-sourced for the developer community, this 
 ## 🚀 Quick Links
 
 - **NPM Package**: [native-update](https://www.npmjs.com/package/native-update)
-- **GitHub Repository**: [aoneahsan/native-update](https://github.com/aoneahsan/native-update)
-- **Issue Tracker**: [GitHub Issues](https://github.com/aoneahsan/native-update/issues)
+- **Website**: [native-update.web.app](https://native-update.web.app)
+- **Support**: Email aoneahsan@gmail.com
 - **Author**: [Ahsan Mahmood](https://aoneahsan.com)
 
 ## 💡 Key Features
@@ -92,11 +92,11 @@ Consistent API across iOS, Android, and Web platforms with platform-specific opt
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Please see our [Contributing Guide](https://github.com/aoneahsan/native-update/blob/main/CONTRIBUTING.md) for details.
+We welcome contributions from the community! Please see our [Contributing Guide](../CONTRIBUTING.md) for details, or contact aoneahsan@gmail.com.
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/aoneahsan/native-update/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](../LICENSE) file for details.
 
 ## 👨‍💻 About the Author
 

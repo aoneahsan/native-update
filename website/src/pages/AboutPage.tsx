@@ -4,7 +4,7 @@ import { Container } from '@/components/ui/Container';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { GitHubLogoIcon, LinkedInLogoIcon, GlobeIcon } from '@radix-ui/react-icons';
-import { ArrowRight, Zap, Shield, Users, Code, Heart, Target } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Users, Code, Heart, Target, Package } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -186,7 +186,7 @@ export default function AboutPage() {
         >
           <Card className="bg-gray-900 p-8 text-white md:p-12">
             <div className="mx-auto max-w-3xl text-center">
-              <GitHubLogoIcon className="mx-auto mb-6 h-16 w-16" />
+              <Package className="mx-auto mb-6 h-16 w-16" />
               <h2 className="mb-4 text-3xl font-bold">100% Open Source</h2>
               <p className="mb-8 text-lg text-gray-300">
                 Native Update is released under the MIT License. Fork it, modify it, contribute
@@ -196,12 +196,14 @@ export default function AboutPage() {
               <div className="flex flex-col justify-center gap-4 sm:flex-row">
                 <Button asChild variant="default" size="lg">
                   <a
-                    href="https://github.com/aoneahsan/native-update"
+                    href="https://www.npmjs.com/package/native-update"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <GitHubLogoIcon className="mr-2 h-5 w-5" />
-                    View on GitHub
+                    <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331z" />
+                    </svg>
+                    View on NPM
                   </a>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-gray-900">

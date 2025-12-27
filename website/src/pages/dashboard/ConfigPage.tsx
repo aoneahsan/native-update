@@ -131,7 +131,7 @@ export default config;`,
           description: 'Initialize and use the plugin in your code',
           icon: Code,
           language: 'typescript',
-          code: `import { NativeUpdate } from '@aoneahsan/native-update';
+          code: `import { NativeUpdate } from 'native-update';
 
 // Check for updates
 async function checkForUpdates() {
@@ -288,7 +288,7 @@ NativeUpdate.addListener('updateReady', () => {
               <div>
                 <p className="font-medium text-gray-900">Install the plugin</p>
                 <code className="mt-1 block rounded bg-gray-100 px-2 py-1 font-mono text-xs">
-                  npm install @aoneahsan/native-update
+                  npm install native-update
                 </code>
               </div>
             </li>
