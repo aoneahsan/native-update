@@ -131,6 +131,25 @@ The plugin aims to be type-safe, framework-independent, secure, and highly perfo
 - ❌ Never use `npm` or `yarn`
 - Package manager is locked to `pnpm@9.15.4` via `packageManager` field in package.json
 
+## 🔌 Unique Dev Server Ports
+
+**CRITICAL: Never use default/common ports (3000, 5000, 5173, 8000, 8080)**
+
+All sub-projects use unique ports registered in `~/.dev-ports.json`:
+
+| Project | Dev Port | Preview Port | Registry Key |
+|---------|----------|--------------|--------------|
+| website | 5942 | 5943 | native-update-website |
+| example-apps/react-capacitor | 5944 | 5945 | native-update-react-capacitor |
+
+**Port Management Rules:**
+- Each project has a unique port in the 5900-6999 range
+- Ports are registered globally at `~/.dev-ports.json`
+- Use `strictPort: true` in Vite to fail if port is taken
+- Never change ports without updating: vite.config, CLAUDE.md, ~/.dev-ports.json
+
+**Verification:** Before starting dev server, confirm port matches all 3 locations.
+
 ## ESLint Configuration
 
 **CRITICAL: Never use @eslint/js package**

@@ -6,6 +6,13 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    port: 5942,
+    strictPort: true,
+  },
+  preview: {
+    port: 5943,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
