@@ -1,12 +1,35 @@
 import type { Timestamp } from 'firebase/firestore';
 
 /**
+ * Safely converts various date types to a JavaScript Date object
+ */
+function toDate(date: Timestamp | Date | { seconds: number; nanoseconds: number } | unknown): Date | null {
+  if (!date) return null;
+
+  // Already a Date
+  if (date instanceof Date) return date;
+
+  // Firebase Timestamp (has toDate method)
+  if (typeof date === 'object' && 'toDate' in date && typeof (date as Timestamp).toDate === 'function') {
+    return (date as Timestamp).toDate();
+  }
+
+  // Timestamp-like object with seconds (from Firestore)
+  if (typeof date === 'object' && 'seconds' in date && typeof (date as { seconds: number }).seconds === 'number') {
+    return new Date((date as { seconds: number }).seconds * 1000);
+  }
+
+  // FieldValue (serverTimestamp) or other - return null
+  return null;
+}
+
+/**
  * Formats a Firebase Timestamp or Date to a human-readable string
  */
 export function formatDate(date: Timestamp | Date | null | undefined): string {
-  if (!date) return 'N/A';
+  const d = toDate(date);
+  if (!d) return 'Just now';
 
-  const d = date instanceof Date ? date : date.toDate();
   return d.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -18,9 +41,9 @@ export function formatDate(date: Timestamp | Date | null | undefined): string {
  * Formats a Firebase Timestamp or Date to a human-readable string with time
  */
 export function formatDateTime(date: Timestamp | Date | null | undefined): string {
-  if (!date) return 'N/A';
+  const d = toDate(date);
+  if (!d) return 'Just now';
 
-  const d = date instanceof Date ? date : date.toDate();
   return d.toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -34,9 +57,9 @@ export function formatDateTime(date: Timestamp | Date | null | undefined): strin
  * Formats a Firebase Timestamp or Date to a relative time string (e.g., "2 hours ago")
  */
 export function formatRelativeTime(date: Timestamp | Date | null | undefined): string {
-  if (!date) return 'N/A';
+  const d = toDate(date);
+  if (!d) return 'Just now';
 
-  const d = date instanceof Date ? date : date.toDate();
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffSec = Math.floor(diffMs / 1000);
