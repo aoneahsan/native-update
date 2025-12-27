@@ -3,6 +3,8 @@ import { getAnalytics } from 'firebase/analytics';
 import type { Analytics } from 'firebase/analytics';
 import { getFirestore } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import type { Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -25,5 +27,14 @@ if (typeof window !== 'undefined' && firebaseConfig.measurementId) {
 
 // Initialize Firestore
 export const db: Firestore = getFirestore(app);
+
+// Initialize Auth
+export const auth: Auth = getAuth(app);
+
+// Initialize Google Auth Provider
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 export { analytics };

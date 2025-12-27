@@ -1,52 +1,128 @@
-import { createBrowserRouter } from 'react-router-dom';
-import App from './App';
-import HomePage from './pages/HomePage';
-import FeaturesPage from './pages/FeaturesPage';
-import PricingPage from './pages/PricingPage';
-import ExamplesPage from './pages/ExamplesPage';
-import DocsPage from './pages/DocsPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import NotFoundPage from './pages/NotFoundPage';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+
+// Auth Pages
+import LoginPage from '@/pages/auth/LoginPage';
+import SignupPage from '@/pages/auth/SignupPage';
+import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
+
+// Marketing Pages
+import HomePage from '@/pages/HomePage';
+import FeaturesPage from '@/pages/FeaturesPage';
+import PricingPage from '@/pages/PricingPage';
+import DocsPage from '@/pages/DocsPage';
+import AboutPage from '@/pages/AboutPage';
+import ContactPage from '@/pages/ContactPage';
+import PrivacyPage from '@/pages/PrivacyPage';
+import TermsPage from '@/pages/TermsPage';
+
+// Dashboard Pages
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardOverview from '@/pages/dashboard/DashboardOverview';
+import AppsPage from '@/pages/dashboard/AppsPage';
+import BuildsPage from '@/pages/dashboard/BuildsPage';
+import UploadPage from '@/pages/dashboard/UploadPage';
+import GoogleDrivePage from '@/pages/dashboard/GoogleDrivePage';
+import ConfigPage from '@/pages/dashboard/ConfigPage';
+import SettingsPage from '@/pages/dashboard/SettingsPage';
 
 export const router = createBrowserRouter([
+  // Marketing Pages
   {
     path: '/',
-    element: <App />,
-    errorElement: <NotFoundPage />,
+    element: <HomePage />,
+  },
+  {
+    path: '/features',
+    element: <FeaturesPage />,
+  },
+  {
+    path: '/pricing',
+    element: <PricingPage />,
+  },
+  {
+    path: '/docs',
+    element: <DocsPage />,
+  },
+  {
+    path: '/about',
+    element: <AboutPage />,
+  },
+  {
+    path: '/contact',
+    element: <ContactPage />,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPage />,
+  },
+  {
+    path: '/terms',
+    element: <TermsPage />,
+  },
+
+  // Auth Pages
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/signup',
+    element: <SignupPage />,
+  },
+  {
+    path: '/verify-email',
+    element: <VerifyEmailPage />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+  },
+
+  // Dashboard (Protected Routes)
+  {
+    path: '/dashboard',
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: <DashboardOverview />,
       },
       {
-        path: 'features',
-        element: <FeaturesPage />,
+        path: 'apps',
+        element: <AppsPage />,
       },
       {
-        path: 'pricing',
-        element: <PricingPage />,
+        path: 'builds',
+        element: <BuildsPage />,
       },
       {
-        path: 'examples',
-        element: <ExamplesPage />,
+        path: 'upload',
+        element: <UploadPage />,
       },
       {
-        path: 'docs',
-        element: <DocsPage />,
+        path: 'drive',
+        element: <GoogleDrivePage />,
       },
       {
-        path: 'about',
-        element: <AboutPage />,
+        path: 'config',
+        element: <ConfigPage />,
       },
       {
-        path: 'contact',
-        element: <ContactPage />,
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />,
+        path: 'settings',
+        element: <SettingsPage />,
       },
     ],
+  },
+
+  // Catch-all redirect
+  {
+    path: '*',
+    element: <Navigate to="/" replace />,
   },
 ]);

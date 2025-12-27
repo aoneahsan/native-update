@@ -1,0 +1,44 @@
+# Compiled JavaScript files
+lib/**/*.js
+lib/**/*.js.map
+
+# Build output
+lib/
+dist/
+
+# Node modules
+node_modules/
+
+# Environment files (private repo - include .env files)
+# Not excluding .env files as this is a private repository
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firebase-debug.*.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Ignore patterns (always exclude)
+*.ignore.*
+project-record-ignore/
+
+# Firebase cache
+.firebase/
+.runtimeconfig.json
