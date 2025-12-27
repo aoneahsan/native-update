@@ -125,6 +125,21 @@ export function Footer() {
                   Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link to="/security" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Data Security
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookies" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/data-deletion" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Data Deletion
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

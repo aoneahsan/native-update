@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="50%" style="stop-color:#0284c7"/>
+      <stop offset="100%" style="stop-color:#c026d3"/>
+    </linearGradient>
+    <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#f0f9ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="180" height="180" rx="36" fill="url(#brandGradient)"/>
+
+  <!-- Inner glow -->
+  <rect x="6" y="6" width="168" height="168" rx="30" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+
+  <!-- Update arrow -->
+  <g transform="translate(90, 82)">
+    <rect x="-10" y="-38" width="20" height="54" rx="4" fill="url(#arrowGradient)"/>
+    <polygon points="0,30 -24,6 -12,6 -12,-4 12,-4 12,6 24,6" fill="url(#arrowGradient)"/>
+  </g>
+
+  <!-- Circular refresh -->
+  <g fill="none" stroke="url(#arrowGradient)" stroke-width="8" stroke-linecap="round">
+    <path d="M 134 90 A 44 44 0 0 1 90 134" opacity="0.9"/>
+    <path d="M 46 90 A 44 44 0 0 1 90 46" opacity="0.9"/>
+  </g>
+
+  <!-- Arrow tips -->
+  <polygon points="134,90 122,74 138,78" fill="url(#arrowGradient)" opacity="0.9"/>
+  <polygon points="46,90 58,106 42,102" fill="url(#arrowGradient)" opacity="0.9"/>
+</svg>

@@ -224,6 +224,39 @@ export default [
 - Ensure proper accessibility with title and desc elements
 - Minimize path complexity while maintaining visual quality
 
+## 📄 Website Info Pages Maintenance (CRITICAL)
+
+**Applies to: `/website/` subdirectory**
+
+The marketing website contains critical info pages that MUST be kept updated with every feature change:
+
+**Required Info Pages:**
+- `/privacy` - Privacy Policy (GDPR, CCPA compliant)
+- `/terms` - Terms of Service
+- `/security` - Data Security information
+- `/cookies` - Cookie Policy
+- `/data-deletion` - Account & data deletion (required for app stores)
+- `/about` - About page with project info
+- `/contact` - Contact page with developer info
+
+**Maintenance Rules:**
+1. **After EVERY feature addition**: Review and update Privacy Policy if data handling changes
+2. **After EVERY API change**: Update Terms of Service if service capabilities change
+3. **After EVERY auth change**: Update Security page with new security measures
+4. **After EVERY third-party integration**: Update Cookie Policy if new cookies are used
+5. **Before EVERY app store submission**: Verify all info pages are current
+
+**SEO Maintenance:**
+- Update `index.html` meta tags when project description changes
+- Update `manifest.json` when app name/description changes
+- Update `og-image.svg` when branding changes
+- All assets use SVG format for icons, logos, and graphics
+
+**App Store Compliance:**
+- Data Deletion page is REQUIRED for Google Play and Apple App Store
+- Privacy Policy URL must be valid and accessible
+- Contact information must be current and accurate
+
 ## Architecture and Structure
 
 ### Plugin Architecture

@@ -1,29 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0284c7;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#c026d3;stop-opacity:1" />
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="50%" style="stop-color:#0284c7"/>
+      <stop offset="100%" style="stop-color:#c026d3"/>
+    </linearGradient>
+    <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#f0f9ff"/>
     </linearGradient>
   </defs>
   
-  <!-- Background circle -->
-  <circle cx="64" cy="64" r="60" fill="url(#grad)" />
+  <!-- Background rounded square -->
+  <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="url(#brandGradient)"/>
   
-  <!-- Update arrow icon -->
-  <path d="M64 32 L64 72 M64 72 L52 60 M64 72 L76 60" 
-        stroke="white" 
-        stroke-width="8" 
-        stroke-linecap="round" 
-        stroke-linejoin="round" 
-        fill="none" />
+  <!-- Inner shadow effect -->
+  <rect x="48" y="48" width="416" height="416" rx="80" ry="80" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
   
-  <!-- Circular arrow indicating update cycle -->
-  <path d="M 90 64 A 26 26 0 1 1 64 38" 
-        stroke="white" 
-        stroke-width="6" 
-        stroke-linecap="round" 
-        fill="none" />
+  <!-- Update arrow pointing down -->
+  <g transform="translate(256, 240)">
+    <!-- Arrow body -->
+    <rect x="-24" y="-100" width="48" height="140" rx="8" fill="url(#arrowGradient)"/>
+    <!-- Arrow head -->
+    <polygon points="0,80 -60,20 -30,20 -30,-10 30,-10 30,20 60,20" fill="url(#arrowGradient)"/>
+  </g>
   
-  <!-- Arrow head for circular arrow -->
-  <polygon points="64,38 58,46 70,46" fill="white" />
+  <!-- Circular refresh indicator -->
+  <g fill="none" stroke="url(#arrowGradient)" stroke-width="20" stroke-linecap="round">
+    <path d="M 380 256 A 124 124 0 0 1 256 380" opacity="0.9"/>
+    <path d="M 132 256 A 124 124 0 0 1 256 132" opacity="0.9"/>
+  </g>
+  
+  <!-- Refresh arrow tips -->
+  <polygon points="380,256 360,220 400,230" fill="url(#arrowGradient)" opacity="0.9"/>
+  <polygon points="132,256 152,292 112,282" fill="url(#arrowGradient)" opacity="0.9"/>
 </svg>

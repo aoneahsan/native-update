@@ -17,6 +17,9 @@ import AboutPage from '@/pages/AboutPage';
 import ContactPage from '@/pages/ContactPage';
 import PrivacyPage from '@/pages/PrivacyPage';
 import TermsPage from '@/pages/TermsPage';
+import DataDeletionPage from '@/pages/DataDeletionPage';
+import CookiePolicyPage from '@/pages/CookiePolicyPage';
+import SecurityPage from '@/pages/SecurityPage';
 
 // Dashboard Pages
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
@@ -64,6 +67,18 @@ export const router = createBrowserRouter([
       {
         path: '/terms',
         element: <TermsPage />,
+      },
+      {
+        path: '/data-deletion',
+        element: <DataDeletionPage />,
+      },
+      {
+        path: '/cookies',
+        element: <CookiePolicyPage />,
+      },
+      {
+        path: '/security',
+        element: <SecurityPage />,
       },
     ],
   },

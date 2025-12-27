@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9"/>
+      <stop offset="50%" style="stop-color:#0284c7"/>
+      <stop offset="100%" style="stop-color:#c026d3"/>
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="0%"  y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#f0f9ff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="100" cy="100" r="200" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="1100" cy="530" r="250" fill="rgba(255,255,255,0.05)"/>
+  <circle cx="900" cy="100" r="150" fill="rgba(255,255,255,0.03)"/>
+
+  <!-- Logo Icon -->
+  <g transform="translate(100, 215)">
+    <rect x="0" y="0" width="200" height="200" rx="40" fill="rgba(255,255,255,0.15)"/>
+    <g transform="translate(100, 90)">
+      <!-- Arrow body -->
+      <rect x="-16" y="-50" width="32" height="80" rx="6" fill="url(#iconGradient)"/>
+      <!-- Arrow head -->
+      <polygon points="0,50 -40,10 -20,10 -20,-10 20,-10 20,10 40,10" fill="url(#iconGradient)"/>
+    </g>
+    <!-- Circular refresh indicator -->
+    <g fill="none" stroke="url(#iconGradient)" stroke-width="12" stroke-linecap="round">
+      <path d="M 160 100 A 60 60 0 0 1 100 160" opacity="0.9"/>
+      <path d="M 40 100 A 60 60 0 0 1 100 40" opacity="0.9"/>
+    </g>
+    <!-- Refresh arrow tips -->
+    <polygon points="160,100 148,80 168,85" fill="url(#iconGradient)" opacity="0.9"/>
+    <polygon points="40,100 52,120 32,115" fill="url(#iconGradient)" opacity="0.9"/>
+  </g>
+
+  <!-- Main Title -->
+  <text x="340" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="800" fill="white" filter="url(#glow)">Native Update</text>
+
+  <!-- Subtitle -->
+  <text x="340" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="500" fill="rgba(255,255,255,0.9)">OTA Updates, App Updates &amp; Reviews</text>
+
+  <!-- Description -->
+  <text x="340" y="410" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="400" fill="rgba(255,255,255,0.75)">The complete update solution for Capacitor apps</text>
+
+  <!-- Feature badges -->
+  <g transform="translate(340, 450)">
+    <rect x="0" y="0" width="160" height="40" rx="20" fill="rgba(255,255,255,0.2)"/>
+    <text x="80" y="26" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white" text-anchor="middle">OTA Updates</text>
+
+    <rect x="180" y="0" width="180" height="40" rx="20" fill="rgba(255,255,255,0.2)"/>
+    <text x="270" y="26" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white" text-anchor="middle">Native Updates</text>
+
+    <rect x="380" y="0" width="160" height="40" rx="20" fill="rgba(255,255,255,0.2)"/>
+    <text x="460" y="26" font-family="system-ui, sans-serif" font-size="16" font-weight="600" fill="white" text-anchor="middle">App Reviews</text>
+  </g>
+
+  <!-- URL -->
+  <text x="1100" y="590" font-family="system-ui, sans-serif" font-size="20" font-weight="500" fill="rgba(255,255,255,0.6)" text-anchor="end">nativeupdate.dev</text>
+</svg>
