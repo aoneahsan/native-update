@@ -5,6 +5,9 @@ const config: CapacitorConfig = {
   appName: 'Native Update Example',
   webDir: 'dist',
   bundledWebRuntime: false,
+  server: {
+    androidScheme: 'https'
+  },
   plugins: {
     NativeUpdate: {
       serverUrl: 'https://your-update-server.com/api/v1',
