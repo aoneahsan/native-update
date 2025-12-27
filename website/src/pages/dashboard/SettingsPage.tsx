@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { db, auth } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { Container } from '@/components/ui/Container';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
@@ -23,7 +23,6 @@ import { toast } from '@/lib/toast';
 import type { User } from '@/types';
 import {
   User as UserIcon,
-  Mail,
   Bell,
   Palette,
   Shield,
@@ -549,3 +548,5 @@ export function SettingsPage() {
     </Container>
   );
 }
+
+export default SettingsPage;

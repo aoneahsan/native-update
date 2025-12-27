@@ -224,3 +224,5 @@ export function AppsPage() {
     </Container>
   );
 }
+
+export default AppsPage;

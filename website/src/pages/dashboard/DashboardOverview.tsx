@@ -251,3 +251,5 @@ export function DashboardOverview() {
     </Container>
   );
 }
+
+export default DashboardOverview;

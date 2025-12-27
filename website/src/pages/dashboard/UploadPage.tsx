@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { googleDriveService } from '@/services/google-drive-service';
 import { formatBytes, formatRelativeTime } from '@/lib/format';
@@ -67,9 +66,13 @@ export function UploadPage() {
         .map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }))
-        .sort((a, b) => b.uploadedAt.toMillis() - a.uploadedAt.toMillis())
-        .slice(0, 5) as Build[];
+        }) as Build)
+        .sort((a, b) => {
+          const aTime = a.uploadedAt instanceof Object && 'toMillis' in a.uploadedAt ? a.uploadedAt.toMillis() : 0;
+          const bTime = b.uploadedAt instanceof Object && 'toMillis' in b.uploadedAt ? b.uploadedAt.toMillis() : 0;
+          return bTime - aTime;
+        })
+        .slice(0, 5);
       setRecentUploads(buildsData);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -171,7 +174,7 @@ export function UploadPage() {
         updatedAt: serverTimestamp(),
       };
 
-      const buildRef = await addDoc(collection(db, 'builds'), buildData);
+      await addDoc(collection(db, 'builds'), buildData);
 
       setUploadProgress(90);
 
@@ -470,3 +473,5 @@ export function UploadPage() {
     </Container>
   );
 }
+
+export default UploadPage;

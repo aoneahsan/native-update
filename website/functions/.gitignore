@@ -1,16 +1,9 @@
-# Compiled JavaScript files
-lib/**/*.js
-lib/**/*.js.map
-
-# Build output
+# Compiled output
 lib/
 dist/
 
-# Node modules
+# Dependencies
 node_modules/
-
-# Environment files (private repo - include .env files)
-# Not excluding .env files as this is a private repository
 
 # Logs
 *.log
@@ -19,26 +12,32 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 firebase-debug.log*
-firebase-debug.*.log*
+firebase-debug.*.log
 
-# OS files
-.DS_Store
-Thumbs.db
+# Environment
+.env
+.env.local
+.env.*.local
 
-# IDE files
+# Firebase
+.firebase/
+.runtimeconfig.json
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# TypeScript cache
-*.tsbuildinfo
+# OS
+.DS_Store
+Thumbs.db
 
-# Ignore patterns (always exclude)
-*.ignore.*
-project-record-ignore/
+# Test
+coverage/
+.nyc_output/
 
-# Firebase cache
-.firebase/
-.runtimeconfig.json
+# Temporary files
+*.tmp
+*.temp

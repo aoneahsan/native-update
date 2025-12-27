@@ -1,5 +1,5 @@
 import { Response, NextFunction } from 'express';
-import { AuthRequest } from '../types';
+import { AuthenticatedRequest } from './auth';
 import { z } from 'zod';
 import { validateBody, validateQuery } from '../utils/validators';
 
@@ -7,7 +7,7 @@ import { validateBody, validateQuery } from '../utils/validators';
  * Validate request body middleware
  */
 export function validateBodyMiddleware<T>(schema: z.ZodSchema<T>) {
-  return (req: AuthRequest, _res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
     req.body = validateBody(schema, req.body);
     next();
   };
@@ -17,7 +17,7 @@ export function validateBodyMiddleware<T>(schema: z.ZodSchema<T>) {
  * Validate query parameters middleware
  */
 export function validateQueryMiddleware<T>(schema: z.ZodSchema<T>) {
-  return (req: AuthRequest, _res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
     req.query = validateQuery(schema, req.query) as typeof req.query;
     next();
   };

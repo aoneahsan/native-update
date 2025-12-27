@@ -1,13 +1,24 @@
-import { Response, NextFunction } from 'express';
-import { auth } from '../config/firebase';
-import { AuthRequest } from '../types';
-import { errors } from '../utils/errors';
+import { Request, Response, NextFunction } from 'express';
+import { getAuth } from 'firebase-admin/auth';
+import { AppError } from '../utils/errors';
 
 /**
- * Verify Firebase ID token
+ * Extend Express Request to include user info
  */
-export async function verifyAuth(
-  req: AuthRequest,
+export interface AuthenticatedRequest extends Request {
+  user: {
+    uid: string;
+    email?: string;
+    emailVerified: boolean;
+  };
+}
+
+/**
+ * Middleware to verify Firebase authentication token
+ * Extracts token from Authorization header and verifies it
+ */
+export async function authenticate(
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -15,82 +26,45 @@ export async function verifyAuth(
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw errors.unauthorized('Missing or invalid authorization header');
+      throw new AppError(
+        401,
+        'UNAUTHORIZED',
+        'Missing or invalid authorization header'
+      );
     }
 
     const token = authHeader.split('Bearer ')[1];
 
     if (!token) {
-      throw errors.unauthorized('Missing token');
+      throw new AppError(401, 'UNAUTHORIZED', 'No token provided');
     }
 
-    const decodedToken = await auth.verifyIdToken(token);
+    const decodedToken = await getAuth().verifyIdToken(token);
 
-    req.user = {
+    (req as AuthenticatedRequest).user = {
       uid: decodedToken.uid,
       email: decodedToken.email,
-      emailVerified: decodedToken.email_verified,
+      emailVerified: decodedToken.email_verified || false,
     };
 
     next();
   } catch (error) {
-    if (error instanceof Error && 'code' in error) {
-      const firebaseError = error as { code: string };
-      if (
-        firebaseError.code === 'auth/id-token-expired' ||
-        firebaseError.code === 'auth/argument-error'
-      ) {
-        throw errors.unauthorized('Token expired or invalid');
-      }
-    }
-    throw error;
-  }
-}
-
-/**
- * Require email verification
- */
-export function requireEmailVerified(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void {
-  if (!req.user?.emailVerified) {
-    throw errors.emailNotVerified(
-      'Email verification required. Please verify your email to continue.'
-    );
-  }
-
-  next();
-}
-
-/**
- * Optional authentication (doesn't throw if no token)
- */
-export async function optionalAuth(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split('Bearer ')[1];
-
-      if (token) {
-        const decodedToken = await auth.verifyIdToken(token);
-
-        req.user = {
-          uid: decodedToken.uid,
-          email: decodedToken.email,
-          emailVerified: decodedToken.email_verified,
-        };
-      }
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({
+        error: {
+          code: error.code,
+          message: error.message,
+        },
+      });
+      return;
     }
 
-    next();
-  } catch (_error) {
-    next();
+    console.error('Authentication error:', error);
+    res.status(401).json({
+      error: {
+        code: 'UNAUTHORIZED',
+        message: 'Invalid or expired token',
+      },
+    });
   }
 }

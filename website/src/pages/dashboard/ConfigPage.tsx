@@ -345,3 +345,5 @@ NativeUpdate.addListener('updateReady', () => {
     </Container>
   );
 }
+
+export default ConfigPage;

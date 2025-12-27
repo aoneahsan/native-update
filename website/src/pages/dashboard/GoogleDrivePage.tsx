@@ -256,7 +256,7 @@ export function GoogleDrivePage() {
                         <div>
                           <p className="font-medium text-gray-900">{folder.name}</p>
                           <p className="text-xs text-gray-600">
-                            Created {formatDateTime(folder.createdTime)}
+                            Created {folder.createdTime ? formatDateTime(new Date(folder.createdTime)) : 'N/A'}
                           </p>
                         </div>
                       </div>
@@ -332,3 +332,5 @@ export function GoogleDrivePage() {
     </Container>
   );
 }
+
+export default GoogleDrivePage;

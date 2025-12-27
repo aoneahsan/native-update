@@ -377,3 +377,5 @@ export function BuildsPage() {
     </Container>
   );
 }
+
+export default BuildsPage;

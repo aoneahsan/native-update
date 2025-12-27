@@ -1,106 +1,166 @@
 import { Response } from 'express';
-import { ErrorCode, ErrorResponse } from '../types';
 
 /**
- * Custom API error class
+ * Standard error response interface
  */
-export class ApiError extends Error {
+export interface ErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  };
+}
+
+/**
+ * Custom application error class
+ */
+export class AppError extends Error {
   constructor(
     public statusCode: number,
-    public code: ErrorCode,
+    public code: string,
     message: string,
-    public details?: Record<string, unknown>
+    public details?: unknown
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = 'AppError';
     Error.captureStackTrace(this, this.constructor);
   }
 }
 
 /**
- * Send error response
+ * Send error response with consistent format
  */
 export function sendError(
   res: Response,
   statusCode: number,
-  code: ErrorCode,
+  code: string,
   message: string,
-  details?: Record<string, unknown>
+  details?: unknown
 ): void {
   const errorResponse: ErrorResponse = {
-    error: message,
-    code,
-    ...(details && { details }),
+    error: {
+      code,
+      message,
+      ...(details && { details }),
+    },
   };
 
   res.status(statusCode).json(errorResponse);
 }
 
 /**
- * Handle API error
+ * Handle errors in route handlers
  */
-export function handleError(res: Response, error: unknown): void {
-  console.error('API Error:', error);
+export function handleError(error: unknown, res: Response): void {
+  console.error('Error:', error);
 
-  if (error instanceof ApiError) {
+  if (error instanceof AppError) {
     sendError(res, error.statusCode, error.code, error.message, error.details);
     return;
   }
 
   if (error instanceof Error) {
-    sendError(res, 500, ErrorCode.INTERNAL_ERROR, error.message);
+    sendError(res, 500, 'INTERNAL_ERROR', error.message);
     return;
   }
 
-  sendError(res, 500, ErrorCode.INTERNAL_ERROR, 'An unexpected error occurred');
+  sendError(res, 500, 'INTERNAL_ERROR', 'An unexpected error occurred');
 }
 
 /**
- * Common error factories
+ * Validation helper
  */
-export const errors = {
-  unauthorized: (message = 'Unauthorized') =>
-    new ApiError(401, ErrorCode.UNAUTHORIZED, message),
+export function validateRequired(
+  fields: Record<string, unknown>,
+  requiredFields: string[]
+): void {
+  const missing = requiredFields.filter((field) => !fields[field]);
 
-  emailNotVerified: (message = 'Email not verified') =>
-    new ApiError(403, ErrorCode.EMAIL_NOT_VERIFIED, message),
-
-  notFound: (resource: string, id?: string) =>
-    new ApiError(
-      404,
-      ErrorCode.NOT_FOUND,
-      id ? `${resource} with ID '${id}' not found` : `${resource} not found`
-    ),
-
-  forbidden: (message = 'Forbidden') =>
-    new ApiError(403, ErrorCode.FORBIDDEN, message),
-
-  validation: (message: string, details?: Record<string, unknown>) =>
-    new ApiError(400, ErrorCode.VALIDATION_ERROR, message, details),
-
-  driveNotConnected: (message = 'Google Drive not connected') =>
-    new ApiError(400, ErrorCode.DRIVE_NOT_CONNECTED, message),
-
-  uploadFailed: (message = 'Upload failed') =>
-    new ApiError(500, ErrorCode.UPLOAD_FAILED, message),
-
-  duplicate: (resource: string, field: string, value: string) =>
-    new ApiError(
-      409,
-      resource === 'app' ? ErrorCode.DUPLICATE_APP : ErrorCode.DUPLICATE_BUILD,
-      `${resource} with ${field} '${value}' already exists`
-    ),
-
-  rateLimitExceeded: (message = 'Rate limit exceeded') =>
-    new ApiError(429, ErrorCode.RATE_LIMIT_EXCEEDED, message),
-
-  fileTooLarge: (maxSize: number) =>
-    new ApiError(
+  if (missing.length > 0) {
+    throw new AppError(
       400,
-      ErrorCode.FILE_TOO_LARGE,
-      `File size exceeds maximum allowed size of ${maxSize} bytes`
-    ),
+      'VALIDATION_ERROR',
+      'Missing required fields',
+      { missingFields: missing }
+    );
+  }
+}
 
-  invalidVersion: (message = 'Invalid version format') =>
-    new ApiError(400, ErrorCode.INVALID_VERSION, message),
-};
+/**
+ * Validate string field
+ */
+export function validateString(
+  value: unknown,
+  fieldName: string,
+  minLength = 1,
+  maxLength = 1000
+): asserts value is string {
+  if (typeof value !== 'string') {
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      `${fieldName} must be a string`
+    );
+  }
+
+  if (value.length < minLength) {
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      `${fieldName} must be at least ${minLength} characters`
+    );
+  }
+
+  if (value.length > maxLength) {
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      `${fieldName} must not exceed ${maxLength} characters`
+    );
+  }
+}
+
+/**
+ * Validate app ID format
+ */
+export function validateAppId(appId: string): void {
+  const appIdRegex = /^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/;
+
+  if (!appIdRegex.test(appId)) {
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      'App ID must be lowercase alphanumeric with hyphens, 2-63 characters'
+    );
+  }
+}
+
+/**
+ * Validate version format (semver)
+ */
+export function validateVersion(version: string): void {
+  const versionRegex = /^\d+\.\d+\.\d+$/;
+
+  if (!versionRegex.test(version)) {
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      'Version must follow semantic versioning (e.g., 1.0.0)'
+    );
+  }
+}
+
+/**
+ * Validate platform
+ */
+export function validatePlatform(platform: string): void {
+  const validPlatforms = ['ios', 'android'];
+
+  if (!validPlatforms.includes(platform)) {
+    throw new AppError(
+      400,
+      'VALIDATION_ERROR',
+      `Platform must be one of: ${validPlatforms.join(', ')}`
+    );
+  }
+}

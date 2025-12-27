@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import * as semver from 'semver';
-import { errors } from './errors';
+import { AppError } from './errors';
 
 /**
  * Validate semver version string
@@ -170,7 +170,7 @@ export function validateBody<T>(schema: z.ZodSchema<T>, data: unknown): T {
       {} as Record<string, string>
     );
 
-    throw errors.validation('Validation failed', formattedErrors);
+    throw new AppError(400, 'VALIDATION_ERROR', 'Validation failed', formattedErrors);
   }
 
   return result.data;
@@ -191,7 +191,7 @@ export function validateQuery<T>(schema: z.ZodSchema<T>, data: unknown): T {
       {} as Record<string, string>
     );
 
-    throw errors.validation('Invalid query parameters', formattedErrors);
+    throw new AppError(400, 'VALIDATION_ERROR', 'Invalid query parameters', formattedErrors);
   }
 
   return result.data;
@@ -209,7 +209,11 @@ export function sanitizeString(input: string): string {
  */
 export function validateFileSize(size: number, maxSize: number): void {
   if (size > maxSize) {
-    throw errors.fileTooLarge(maxSize);
+    throw new AppError(
+      400,
+      'FILE_TOO_LARGE',
+      `File size exceeds maximum allowed size of ${maxSize} bytes`
+    );
   }
 }
 
