@@ -1,38 +1,16 @@
 {
-  "name": "capacitor-update-server-production",
+  "name": "native-update-node-express-example",
   "version": "1.0.0",
-  "description": "Production-ready update server for Capacitor Native Update",
+  "description": "Simple Node.js + Express backend for native-update plugin",
   "type": "module",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "test": "vitest",
-    "db:init": "node scripts/init-db.js",
-    "db:migrate": "node scripts/migrate.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.21.2",
     "cors": "^2.8.5",
-    "helmet": "^8.0.0",
-    "compression": "^1.7.5",
-    "express-rate-limit": "^7.5.0",
-    "multer": "^1.4.5-lts.1",
-    "sqlite3": "^5.1.7",
-    "better-sqlite3": "^11.7.0",
-    "winston": "^3.17.0",
-    "joi": "^17.13.3",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "nanoid": "^5.0.9",
-    "archiver": "^7.0.1",
-    "crypto": "^1.0.1",
-    "semver": "^7.6.3",
-    "dotenv": "^16.4.7"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.5",
-    "vitest": "^2.1.8"
+    "multer": "^1.4.5-lts.1"
   },
   "engines": {
     "node": ">=20.0.0"

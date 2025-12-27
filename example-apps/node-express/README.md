@@ -1,152 +1,233 @@
-# Production Update Server for Capacitor Native Update
+# Node.js + Express Backend Example
 
-This is a production-grade backend server for managing OTA updates with the Capacitor Native Update plugin.
+A **simple, minimal** backend server for demonstrating OTA updates with the `native-update` plugin.
 
-## Features
+## 🎯 Purpose
 
-- **Version Management**: Track and manage update versions with channels
-- **Bundle Storage**: Store and serve update bundles with CDN support
-- **Security**: RSA signature verification, checksum validation, API authentication
-- **Analytics**: Track update success rates, download metrics, and errors
-- **Admin Dashboard**: Web UI for managing updates and monitoring
-- **Database**: SQLite for development, easily swappable to PostgreSQL/MySQL
-- **API Authentication**: JWT-based authentication for admin operations
-- **Rate Limiting**: Protect against abuse
-- **Compression**: Automatic response compression
-- **Logging**: Structured logging with Winston
-- **Health Checks**: Monitoring endpoints
+This example provides the essential API endpoints needed to serve OTA updates. **No database, no complex authentication, no production features** - just file-based storage for demonstration.
 
-## Quick Start
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 20+ and pnpm installed
+
+### Installation
 
 ```bash
-# Install dependencies
-npm install
+# From the monorepo root
+pnpm install
 
-# Initialize database
-npm run db:init
-
-# Start server
-npm start
-
-# Development mode with auto-reload
-npm run dev
+# Or from this directory
+cd example-apps/node-express
+pnpm install
 ```
 
-## Environment Variables
+### Start the Server
 
-Create a `.env` file:
+```bash
+pnpm start
+```
 
+The server will start on `http://localhost:3000`
+
+## 📡 API Endpoints
+
+### Health Check
+```http
+GET /api/health
+```
+
+Returns server status.
+
+### Check for Updates
+```http
+GET /api/updates/check?version=1.0.0&channel=production
+```
+
+**Query Parameters:**
+- `version` - Current app version
+- `channel` - Update channel (default: `production`)
+
+**Response:**
+```json
+{
+  "available": true,
+  "latestVersion": "1.1.0",
+  "downloadUrl": "http://localhost:3000/api/updates/download/bundle-123",
+  "size": 1024000,
+  "releaseNotes": "Bug fixes and improvements"
+}
+```
+
+### Download Bundle
+```http
+GET /api/updates/download/:id
+```
+
+Downloads the bundle file.
+
+### Upload Bundle (For Testing)
+```http
+POST /api/bundles/upload
+```
+
+**Body (multipart/form-data):**
+- `bundle` - ZIP file
+- `version` - Version number (e.g., "1.1.0")
+- `channel` - Channel name (default: "production")
+- `releaseNotes` - Optional release notes
+
+**Example with curl:**
+```bash
+curl -F "bundle=@bundle.zip" \
+     -F "version=1.1.0" \
+     -F "channel=production" \
+     -F "releaseNotes=Bug fixes" \
+     http://localhost:3000/api/bundles/upload
+```
+
+### List Bundles
+```http
+GET /api/bundles
+```
+
+Returns all uploaded bundles with metadata.
+
+## 📂 Project Structure
+
+```
+node-express/
+├── index.js          # Single file with all server logic
+├── bundles/          # Stored bundle files (created automatically)
+├── metadata.json     # Bundle metadata (created automatically)
+├── package.json      # Dependencies
+├── .env.example      # Environment variables template
+└── README.md
+```
+
+## 💾 Data Storage
+
+- **Bundles:** Stored as files in `bundles/` directory
+- **Metadata:** Stored in `metadata.json` file
+- **No database required!**
+
+## 🧪 Testing the Server
+
+### 1. Start the Server
+```bash
+pnpm start
+```
+
+### 2. Check Health
+```bash
+curl http://localhost:3000/api/health
+```
+
+### 3. Upload a Bundle
+```bash
+# First, create a test bundle (zip your built app)
+cd ../react-capacitor
+pnpm build
+cd dist
+zip -r ../bundle.zip .
+
+# Upload it
+cd ..
+curl -F "bundle=@bundle.zip" \
+     -F "version=1.1.0" \
+     -F "channel=production" \
+     http://localhost:3000/api/bundles/upload
+```
+
+### 4. Check for Updates
+```bash
+curl "http://localhost:3000/api/updates/check?version=1.0.0&channel=production"
+```
+
+### 5. Download Bundle
+```bash
+# Use the ID from the previous response
+curl "http://localhost:3000/api/updates/download/bundle-123" -o downloaded.zip
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file (copy from `.env.example`):
 ```env
 PORT=3000
-NODE_ENV=production
-
-# Security
-JWT_SECRET=your-secret-key-here
-ADMIN_PASSWORD=change-this-password
-
-# Database
-DB_PATH=./data/updates.db
-
-# Storage
-STORAGE_PATH=./storage/bundles
-MAX_BUNDLE_SIZE=104857600  # 100MB
-
-# Rate Limiting
-RATE_LIMIT_WINDOW=15  # minutes
-RATE_LIMIT_MAX=100    # requests per window
-
-# CORS
-ALLOWED_ORIGINS=https://your-app.com,capacitor://localhost
-
-# Logging
-LOG_LEVEL=info
-LOG_FILE=./logs/server.log
 ```
 
-## API Endpoints
+## 📚 Integration with Frontend
 
-### Public Endpoints
+In your React app (`example-apps/react-capacitor`), configure the plugin:
 
-- `GET /api/health` - Health check
-- `GET /api/updates/check/:appId/:platform/:currentVersion` - Check for updates
-- `GET /api/bundles/:bundleId` - Download update bundle
-- `POST /api/analytics/event` - Track update events
+```typescript
+await NativeUpdate.configure({
+  serverUrl: 'http://localhost:3000/api',
+  autoCheck: false,
+  channel: 'production',
+});
+```
 
-### Admin Endpoints (Requires Authentication)
+## 🐛 Troubleshooting
 
-- `POST /api/auth/login` - Admin login
-- `POST /api/updates/create` - Create new update
-- `POST /api/updates/upload` - Upload bundle
-- `GET /api/updates/list` - List all updates
-- `PUT /api/updates/:id` - Update metadata
-- `DELETE /api/updates/:id` - Delete update
-- `GET /api/analytics/dashboard` - Analytics dashboard data
-
-## Database Schema
-
-The server uses SQLite by default with the following schema:
-
-- **updates**: Version information and metadata
-- **bundles**: Bundle file references and checksums
-- **channels**: Update channels (production, staging, etc.)
-- **download_stats**: Download tracking
-- **events**: Analytics events
-- **api_keys**: API authentication
-
-## Production Deployment
-
-1. **Environment Setup**
-   - Set secure JWT_SECRET
-   - Configure production database
-   - Set up proper logging
-
-2. **Storage**
-   - Configure CDN for bundle serving
-   - Set up backup strategy
-   - Implement cleanup for old bundles
-
-3. **Security**
-   - Enable HTTPS only
-   - Configure firewall rules
-   - Set up monitoring alerts
-
-4. **Scaling**
-   - Use PostgreSQL/MySQL for database
-   - Implement Redis for caching
-   - Use S3/Cloud Storage for bundles
-   - Deploy behind load balancer
-
-## Monitoring
-
-The server provides several monitoring endpoints:
-
-- `/api/health` - Basic health check
-- `/api/health/detailed` - Detailed system status
-- `/metrics` - Prometheus-compatible metrics
-
-## Security Features
-
-- JWT authentication for admin operations
-- Request signature validation
-- Bundle checksum verification
-- Rate limiting per IP
-- CORS configuration
-- SQL injection protection
-- XSS prevention
-
-## Development
-
+### Port already in use
 ```bash
-# Run tests
-npm test
-
-# Database migrations
-npm run db:migrate
-
-# Generate API documentation
-npm run docs
+# Change port in .env or run with custom port
+PORT=3001 pnpm start
 ```
 
-## License
+### Cannot upload files
+- Ensure the server has write permissions
+- Check that the `bundles/` directory can be created
 
-MIT
+### CORS errors
+- The server uses `cors()` with no restrictions for development
+- For production, configure allowed origins properly
+
+## 🚀 Creating and Uploading Bundles
+
+### Method 1: Using curl (Easiest)
+```bash
+# Build your app
+cd ../react-capacitor
+pnpm build
+
+# Create bundle
+cd dist
+zip -r ../bundle.zip .
+
+# Upload
+cd ..
+curl -F "bundle=@bundle.zip" \
+     -F "version=1.1.0" \
+     http://localhost:3000/api/bundles/upload
+```
+
+### Method 2: Using Postman
+1. Create a POST request to `http://localhost:3000/api/bundles/upload`
+2. Set body type to `form-data`
+3. Add fields:
+   - `bundle` (file) - Select your ZIP file
+   - `version` (text) - e.g., "1.1.0"
+   - `channel` (text) - e.g., "production"
+
+## 💡 Tips
+
+1. **Simple is better:** This example focuses on demonstrating the update flow, not production features
+2. **File-based storage:** Perfect for local development and testing
+3. **No authentication:** Add authentication before deploying to production
+4. **Version format:** Use semantic versioning (e.g., 1.0.0, 1.1.0, 2.0.0)
+
+## 📖 Next Steps
+
+- Use this backend with the [React frontend example](../react-capacitor/)
+- Learn about [bundle signing](../../docs/BUNDLE_SIGNING.md) for production
+- Check out the [Firebase backend example](../firebase-backend/) for a serverless alternative
+
+---
+
+**Built with ❤️ by Ahsan Mahmood** | [aoneahsan.com](https://aoneahsan.com)

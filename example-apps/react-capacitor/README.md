@@ -1,216 +1,178 @@
-# Capacitor Native Update - Complete Example
+# React + Capacitor Example
 
-This is a comprehensive example demonstrating all features of the native-update plugin with a React frontend and Firebase Functions backend.
+A **simple, focused** example demonstrating OTA (Over-The-Air) updates with the `native-update` plugin.
 
-## 🚀 Features Demonstrated
+## 🎯 Purpose
 
-### Frontend (React + Capacitor)
-- **Live/OTA Updates**: Download and apply JavaScript updates
-- **App Store Updates**: Check and prompt for native app updates  
-- **App Reviews**: Request in-app reviews at optimal moments
-- **Security**: Bundle signature verification and HTTPS enforcement
-- **Analytics**: Track update metrics and user behavior
-- **Advanced Features**: Background updates, version management, rollback
+This example shows the basic workflow of checking for, downloading, and applying OTA updates in a Capacitor app. **No unnecessary complexity** - just the plugin working.
 
-### Backend (Firebase Functions)
-- **Update API**: Serve bundle updates with versioning
-- **Bundle Management**: Upload, sign, and manage update bundles
-- **Analytics Collection**: Track update performance metrics
-- **Security**: JWT authentication and signed URLs
-- **Storage**: Firebase Storage for bundle files
-- **Database**: Firestore for metadata and analytics
-
-## 📦 Project Structure
-
-```
-example-app/
-├── src/                    # React app source
-│   ├── components/         # Feature demo components
-│   ├── context/           # React context for state
-│   └── App.tsx            # Main app component
-├── firebase-backend/       # Firebase Functions backend
-│   ├── src/
-│   │   ├── routes/        # API endpoints
-│   │   ├── middleware/    # Auth and validation
-│   │   └── utils/         # Helper functions
-│   ├── firebase.json      # Firebase configuration
-│   └── firestore.rules    # Security rules
-├── capacitor.config.ts    # Capacitor configuration
-└── package.json          # Dependencies
-```
-
-## 🛠️ Setup Instructions
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 22+ (for Firebase Functions)
-- Firebase CLI: `npm install -g firebase-tools`
-- Capacitor CLI: `npm install -g @capacitor/cli`
 
-### 1. Install Dependencies
+- Node.js 18+ and pnpm installed
+- A running backend server (see `example-apps/node-express` or `example-apps/firebase-backend`)
 
-```bash
-# Install frontend dependencies
-cd example-app
-yarn install
-
-# Install backend dependencies
-cd firebase-backend
-yarn install
-```
-
-### 2. Configure Firebase
-
-1. Create a new Firebase project at https://console.firebase.google.com
-
-2. Initialize Firebase:
-```bash
-cd firebase-backend
-firebase init
-# Select: Functions, Firestore, Storage
-# Choose your project
-# Select TypeScript
-# Use existing files when prompted
-```
-
-3. Update Firebase configuration in your app
-
-### 3. Generate Security Keys
+### Installation
 
 ```bash
-# Generate RSA key pair for bundle signing
-cd ..
-npx native-update keys generate --type rsa --size 4096
+# From the root of the monorepo
+pnpm install
 
-# Copy the public key to capacitor.config.ts
+# Navigate to this example
+cd example-apps/react-capacitor
+
+# Install dependencies (if not already installed from root)
+pnpm install
 ```
 
-### 4. Deploy Backend
+### Development
 
 ```bash
-cd example-app/firebase-backend
-npm run deploy
+# Start the dev server
+pnpm start
+
+# Open http://localhost:5173
 ```
 
-### 5. Update Configuration
+### Build for Mobile
 
-Edit `capacitor.config.ts`:
+```bash
+# Build the web assets
+pnpm build
+
+# Sync with Capacitor
+pnpm cap:sync
+
+# Run on iOS
+pnpm ios
+
+# Run on Android
+pnpm android
+```
+
+## 📱 How to Test OTA Updates
+
+### Step 1: Start Backend Server
+
+Choose one of the backend examples and start it:
+
+```bash
+# Option 1: Node.js + Express
+cd example-apps/node-express
+pnpm start
+
+# Option 2: Firebase Functions
+cd example-apps/firebase-backend
+pnpm serve
+```
+
+### Step 2: Configure Server URL
+
+Update the server URL in `src/App.tsx` if your backend is running on a different port:
+
+```typescript
+await NativeUpdate.configure({
+  serverUrl: 'http://localhost:3000/api',  // Update this
+  autoCheck: false,
+  channel: 'production',
+});
+```
+
+### Step 3: Test the Update Flow
+
+1. **Click "Check for Updates"** - Checks if a new version is available
+2. **Click "Download Update"** - Downloads the new bundle
+3. **Click "Apply Update & Reload"** - Applies the update and reloads the app
+
+### Step 4: Deploy a New Version
+
+To test that updates actually work:
+
+1. **Change the demo text** in `src/App.tsx`:
+   ```tsx
+   <p>
+     ✨ <strong>This is version 2.0!</strong> ✨
+   </p>
+   ```
+
+2. **Build a new bundle:**
+   ```bash
+   pnpm build
+   ```
+
+3. **Upload to your backend** (see backend README for upload instructions)
+
+4. **Check for updates in the app** - You should see the new text after applying the update!
+
+## 📂 Project Structure
+
+```
+react-capacitor/
+├── src/
+│   ├── App.tsx       # Single component with all logic
+│   ├── App.css       # Simple styles
+│   └── main.tsx      # Entry point
+├── public/           # Static assets
+├── capacitor.config.ts
+├── package.json
+└── README.md
+```
+
+## 🎨 Features Demonstrated
+
+- ✅ **Plugin initialization**
+- ✅ **Check for updates** manually
+- ✅ **Download progress** tracking
+- ✅ **Apply updates** and reload app
+- ✅ **Error handling**
+- ✅ **Status updates** for user feedback
+
+## 🔧 Configuration Options
+
+The plugin is configured with minimal options for simplicity:
+
 ```typescript
 {
-  plugins: {
-    NativeUpdate: {
-      serverUrl: 'https://your-project.cloudfunctions.net/api',
-      publicKey: 'YOUR_BASE64_PUBLIC_KEY',
-      appStoreId: 'YOUR_APP_STORE_ID'
-    }
-  }
+  serverUrl: 'http://localhost:3000/api',  // Backend server URL
+  autoCheck: false,                        // Manual check only
+  channel: 'production',                   // Update channel
 }
 ```
 
-### 6. Run the App
+For all available options, see the main plugin documentation.
 
-```bash
-# Web development
-yarn start
+## 🐛 Troubleshooting
 
-# iOS
-yarn cap:build
-yarn ios
+### "Error: Failed to initialize"
 
-# Android
-yarn cap:build
-yarn android
-```
+- **Cause:** Backend server not running or unreachable
+- **Solution:** Start your backend server and ensure the `serverUrl` is correct
 
-## 📱 Feature Usage
+### "No updates available"
 
-### Live Updates (OTA)
+- **Cause:** No new version uploaded to backend
+- **Solution:** Build and upload a new bundle to your backend server
 
-1. **Check for Updates**: Click "Check for Updates" to query the server
-2. **Download**: Download available updates with progress tracking
-3. **Apply**: Apply the update (app will restart)
-4. **Rollback**: Reset to original bundle if needed
+### App doesn't reload after applying update
 
-### App Store Updates
+- **Cause:** Update might have failed silently
+- **Solution:** Check the browser console for errors
 
-1. **Check Version**: Compare current app version with store version
-2. **Immediate Update**: Force blocking update for critical fixes
-3. **Flexible Update**: Background download with user-controlled install
-4. **Open Store**: Direct link to app store listing
+## 📚 Next Steps
 
-### App Reviews
+- Read the [full plugin documentation](../../docs/)
+- Try the [Node.js backend example](../node-express/)
+- Try the [Firebase backend example](../firebase-backend/)
+- Learn about [bundle signing and security](../../docs/BUNDLE_SIGNING.md)
 
-1. **Smart Request**: Request review after positive interactions
-2. **Rate Limiting**: Respects platform limits (iOS: 3x/year)
-3. **Fallback**: Opens store review page if in-app fails
+## 💡 Tips
 
-### Security Features
+1. **Start simple:** Get basic updates working before adding security features
+2. **Use HTTPS in production:** The demo uses HTTP for simplicity, but always use HTTPS in production
+3. **Test thoroughly:** Test the complete update flow on actual devices, not just in browser
+4. **Monitor backend:** Check your backend logs to see update requests
 
-1. **HTTPS Only**: Enforces secure connections
-2. **Signature Verification**: Validates bundle authenticity
-3. **Certificate Pinning**: Optional enhanced security
-4. **Checksum Validation**: Ensures bundle integrity
+---
 
-### Analytics
-
-1. **Automatic Tracking**: Update events tracked automatically
-2. **Custom Events**: Track user interactions
-3. **Performance Metrics**: Download times and success rates
-4. **Export Data**: Download analytics as JSON/CSV
-
-## 🔧 Backend API Endpoints
-
-### Public Endpoints
-- `GET /api/v1/updates/check` - Check for updates
-- `GET /api/v1/updates/bundle/:id` - Get bundle info
-- `POST /api/v1/updates/report` - Report update result
-- `POST /api/v1/analytics/track` - Track events
-
-### Admin Endpoints (Requires Auth)
-- `POST /api/v1/bundles` - Upload new bundle
-- `GET /api/v1/bundles` - List bundles
-- `PATCH /api/v1/bundles/:id/status` - Update bundle status
-- `POST /api/v1/bundles/:id/sign` - Sign bundle
-
-## 🚀 Creating Updates
-
-1. **Build your web app**:
-```bash
-yarn build
-```
-
-2. **Create bundle**:
-```bash
-npx native-update bundle create ./dist
-```
-
-3. **Sign bundle**:
-```bash
-npx native-update bundle sign bundle.zip --key private-key.pem
-```
-
-4. **Upload via Admin API** or Firebase Console
-
-## 🔒 Security Best Practices
-
-1. **Never commit keys**: Keep private keys secure
-2. **Use HTTPS**: Always use secure connections
-3. **Validate bundles**: Check signatures and checksums
-4. **Monitor failures**: Track failed update attempts
-5. **Test thoroughly**: Test updates on all platforms
-
-## 📊 Monitoring
-
-The Firebase backend includes:
-- Real-time analytics dashboard
-- Update success/failure rates
-- Performance metrics
-- Error tracking
-- User engagement data
-
-## 🤝 Contributing
-
-See the main project's [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
-
-## 📝 License
-
-MIT - see [LICENSE](../LICENSE) for details.
+**Built with ❤️ by Ahsan Mahmood** | [aoneahsan.com](https://aoneahsan.com)

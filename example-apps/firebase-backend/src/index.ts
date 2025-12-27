@@ -2,13 +2,12 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import express from 'express';
 import cors from 'cors';
-import { updateRoutes } from './routes/updates';
-import { bundleRoutes } from './routes/bundles';
-import { analyticsRoutes } from './routes/analytics';
-import { authMiddleware } from './middleware/auth';
+import multer from 'multer';
 
 // Initialize Firebase Admin
 admin.initializeApp();
+const db = admin.firestore();
+const storage = admin.storage().bucket();
 
 // Create Express app
 const app = express();
@@ -17,95 +16,127 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 
+// Setup file upload
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+});
+
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+  res.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
   });
 });
 
-// API Routes
-app.use('/api/v1/updates', updateRoutes);
-app.use('/api/v1/bundles', authMiddleware, bundleRoutes);
-app.use('/api/v1/analytics', analyticsRoutes);
+// Check for updates
+app.get('/api/updates/check', async (req, res) => {
+  try {
+    const { version, channel = 'production' } = req.query;
 
-// Export the API
-export const api = functions.https.onRequest(app);
-
-// Scheduled function to clean old bundles
-export const cleanupOldBundles = functions.pubsub
-  .schedule('every 24 hours')
-  .onRun(async (context) => {
-    const db = admin.firestore();
-    const storage = admin.storage();
-    
-    // Delete bundles older than 30 days
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - 30);
-    
-    const oldBundles = await db.collection('bundles')
-      .where('createdAt', '<', cutoffDate)
-      .where('status', '!=', 'active')
+    // Get latest bundle for channel
+    const snapshot = await db
+      .collection('bundles')
+      .where('channel', '==', channel)
+      .where('active', '==', true)
+      .orderBy('timestamp', 'desc')
+      .limit(1)
       .get();
-    
-    for (const doc of oldBundles.docs) {
-      const bundle = doc.data();
-      
-      // Delete from storage
-      try {
-        await storage.bucket()
-          .file(`bundles/${bundle.channel}/${bundle.bundleId}/bundle.zip`)
-          .delete();
-      } catch (error) {
-        console.error(`Failed to delete bundle file: ${error}`);
-      }
-      
-      // Delete from Firestore
-      await doc.ref.delete();
-    }
-    
-    console.log(`Cleaned up ${oldBundles.size} old bundles`);
-  });
 
-// Function to process bundle after upload
-export const processBundleUpload = functions.storage
-  .object()
-  .onFinalize(async (object) => {
-    if (!object.name?.startsWith('temp/')) {
-      return;
+    if (snapshot.empty) {
+      return res.json({
+        available: false,
+        message: 'No updates available',
+      });
     }
-    
-    const db = admin.firestore();
-    const uploadId = object.name.split('/')[1];
-    
-    // Get upload metadata
-    const uploadDoc = await db.collection('uploads').doc(uploadId).get();
-    if (!uploadDoc.exists) {
-      console.error(`Upload document not found: ${uploadId}`);
-      return;
-    }
-    
-    const uploadData = uploadDoc.data()!;
-    
-    // Move file to permanent location
-    const bucket = admin.storage().bucket();
-    const tempFile = bucket.file(object.name);
-    const permanentPath = `bundles/${uploadData.channel}/${uploadData.bundleId}/bundle.zip`;
-    
-    await tempFile.move(permanentPath);
-    
-    // Update bundle document
-    await db.collection('bundles').doc(uploadData.bundleId).update({
-      status: 'ready',
-      storageUrl: permanentPath,
-      size: object.size,
-      processedAt: admin.firestore.FieldValue.serverTimestamp()
+
+    const latestBundle = snapshot.docs[0].data();
+    const updateAvailable = latestBundle.version !== version;
+
+    res.json({
+      available: updateAvailable,
+      latestVersion: latestBundle.version,
+      downloadUrl: latestBundle.downloadUrl,
+      size: latestBundle.size,
+      releaseNotes: latestBundle.releaseNotes || 'Bug fixes and improvements',
     });
-    
-    // Clean up upload document
-    await uploadDoc.ref.delete();
-    
-    console.log(`Processed bundle: ${uploadData.bundleId}`);
-  });
+  } catch (error) {
+    console.error('Error checking for updates:', error);
+    res.status(500).json({ error: 'Failed to check for updates' });
+  }
+});
+
+// Upload bundle
+app.post('/api/bundles/upload', upload.single('bundle'), async (req, res) => {
+  try {
+    const { version, channel = 'production', releaseNotes } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const bundleId = `bundle-${Date.now()}`;
+    const filePath = `bundles/${channel}/${bundleId}.zip`;
+
+    // Upload to Firebase Storage
+    const file = storage.file(filePath);
+    await file.save(req.file.buffer, {
+      metadata: {
+        contentType: 'application/zip',
+      },
+    });
+
+    // Make file public
+    await file.makePublic();
+
+    // Get download URL
+    const downloadUrl = `https://storage.googleapis.com/${storage.name}/${filePath}`;
+
+    // Save metadata to Firestore
+    const bundleData = {
+      id: bundleId,
+      version,
+      channel,
+      downloadUrl,
+      size: req.file.size,
+      releaseNotes,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      active: true,
+    };
+
+    await db.collection('bundles').doc(bundleId).set(bundleData);
+
+    res.json({
+      success: true,
+      bundle: bundleData,
+      message: 'Bundle uploaded successfully',
+    });
+  } catch (error) {
+    console.error('Error uploading bundle:', error);
+    res.status(500).json({ error: 'Failed to upload bundle' });
+  }
+});
+
+// List all bundles
+app.get('/api/bundles', async (req, res) => {
+  try {
+    const snapshot = await db
+      .collection('bundles')
+      .orderBy('timestamp', 'desc')
+      .get();
+
+    const bundles = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.json(bundles);
+  } catch (error) {
+    console.error('Error listing bundles:', error);
+    res.status(500).json({ error: 'Failed to list bundles' });
+  }
+});
+
+// Export the Cloud Function
+export const api = functions.https.onRequest(app);
