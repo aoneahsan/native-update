@@ -59,8 +59,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/examples" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
-                  Examples
+                <Link to="/login" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to="/signup" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Sign Up
                 </Link>
               </li>
             </ul>
@@ -111,14 +116,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href="https://aoneahsan.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-gray-600 hover:text-brand-600 transition-colors"
-                >
-                  Portfolio
-                </a>
+                <Link to="/privacy" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">
+                  Terms of Service
+                </Link>
               </li>
             </ul>
           </div>

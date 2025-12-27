@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { MarketingLayout } from '@/components/layout/MarketingLayout';
 
 // Auth Pages
 import LoginPage from '@/pages/auth/LoginPage';
@@ -28,41 +29,46 @@ import ConfigPage from '@/pages/dashboard/ConfigPage';
 import SettingsPage from '@/pages/dashboard/SettingsPage';
 
 export const router = createBrowserRouter([
-  // Marketing Pages
+  // Marketing Pages with Header/Footer
   {
-    path: '/',
-    element: <HomePage />,
-  },
-  {
-    path: '/features',
-    element: <FeaturesPage />,
-  },
-  {
-    path: '/pricing',
-    element: <PricingPage />,
-  },
-  {
-    path: '/docs',
-    element: <DocsPage />,
-  },
-  {
-    path: '/about',
-    element: <AboutPage />,
-  },
-  {
-    path: '/contact',
-    element: <ContactPage />,
-  },
-  {
-    path: '/privacy',
-    element: <PrivacyPage />,
-  },
-  {
-    path: '/terms',
-    element: <TermsPage />,
+    element: <MarketingLayout />,
+    children: [
+      {
+        path: '/',
+        element: <HomePage />,
+      },
+      {
+        path: '/features',
+        element: <FeaturesPage />,
+      },
+      {
+        path: '/pricing',
+        element: <PricingPage />,
+      },
+      {
+        path: '/docs',
+        element: <DocsPage />,
+      },
+      {
+        path: '/about',
+        element: <AboutPage />,
+      },
+      {
+        path: '/contact',
+        element: <ContactPage />,
+      },
+      {
+        path: '/privacy',
+        element: <PrivacyPage />,
+      },
+      {
+        path: '/terms',
+        element: <TermsPage />,
+      },
+    ],
   },
 
-  // Auth Pages
+  // Auth Pages (no header/footer)
   {
     path: '/login',
     element: <LoginPage />,

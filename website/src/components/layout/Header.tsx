@@ -1,9 +1,22 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from '@/components/ui/Container';
 import { Button } from '@/components/ui/Button';
-import { GitHubLogoIcon } from '@radix-ui/react-icons';
+import { GitHubLogoIcon, HamburgerMenuIcon, Cross1Icon } from '@radix-ui/react-icons';
+import { useAuth } from '@/context/AuthContext';
+
+const navLinks = [
+  { to: '/features', label: 'Features' },
+  { to: '/docs', label: 'Docs' },
+  { to: '/pricing', label: 'Pricing' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+];
 
 export function Header() {
+  const { user, loading } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <Container>
@@ -17,25 +30,19 @@ export function Header() {
             </Link>
 
             <nav className="hidden md:flex md:gap-6">
-              <Link to="/features" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors">
-                Features
-              </Link>
-              <Link to="/docs" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors">
-                Docs
-              </Link>
-              <Link to="/examples" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors">
-                Examples
-              </Link>
-              <Link to="/pricing" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors">
-                Pricing
-              </Link>
-              <Link to="/about" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors">
-                About
-              </Link>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <a
               href="https://github.com/aoneahsan/native-update"
               target="_blank"
@@ -47,13 +54,72 @@ export function Header() {
                 GitHub
               </Button>
             </a>
-            <Link to="/contact">
-              <Button variant="primary" size="sm">
-                Get Started
-              </Button>
-            </Link>
+
+            {!loading && (
+              <>
+                {user ? (
+                  <Link to="/dashboard">
+                    <Button variant="primary" size="sm">
+                      Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/login" className="hidden sm:inline-flex">
+                      <Button variant="ghost" size="sm">
+                        Login
+                      </Button>
+                    </Link>
+                    <Link to="/signup">
+                      <Button variant="primary" size="sm">
+                        Sign Up Free
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+            >
+              {mobileMenuOpen ? (
+                <Cross1Icon className="h-5 w-5" />
+              ) : (
+                <HamburgerMenuIcon className="h-5 w-5" />
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <nav className="flex flex-col gap-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-600 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {!loading && !user && (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-600 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  Login
+                </Link>
+              )}
+            </nav>
+          </div>
+        )}
       </Container>
     </header>
   );
