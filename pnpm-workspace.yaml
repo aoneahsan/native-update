@@ -1,0 +1,9 @@
+packages:
+  # Main plugin package
+  - '.'
+  # Example applications
+  - 'example-apps/*'
+  # CLI tool
+  - 'cli'
+  # Marketing website (to be created)
+  - 'website'

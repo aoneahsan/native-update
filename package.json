@@ -22,8 +22,7 @@
     "ios/Plugin/",
     "NativeUpdate.podspec",
     "docs/",
-    "cli/",
-    "backend-template/"
+    "cli/"
   ],
   "author": {
     "name": "Ahsan Mahmood",

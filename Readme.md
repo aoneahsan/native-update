@@ -1,17 +1,17 @@
 # Capacitor Native Update Plugin
 
 > ⚠️ **IMPORTANT: Production-Ready with Complete Examples** ⚠️
-> 
+>
 > This package is now **feature-complete** with significant improvements:
-> 
-> - ✅ **Production Backend Example Included** - Full server implementation in `production-backend/`
-> - ✅ **Complete Example App** - React + Firebase Functions in `example-app/`
+>
+> - ✅ **pnpm Workspace Monorepo** - Seamless development with workspace:* references
+> - ✅ **3 Complete Examples** - React+Capacitor frontend, Node.js+Express and Firebase backends in `example-apps/`
 > - ✅ **Native Implementations Complete** - iOS (Swift) and Android (Kotlin) fully implemented
 > - ✅ **Comprehensive Test Suite** - Unit and integration tests with Vitest
 > - ✅ **Development Tools Included** - Bundle creator, signer, and CLI tools
 > - ✅ **Security Features Implemented** - HTTPS enforcement, signatures, checksums
-> 
-> **🚀 Try the complete example app in `example-app/` to see all features in action!**
+>
+> **🚀 Try the example apps in `example-apps/` to see all features in action!**
 
 ## 📚 Documentation
 
@@ -288,30 +288,44 @@ This plugin implements multiple security layers:
 - **Checksum validation** before applying updates
 - **Certificate pinning** support for enhanced security
 
-## 🎯 Complete Example Implementation
+## 🎯 Complete Example Implementations
 
-### Full-Featured Example App
+This repository uses **pnpm workspace** for seamless development. All examples reference the local plugin via `workspace:*` - no need to publish to npm for testing!
 
-The **[example-app](./example-app)** directory contains a complete, production-ready implementation:
+### Frontend Example: React + Capacitor
 
-#### Frontend (React + Capacitor)
-- ✅ All plugin features demonstrated
-- ✅ Live update management UI
-- ✅ App store update integration
-- ✅ In-app review prompts
-- ✅ Security implementation
-- ✅ Analytics dashboard
-- ✅ Error handling & recovery
+**[example-apps/react-capacitor](./example-apps/react-capacitor)**
 
-#### Backend (Firebase Functions)
-- ✅ Complete update server
+- ✅ Simple, focused demonstration of OTA updates
+- ✅ Single-page app with "change this text and deploy" example
+- ✅ Capacitor integration (iOS + Android)
+- ✅ TypeScript + Vite for modern development
+- ✅ Uses local plugin via workspace reference
+
+### Backend Examples
+
+#### 1. Node.js + Express Backend
+
+**[example-apps/node-express](./example-apps/node-express)**
+
+- ✅ Production-ready update server
 - ✅ Bundle management API
+- ✅ SQLite database for bundle tracking
 - ✅ Authentication & security
-- ✅ Analytics collection
-- ✅ Firestore + Storage integration
+- ✅ Rate limiting and compression
+- ✅ Signature verification
+
+#### 2. Firebase Functions Backend
+
+**[example-apps/firebase-backend](./example-apps/firebase-backend)**
+
+- ✅ Serverless architecture with Firebase
+- ✅ Cloud Functions for bundle management
+- ✅ Firestore for bundle metadata
+- ✅ Firebase Storage for bundle hosting
 - ✅ Auto-scaling infrastructure
 
-**🚀 Get started:** See [example-app/README.md](./example-app/README.md) for setup instructions.
+**🚀 Get started:** Each example app has its own README with setup instructions.
 
 ## Contributing
 

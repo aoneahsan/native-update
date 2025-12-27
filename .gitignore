@@ -1,57 +1,70 @@
-# Node modules
-node_modules/
-
 # Build output
 dist/
 build/
+www/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+lerna-debug.log*
 
 # IDE files
-.idea/
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 .DS_Store
 
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Custom ignore patterns (ALWAYS EXCLUDE)
+*.ignore.*
+project-record-ignore/
 
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Example app specific
-example/node_modules/
-example/dist/
-example/build/
-example/android/
-example/ios/
-
-# Native projects (for plugin development, these are generated)
-android/.gradle/
+# Capacitor
 android/build/
+android/.gradle/
 android/local.properties
-ios/Pods/
+android/*.apk
+android/*.ipa
+android/app/build/
 ios/build/
+ios/Pods/
 ios/DerivedData/
+ios/*.ipa
+
+# Example apps build artifacts
+example-apps/*/dist/
+example-apps/*/build/
+example-apps/*/www/
+example-apps/*/node_modules/
+example-apps/react-capacitor/android/build/
+example-apps/react-capacitor/android/.gradle/
+example-apps/react-capacitor/android/local.properties
+example-apps/react-capacitor/ios/build/
+example-apps/react-capacitor/ios/Pods/
+example-apps/react-capacitor/ios/DerivedData/
+
+# Testing
+coverage/
+.nyc_output/
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
 
-# Coverage
-coverage/
-.nyc_output/
+# Package tarballs
+*.tgz
 
-# Package lock files (using yarn)
+# Lock files (using pnpm)
 package-lock.json
+yarn.lock
 
-
-native-update*.tgz
+# NOTE: This is a PRIVATE repository
+# .env files and secrets ARE included in git for team access
+# If this becomes public, update .gitignore to exclude sensitive files

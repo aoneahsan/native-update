@@ -2,6 +2,77 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 📏 PROJECT STRUCTURE SYNC STATUS
+| Metric | Value | Last Updated |
+|--------|-------|--------------|
+| Project Type | Capacitor Plugin Package | 2025-12-27 |
+| Package Manager | pnpm@9.15.4 | 2025-12-27 |
+| Workspace Setup | ✅ Monorepo with pnpm workspace | 2025-12-27 |
+| Example Apps Structure | ✅ Consolidated to 3 apps | 2025-12-27 |
+| Docs Organization | ✅ All docs in /docs folder | 2025-12-27 |
+| .gitignore Configuration | ✅ Private repo mode | 2025-12-27 |
+
+**Last Major Restructure:** 2025-12-27
+
+## Project Type Context
+
+**This is a Capacitor Plugin Package** - Many global CLAUDE.md rules do NOT apply:
+
+### ❌ Rules That DO NOT Apply to This Project:
+- No RadixUI/ShadCN (this is a plugin, not a UI app)
+- No analytics setup (Firebase Analytics, Clarity, Amplitude)
+- No user authentication or accounts
+- No privacy pages, terms, about pages (plugin, not end-user app)
+- No sitemap
+- No app store assets (plugin is distributed via npm)
+- No advertising panels
+- No theme customizers
+- No responsive design concerns (no UI)
+
+### ✅ Rules That DO Apply:
+- pnpm package manager exclusively
+- SVG for all visual assets (logos, diagrams in docs)
+- No .sh scripts policy
+- *.ignore.* and project-record-ignore/ gitignore patterns
+- Clean build output (zero warnings/errors)
+- ESLint configuration (no @eslint/js)
+- Documentation organization in /docs folder
+- pnpm workspace for monorepo structure
+
+## Monorepo Structure
+
+This project uses **pnpm workspace** to manage the plugin and example apps:
+
+```
+/
+├── src/                    # Main plugin source code
+├── cli/                    # CLI tool for bundle management
+├── android/                # Android native implementation
+├── ios/                    # iOS native implementation
+├── docs/                   # All documentation
+├── example-apps/           # Example applications
+│   ├── react-capacitor/    # React + Capacitor + Vite frontend example
+│   ├── firebase-backend/   # Firebase Functions backend example
+│   └── node-express/       # Node.js + Express backend example
+├── website/                # Marketing website (separate React app)
+└── pnpm-workspace.yaml     # Workspace configuration
+```
+
+**Workspace Benefits:**
+- Example apps use `native-update: workspace:*` to reference local plugin
+- No need to publish plugin to test in example apps
+- Build plugin → changes automatically available in example apps
+- Single `pnpm install` at root installs all dependencies
+
+## Example Apps Guidelines
+
+**Keep Example Apps SIMPLE:**
+- Frontend: Single page demonstrating OTA updates ("change this text and deploy")
+- Backend: Minimal setup - just enough to show plugin working
+- No unnecessary complexity or features
+- Focus on showcasing THIS plugin only
+- Use SVG assets for all visual elements
+
 ## Project Overview
 
 This is a Capacitor plugin project called "native-update" that provides a comprehensive update solution combining:
