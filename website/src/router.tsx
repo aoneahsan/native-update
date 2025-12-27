@@ -5,8 +5,6 @@ import { MarketingLayout } from '@/components/layout/MarketingLayout';
 // Auth Pages
 import LoginPage from '@/pages/auth/LoginPage';
 import SignupPage from '@/pages/auth/SignupPage';
-import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
-import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 
 // Marketing Pages
 import HomePage from '@/pages/HomePage';
@@ -91,14 +89,6 @@ export const router = createBrowserRouter([
   {
     path: '/signup',
     element: <SignupPage />,
-  },
-  {
-    path: '/verify-email',
-    element: <VerifyEmailPage />,
-  },
-  {
-    path: '/forgot-password',
-    element: <ForgotPasswordPage />,
   },
 
   // Dashboard (Protected Routes)
