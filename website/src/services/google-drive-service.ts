@@ -83,7 +83,12 @@ interface GapiFileResponse {
 }
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+// Scopes: drive.file for Drive access, userinfo.email for getting user's email
+const GOOGLE_SCOPES = [
+  'https://www.googleapis.com/auth/drive.file',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile',
+].join(' ');
 const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3';
 const DRIVE_UPLOAD_BASE = 'https://www.googleapis.com/upload/drive/v3';
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
@@ -127,7 +132,7 @@ class GoogleDriveService {
     return new Promise((resolve, reject) => {
       this.tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_CLIENT_ID,
-        scope: GOOGLE_DRIVE_SCOPE,
+        scope: GOOGLE_SCOPES,
         prompt: 'consent',
         callback: async (response: GapiAuthResponse) => {
           if (response.error) {
@@ -141,23 +146,36 @@ class GoogleDriveService {
 
             const userInfo = await this.getUserInfo(response.access_token);
 
+            // Store comprehensive drive token and user info in Firestore
             await setDoc(doc(db, 'drive_tokens', userId), {
               userId,
               accessToken: response.access_token,
-              refreshToken: '',
+              refreshToken: '', // Implicit flow doesn't provide refresh token
               tokenType: response.token_type,
               scope: scopes,
               expiresAt,
+              // Google account info from the connected Drive account
+              googleAccountEmail: userInfo.email,
+              googleAccountName: userInfo.name,
+              googleAccountPicture: userInfo.picture,
+              googleAccountId: userInfo.googleId,
+              googleAccountLocale: userInfo.locale,
+              // Security metadata
               encryptionMethod: 'client-side-implicit-flow',
               iv: '',
               authTag: '',
+              // Timestamps
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
             });
 
+            // Update user document with Drive connection status
             await updateDoc(doc(db, 'users', userId), {
               driveConnected: true,
               driveEmail: userInfo.email,
+              driveName: userInfo.name,
+              drivePicture: userInfo.picture,
+              driveGoogleId: userInfo.googleId,
               driveConnectedAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
             });
@@ -202,6 +220,9 @@ class GoogleDriveService {
     await updateDoc(doc(db, 'users', userId), {
       driveConnected: false,
       driveEmail: null,
+      driveName: null,
+      drivePicture: null,
+      driveGoogleId: null,
       driveConnectedAt: null,
       updatedAt: serverTimestamp(),
     });
@@ -212,7 +233,7 @@ class GoogleDriveService {
       if (!this.tokenClient) {
         this.tokenClient = google.accounts.oauth2.initTokenClient({
           client_id: GOOGLE_CLIENT_ID,
-          scope: GOOGLE_DRIVE_SCOPE,
+          scope: GOOGLE_SCOPES,
           prompt: '',
           callback: async (response: GapiAuthResponse) => {
             if (response.error) {
@@ -560,7 +581,13 @@ class GoogleDriveService {
     return tokenData.accessToken;
   }
 
-  private async getUserInfo(accessToken: string): Promise<{ email: string }> {
+  private async getUserInfo(accessToken: string): Promise<{
+    email: string;
+    name: string | null;
+    picture: string | null;
+    googleId: string;
+    locale: string | null;
+  }> {
     const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -568,11 +595,19 @@ class GoogleDriveService {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to get user info from Google');
+      const errorText = await response.text();
+      console.error('Failed to get user info:', response.status, errorText);
+      throw new Error(`Failed to get user info from Google: ${response.status}`);
     }
 
     const data = await response.json();
-    return { email: data.email };
+    return {
+      email: data.email || '',
+      name: data.name || null,
+      picture: data.picture || null,
+      googleId: data.id || '',
+      locale: data.locale || null,
+    };
   }
 
   private async blobToBase64(blob: Blob): Promise<string> {
