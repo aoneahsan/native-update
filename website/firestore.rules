@@ -13,11 +13,6 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Helper function to check if user email is verified
-    function isEmailVerified() {
-      return isAuthenticated() && request.auth.token.email_verified == true;
-    }
-    
     // Users collection - user can only access their own document
     match /users/{userId} {
       allow read: if isOwner(userId);
